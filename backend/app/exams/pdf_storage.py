@@ -10,7 +10,14 @@ from uuid import UUID
 
 import fitz
 
-from app.exams.pdf_import import PdfQuestion, render_region, validate_pdf
+from app.exams.pdf_import import (
+    PdfQuestion,
+    graphic_boxes,
+    render_region,
+    repeated_bands,
+    validate_pdf,
+    white_horizontal_border,
+)
 
 MIN_CROP_HEIGHT = 30.0
 MAX_RENDER_DPI = 300
@@ -75,7 +82,7 @@ def regenerate_crops(
     question_number: int,
     regions: list[dict] | None = None,
     *,
-    dpi: int = 200,
+    dpi: int = 220,
     padding: float = 0.0,
 ) -> list[dict]:
     """Validate and re-render a question from its stored original PDF.
@@ -99,6 +106,7 @@ def regenerate_crops(
         raise ValueError("At least one page region is required")
     doc = validate_pdf(source.read_bytes())
     try:
+        bands = repeated_bands(doc)
         previous_page = 0
         images: list[bytes] = []
         normalized: list[dict] = []
@@ -132,7 +140,15 @@ def regenerate_crops(
                 min(page.rect.width, x1 + padding),
                 min(page.rect.height, y1 + padding),
             )
-            images.append(page.get_pixmap(clip=clip, dpi=dpi, alpha=False).tobytes("png"))
+            if any(box.intersects(clip) and not clip.contains(box)
+                   for box in graphic_boxes(page, bands[page_number - 1])):
+                raise ValueError("Crop failed: partially clipped graphic; expand the crop.")
+            pix = page.get_pixmap(clip=clip, dpi=dpi, alpha=False)
+            if not white_horizontal_border(pix):
+                raise ValueError(
+                    "Crop failed: non-white pixels touch the top or bottom 2px border."
+                )
+            images.append(pix.tobytes("png"))
             normalized.append({"page": page_number, "bbox": [x0, y0, x1, y1]})
             previous_page = page_number
     finally:

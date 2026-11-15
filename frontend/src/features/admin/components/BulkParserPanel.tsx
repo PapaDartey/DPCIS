@@ -297,6 +297,10 @@ export function BulkParserPanel({
     mode: "append" | "replace",
     includeInvalidNote: boolean,
   ) => {
+    if (items.some((item) => item.errors.some((message) => message.startsWith("Crop failed:")))) {
+      setRequestError("Repair failed crops in the preview before importing these questions.");
+      return;
+    }
     const mapped = items.map(fromParsedQuestion);
     const editable = mode === "replace"
       ? mapped
@@ -471,7 +475,7 @@ export function BulkParserPanel({
             <input
               id={`${baseId}-file`}
               type="file"
-              accept=".pdf,application/pdf"
+              accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
               disabled={disabled || isParsing || isReadingFile}
               className="sr-only"
               onChange={(event) => {
@@ -480,8 +484,8 @@ export function BulkParserPanel({
               }}
             />
           </Label>
-          <p className="mt-2 text-xs text-muted-foreground">Or drag and drop a PDF up to 100 MB. The PDF must contain selectable text. Preview before publishing.</p>
-          {questionFile ? <p className="mt-2 text-xs font-medium text-foreground">Question PDF ready: {questionFile.name}</p> : null}
+          <p className="mt-2 text-xs text-muted-foreground">Or drag and drop a PDF, PNG, or JPG up to 100 MB. Scans use white-gap detection; review the suggested question boundaries before saving.</p>
+          {questionFile ? <p className="mt-2 text-xs font-medium text-foreground">Question file ready: {questionFile.name}</p> : null}
         </div>
         </div>
 
@@ -538,7 +542,7 @@ export function BulkParserPanel({
         {questionFile && answerFileName ? (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
             <div>
-              <p className="font-semibold">Both PDF files are ready</p>
+              <p className="font-semibold">Both import files are ready</p>
               <p className="text-sm text-muted-foreground">Save the matched questions and correct answers, then continue to Settings.</p>
             </div>
             <Button type="button" disabled={disabled || isSavingImport || isParsing || isReadingFile}
@@ -606,6 +610,11 @@ export function BulkParserPanel({
               </div>
             </div>
             <div id={`${baseId}-preview-content`} hidden={!previewExpanded} className="space-y-4">
+            {parseResult.scan_mode ? (
+              <p role="status" className="text-sm text-muted-foreground">
+                Scan mode: questions were split at white gaps. Review boundaries and provisional numbering before saving.
+              </p>
+            ) : null}
             {parseResult.ocr_used ? (
               <Alert role="status">
                 <AlertTitle>OCR used</AlertTitle>
@@ -671,7 +680,7 @@ export function BulkParserPanel({
                     I have reviewed the answer-key count mismatch and will correct any missing answers before saving.
                   </label>
                 ) : null}
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-2.5 [&_button]:max-w-full [&_button]:whitespace-normal">
                   {parseResult.valid_questions.length > 0 ? (
                     <>
                       <Button
@@ -778,14 +787,16 @@ export function BulkParserPanel({
                             pageDimensions={parseResult.page_dimensions ?? []}
                             onUpdated={(regions, imageUrls) => setParseResult((current) => {
                               if (!current) return current;
-                              const update = (question: ParsedQuestion) => question.position === block.position
-                                ? { ...question, image_regions: regions, image_urls: imageUrls }
-                                : question;
-                              return {
-                                ...current,
-                                valid_questions: current.valid_questions.map(update),
-                                invalid_questions: current.invalid_questions.map(update),
-                              };
+                              const updated = [...current.valid_questions, ...current.invalid_questions]
+                                .sort((a, b) => a.position - b.position)
+                                .map((question) => {
+                                  if (question.position !== block.position) return question;
+                                  const errors = question.errors.filter((message) => !message.startsWith("Crop failed:"));
+                                  return { ...question, image_regions: regions, image_urls: imageUrls,
+                                    errors, valid: !!question.answer_label && errors.length === 0 && !keyMismatch,
+                                    warnings: (question.warnings ?? []).filter((message) => !message.startsWith("Crop failed:")) };
+                                });
+                              return rebuildPreview(updated, current);
                             })} />
                         ) : null}
                         {block.source_file_id && block.image_regions?.length ? (
@@ -812,7 +823,7 @@ export function BulkParserPanel({
                         ) : null}
                         <p className="mt-2 text-xs">Marks: {block.points}</p>
                         {block.warnings?.map((warning) => (
-                          <p key={warning} className="mt-1 text-xs text-amber-700">{warning}</p>
+                          <p key={warning} className="mt-1 text-xs text-[var(--warn)]">{warning}</p>
                         ))}
 
                         {block.options.length > 0 ? (

@@ -418,6 +418,7 @@ class ParseQuestionsResponse(BaseModel):
     normalized_answer_key: str | None = None
     page_dimensions: list[tuple[float, float]] = Field(default_factory=list)
     ocr_used: bool = False
+    scan_mode: bool = False
 
 
 class CropRegionInput(BaseModel):
@@ -427,7 +428,7 @@ class CropRegionInput(BaseModel):
 
 class CropUpdateRequest(BaseModel):
     regions: list[CropRegionInput] = Field(min_length=1, max_length=20)
-    dpi: int = Field(default=200, ge=72, le=300)
+    dpi: int = Field(default=220, ge=72, le=300)
     padding: float = Field(default=0.0, ge=0, le=30)
 
 

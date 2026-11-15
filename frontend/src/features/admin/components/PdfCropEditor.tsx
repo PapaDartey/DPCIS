@@ -17,7 +17,7 @@ interface Props {
 
 export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: Props) {
   const [regions, setRegions] = useState<Region[]>(question.image_regions ?? []);
-  const [dpi, setDpi] = useState(200);
+  const [dpi, setDpi] = useState(220);
   const [padding, setPadding] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);

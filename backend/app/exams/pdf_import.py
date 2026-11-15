@@ -19,7 +19,7 @@ import fitz
 
 MAX_PDF_BYTES = 100 * 1024 * 1024
 MAX_PAGES = 200
-RENDER_DPI = 200
+RENDER_DPI = 220
 PADDING = 8.0
 
 
@@ -38,6 +38,7 @@ class PdfQuestion:
     warnings: list[str] = field(default_factory=list)
     options_kind: str = "text"
     section: str | None = None
+    crop_valid: bool = True
 
 
 class OCRUnavailable(ValueError):
@@ -60,6 +61,78 @@ def validate_pdf(data: bytes) -> fitz.Document:
         doc.close()
         raise ValueError(f"The PDF must contain 1 to {MAX_PAGES} pages.")
     return doc
+
+
+def open_question_upload(data: bytes) -> fitz.Document:
+    """Normalize supported raster uploads to PDF using PyMuPDF alone."""
+    if len(data) > MAX_PDF_BYTES:
+        raise ValueError("Choose a file up to 100 MB.")
+    kind = "png" if data.startswith(b"\x89PNG\r\n\x1a\n") else (
+        "jpeg" if data.startswith(b"\xff\xd8\xff") else None
+    )
+    if kind is None:
+        return validate_pdf(data)
+    try:
+        with fitz.open(stream=data, filetype=kind) as image:
+            return validate_pdf(image.convert_to_pdf())
+    except Exception as exc:
+        raise ValueError("The uploaded image could not be opened.") from exc
+
+
+def detect_scan_questions(doc: fitz.Document) -> list[PdfQuestion]:
+    """Split raster content at >=24 blank analysis rows, without OCR assumptions.
+
+    Pure Python row traversal with C-level bytes.translate/count is O(pixels).
+    Gaps are heuristics: numbers are provisional and require administrator review.
+    Noisy/skewed pages fail closed as one editable page region, never disappear.
+    """
+    questions: list[PdfQuestion] = []
+    table = bytes(1 if value < 200 else 0 for value in range(256))
+    for page_index, page in enumerate(doc):
+        pix = page.get_pixmap(dpi=120, colorspace=fitz.csGRAY, alpha=False)
+        samples = pix.samples
+        blank = [
+            samples[y * pix.stride:y * pix.stride + pix.width].translate(table).count(1)
+            <= pix.width * .003
+            for y in range(pix.height)
+        ]
+        noisy = sum(blank) / len(blank) < .05
+        runs: list[tuple[int, int]] = []
+        start: int | None = None
+        last_content = 0
+        for y, is_blank in enumerate(blank):
+            if not is_blank:
+                if start is None:
+                    start = y
+                elif y - last_content - 1 >= 24:
+                    runs.append((start, last_content + 1))
+                    start = y
+                last_content = y
+        if start is not None:
+            runs.append((start, last_content + 1))
+        if noisy or not runs:
+            runs = [(0, pix.height)]
+        for first, last in runs:
+            rect = fitz.Rect(
+                0, max(0, first * page.rect.height / pix.height - PADDING),
+                page.rect.width,
+                min(page.rect.height, last * page.rect.height / pix.height + PADDING),
+            )
+            warnings = [
+                "Scan mode: white-gap split; question numbers are provisional. Review boundaries."
+            ]
+            valid = not noisy and any(not row for row in blank)
+            if not valid:
+                warnings.append("Crop failed: needs manual crop (noisy, skewed, or blank page).")
+            final = page.get_pixmap(clip=rect, dpi=RENDER_DPI, alpha=False)
+            if not white_horizontal_border(final):
+                valid = False
+                warnings.append("Crop failed: non-white pixels touch the top or bottom 2px border.")
+            questions.append(PdfQuestion(
+                number=len(questions) + 1, regions=[PdfRegion(page_index + 1, tuple(rect))],
+                warnings=warnings, crop_valid=valid,
+            ))
+    return questions
 
 
 def repeated_bands(doc: fitz.Document) -> dict[int, list[tuple[float, float]]]:
@@ -98,9 +171,17 @@ def _ordered_words(page: fitz.Page) -> list[tuple[Any, ...]]:
     return sorted(words, key=lambda w: (w[1], w[0]))
 
 
-def _graphic_regions(page: fitz.Page) -> list[fitz.Rect]:
+def _graphic_regions(
+    page: fitz.Page, bands: list[tuple[float, float]] | None = None,
+) -> list[fitz.Rect]:
     """Coalesce adjacent vector strokes into tables and drawings."""
     pieces = [fitz.Rect(item["rect"]) for item in page.get_drawings()]
+    # Keep zero-area strokes here only to recognize table interiors for header
+    # detection. Crop attribution uses nonempty graphic_boxes instead.
+    pieces = [piece for piece in pieces
+              if not (piece.width > page.rect.width * .9
+                      and piece.height > page.rect.height * .9)
+              and not _excluded(piece.y0, piece.y1, bands or [])]
     groups: list[fitz.Rect] = []
     for piece in pieces:
         merged = piece
@@ -133,10 +214,82 @@ def _inside_graphic(word: tuple, regions: list[fitz.Rect]) -> bool:
     return any(region.contains(centre) for region in regions)
 
 
+def graphic_boxes(page: fitz.Page, bands: list[tuple[float, float]]) -> list[fitz.Rect]:
+    """Keep actual vector/image bounds; exclude backgrounds and repeated bands."""
+    boxes = [fitz.Rect(item["rect"]) for item in page.get_drawings()]
+    boxes.extend(fitz.Rect(item["bbox"]) for item in page.get_image_info())
+    return [
+        box for box in boxes
+        if not box.is_empty and not box.is_infinite
+        and not (box.width > page.rect.width * .9 and box.height > page.rect.height * .9)
+        and not _excluded(box.y0, box.y1, bands)
+    ]
+
+
+def white_horizontal_border(pix: fitz.Pixmap) -> bool:
+    """Require every channel of the first/last two pixel rows to be white."""
+    data = pix.samples
+    size = min(2, pix.height) * pix.stride
+    return all(value == 255 for value in data[:size]) and all(
+        value == 255 for value in data[-size:]
+    )
+
+
+def graphics_crop(
+    page: fitz.Page, words: list[tuple], boxes: list[fitz.Rect],
+    top: float, bottom: float, x0: float, x1: float,
+    next_top: float | None,
+) -> tuple[fitz.Rect | None, list[tuple], list[str]]:
+    """Grow a question interval monotonically to a fixed point, then union content.
+
+    At most G passes; list membership bounds worst-case work at O(G**3 + W).
+    A graphic extending into the next text interval is ambiguous and fails closed.
+    Padding is applied only after attribution; no graphic may be partly clipped.
+    Empty regions are omitted. Columns constrain attribution, not the final guard.
+    """
+    warnings: list[str] = []
+    admitted: list[fitz.Rect] = []
+    candidates = [box for box in boxes if box.x0 < x1 and box.x1 > x0]
+    while True:
+        previous = bottom
+        for box in candidates:
+            if box in admitted or not top <= box.y0 < bottom:
+                continue
+            admitted.append(box)
+            if next_top is not None and box.y1 >= next_top:
+                warnings.append(
+                    f"Crop failed: graphic {tuple(box)} overlaps the next question text."
+                )
+            else:
+                bottom = max(bottom, box.y1)
+        if bottom == previous:
+            break
+    selected = [w for w in words if w[1] >= top and w[3] <= bottom]
+    content = [fitz.Rect(w[:4]) for w in selected] + admitted
+    if not content:
+        return None, selected, warnings
+    rect = fitz.Rect(content[0])
+    for box in content[1:]:
+        rect |= box
+    rect = (rect + (-PADDING, -PADDING, PADDING, PADDING)) & page.rect
+    # Keep a failed preview inside its question interval, without hiding the failure.
+    if next_top is not None:
+        rect.y1 = min(rect.y1, next_top)
+    rect.x0, rect.x1 = max(rect.x0, x0), min(rect.x1, x1)
+    for box in boxes:
+        if box.intersects(rect) and not rect.contains(box):
+            warnings.append(f"Crop failed: partially clipped graphic {tuple(box)}.")
+    pix = page.get_pixmap(clip=rect, dpi=RENDER_DPI, alpha=False)
+    if not white_horizontal_border(pix):
+        warnings.append("Crop failed: non-white pixels touch the top or bottom 2px border.")
+    return rect, selected, warnings
+
+
 def detect_pdf_questions(doc: fitz.Document) -> list[PdfQuestion]:
     pages = list(cast(Iterable[fitz.Page], doc))
     bands = repeated_bands(doc)
-    graphics = {index: _graphic_regions(page) for index, page in enumerate(pages)}
+    graphics = {index: _graphic_regions(page, bands[index]) for index, page in enumerate(pages)}
+    boxes = {index: graphic_boxes(page, bands[index]) for index, page in enumerate(pages)}
     headers: list[tuple[int, int, float, int]] = []
     columns_by_page: dict[int, bool] = {}
     expected = 1
@@ -242,25 +395,15 @@ def detect_pdf_questions(doc: fitz.Document) -> list[PdfQuestion]:
                 if page_index == next_page and column == next_column
                 else page.rect.height
             )
-            selected = [w for w in words if w[1] >= top and w[3] <= bottom_limit]
-            if not selected:
-                continue
-            drawings = [
-                drawing["rect"]
-                for drawing in page.get_drawings()
-                if drawing["rect"].y0 >= top
-                and drawing["rect"].y0 < bottom_limit
-                and drawing["rect"].x0 >= x0
-                and drawing["rect"].x1 <= x1
-            ]
-            bottom = min(
-                bottom_limit,
-                max([w[3] for w in selected] + [rect.y1 for rect in drawings]) + PADDING,
+            rect, selected, crop_warnings = graphics_crop(
+                page, words, boxes[page_index], top, bottom_limit, x0, x1,
+                next_y if page_index == next_page and column == next_column else None,
             )
-            # Use the full page width: PDF text/drawing runs can disappear when
-            # their underlying stream crosses a narrow horizontal clip.
-            rect = (float(x0), top, float(x1), bottom)
-            question.regions.append(PdfRegion(page_index + 1, rect))
+            question.warnings.extend(crop_warnings)
+            question.crop_valid = question.crop_valid and not crop_warnings
+            if rect is None:
+                continue
+            question.regions.append(PdfRegion(page_index + 1, tuple(rect)))
             text_parts.extend(
                 w[4] for w in sorted(selected, key=lambda w: (round(w[1] / 3), w[0]))
             )

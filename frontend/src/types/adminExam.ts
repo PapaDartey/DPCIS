@@ -128,6 +128,7 @@ export interface ParseQuestionsResponse {
   normalized_answer_key?: string | null;
   page_dimensions?: Array<[number, number]>;
   ocr_used?: boolean;
+  scan_mode?: boolean;
 }
 
 export interface ExamResultsSummary {
