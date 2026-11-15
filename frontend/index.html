@@ -3,16 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f8fa" />
+    <meta name="theme-color" content="#067a1f" />
     <meta
       name="description"
-      content="Examination Hub — server-authoritative digital assessment platform."
+      content="Delhi Private School Examination Hub — Service Beyond Self. Server-authoritative digital assessment platform."
     />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Overview | Examination Hub</title>
+    <meta property="og:title" content="Delhi Private School — Examination Hub" />
+    <meta
+      property="og:description"
+      content="Delhi Private School digital assessment platform — Service Beyond Self."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <title>Sign In | Examination Hub</title>
+    <style>
+      .dps-boot-splash {
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        background: #f4f7f5;
+        color: #0f1a13;
+        font-family: "Inter", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+        padding: 24px;
+      }
+      .dps-boot-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+      }
+      .dps-boot-card img {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+      }
+      .dps-boot-title {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .dps-boot-sub {
+        font-size: 13px;
+        color: #5b6d62;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="dps-boot-splash" role="status" aria-live="polite">
+        <div class="dps-boot-card">
+          <img
+            src="/icon-192.png"
+            alt="Delhi Private School logo"
+            width="64"
+            height="64"
+            data-brand-logo="boot"
+          />
+          <div>
+            <div class="dps-boot-title">Delhi Private School · Examination Hub</div>
+            <div class="dps-boot-sub">Service Beyond Self · Loading workspace...</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

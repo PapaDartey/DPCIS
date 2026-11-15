@@ -119,11 +119,11 @@ export function StudentDashboardPage() {
           <small>{resumeAttemptId ? "Current sitting" : nextExam ? "Next examination" : "Latest result"}</small>
           <strong>{resumeAttemptId ? "In progress" : nextExam ? `${nextExam.question_count} questions` : state.attempts.find((attempt) => attempt.result_visible)?.percentage != null ? `${state.attempts.find((attempt) => attempt.result_visible)?.percentage}%` : "—"}</strong>
           {state.status === "ready" && resumeAttemptId ? (
-            <Button asChild className="mt-4 bg-white text-[#a3123f] hover:bg-[#fdf0f4]">
+            <Button asChild className="mt-4 bg-white text-[var(--brand-700)] hover:bg-[var(--brand-50)]">
               <Link to={`/student/attempts/${encodeURIComponent(resumeAttemptId)}`}>Resume examination <ArrowRight className="size-4" aria-hidden="true" /></Link>
             </Button>
           ) : state.status === "ready" && nextExam ? (
-            <Button asChild className="mt-4 bg-white text-[#a3123f] hover:bg-[#fdf0f4]">
+            <Button asChild className="mt-4 bg-white text-[var(--brand-700)] hover:bg-[var(--brand-50)]">
               <Link to={`/student/exams/${encodeURIComponent(nextExam.id)}`}>View examination <ArrowRight className="size-4" aria-hidden="true" /></Link>
             </Button>
           ) : null}

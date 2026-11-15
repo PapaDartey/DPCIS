@@ -8,7 +8,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -27,6 +26,7 @@ import type { AuthUser } from "@/lib/auth";
 
 export interface AuthBoundaryProps {
   onAuthSuccess?: () => void | Promise<void>;
+  embedded?: boolean;
 }
 
 function extractRawErrorMessage(error: unknown): string {
@@ -69,7 +69,7 @@ function sanitizeAuthError(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
+export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryProps = {}) {
   const sharedAuth = useOptionalAuth();
   const baseId = useId();
 
@@ -321,6 +321,157 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
       .filter(Boolean)
       .join(" ") || undefined;
 
+  const formBody = (
+    <div className="space-y-4">
+      {displayError ? (
+        <Alert id={errorAlertId} variant="destructive" role="alert">
+          <AlertTitle>Unable to sign in</AlertTitle>
+          <AlertDescription>{displayError}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      <form className="space-y-4" onSubmit={handleSubmitEmailAuth}>
+        {mode === "sign-up" ? (
+          <div className="field-group space-y-1.5">
+            <Label htmlFor={nameInputId}>Full name</Label>
+            <Input
+              id={nameInputId}
+              name="name"
+              required
+              className="auth-input min-h-[48px]"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              autoComplete="name"
+              enterKeyHint="next"
+              aria-invalid={Boolean(displayError)}
+              aria-describedby={emailDescribedBy}
+            />
+          </div>
+        ) : null}
+
+        <div className="field-group space-y-1.5">
+          <Label htmlFor={emailInputId}>Email</Label>
+          <Input
+            id={emailInputId}
+            name="email"
+            required
+            type="email"
+            className="auth-input min-h-[48px]"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="none"
+            enterKeyHint="next"
+            aria-invalid={Boolean(displayError)}
+            aria-describedby={emailDescribedBy}
+          />
+        </div>
+
+        <div className="field-group space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor={passwordInputId}>Password</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="default"
+              className="min-h-[44px] min-w-[44px] px-2.5 text-xs"
+              aria-pressed={showPassword}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? (
+                <EyeOff className="size-4" aria-hidden="true" />
+              ) : (
+                <Eye className="size-4" aria-hidden="true" />
+              )}
+              <span>{showPassword ? "Hide" : "Show"}</span>
+            </Button>
+          </div>
+          <Input
+            id={passwordInputId}
+            name="password"
+            required
+            minLength={8}
+            type={showPassword ? "text" : "password"}
+            className="auth-input min-h-[48px]"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
+            enterKeyHint="done"
+            aria-invalid={Boolean(displayError)}
+            aria-describedby={passwordDescribedBy}
+          />
+          {mode === "sign-up" ? (
+            <p id={passwordHelpId} className="text-xs text-muted-foreground">
+              Use at least 8 characters.
+            </p>
+          ) : null}
+        </div>
+
+        <Button
+          type="submit"
+          size="default"
+          className="auth-submit min-h-[48px] w-full"
+          disabled={isSubmitting}
+        >
+          {mode === "sign-up" ? (
+            <UserPlus className="size-4" aria-hidden="true" />
+          ) : (
+            <LogIn className="size-4" aria-hidden="true" />
+          )}
+          <span>
+            {isSubmitting
+              ? "Working..."
+              : mode === "sign-up"
+                ? "Create account"
+                : "Sign in"}
+          </span>
+        </Button>
+      </form>
+
+      <div className="relative flex items-center py-1" aria-hidden="true">
+        <div className="w-full border-t border-border" />
+        <span className="shrink-0 bg-card px-3 text-xs uppercase tracking-wide text-muted-foreground">
+          or
+        </span>
+        <div className="w-full border-t border-border" />
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        size="default"
+        className="auth-google min-h-[48px] w-full"
+        disabled={isSubmitting}
+        onClick={handleGoogleSignIn}
+      >
+        <LogIn className="size-4" aria-hidden="true" />
+        <span>Continue with Google</span>
+      </Button>
+
+      <div className="pt-1 text-center">
+        <Button
+          type="button"
+          variant="ghost"
+          size="default"
+          className="min-h-[44px] w-full text-sm text-muted-foreground hover:text-foreground"
+          disabled={isSubmitting}
+          onClick={toggleMode}
+        >
+          {mode === "sign-up"
+            ? "Already have an account? Sign in"
+            : "Don't have an account? Create one"}
+        </Button>
+      </div>
+    </div>
+  );
+
+  if (embedded) {
+    return <div className="w-full space-y-5">{formBody}</div>;
+  }
+
   return (
     <Card className="auth-card mx-auto w-full max-w-md">
       <CardHeader className="space-y-3 pb-5">
@@ -338,145 +489,7 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {displayError ? (
-          <Alert id={errorAlertId} variant="destructive" role="alert">
-            <AlertTitle>Unable to sign in</AlertTitle>
-            <AlertDescription>{displayError}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        <form className="space-y-4" onSubmit={handleSubmitEmailAuth}>
-          {mode === "sign-up" ? (
-            <div className="field-group space-y-1.5">
-              <Label htmlFor={nameInputId}>Full name</Label>
-              <Input
-                id={nameInputId}
-                name="name"
-                required
-                className="auth-input min-h-[48px]"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                autoComplete="name"
-                enterKeyHint="next"
-                aria-invalid={Boolean(displayError)}
-                aria-describedby={emailDescribedBy}
-              />
-            </div>
-          ) : null}
-
-          <div className="field-group space-y-1.5">
-            <Label htmlFor={emailInputId}>Email</Label>
-            <Input
-              id={emailInputId}
-              name="email"
-              required
-              type="email"
-              className="auth-input min-h-[48px]"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              spellCheck={false}
-              autoCorrect="off"
-              autoCapitalize="none"
-              enterKeyHint="next"
-              aria-invalid={Boolean(displayError)}
-              aria-describedby={emailDescribedBy}
-            />
-          </div>
-
-          <div className="field-group space-y-1.5">
-            <div className="flex items-center justify-between gap-2">
-              <Label htmlFor={passwordInputId}>Password</Label>
-              <Button
-                type="button"
-                variant="ghost"
-                size="default"
-                className="min-h-[44px] min-w-[44px] px-2.5 text-xs"
-                aria-pressed={showPassword}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                {showPassword ? (
-                  <EyeOff className="size-4" aria-hidden="true" />
-                ) : (
-                  <Eye className="size-4" aria-hidden="true" />
-                )}
-                <span>{showPassword ? "Hide" : "Show"}</span>
-              </Button>
-            </div>
-            <Input
-              id={passwordInputId}
-              name="password"
-              required
-              minLength={8}
-              type={showPassword ? "text" : "password"}
-              className="auth-input min-h-[48px]"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
-              enterKeyHint="done"
-              aria-invalid={Boolean(displayError)}
-              aria-describedby={passwordDescribedBy}
-            />
-            {mode === "sign-up" ? (
-              <p id={passwordHelpId} className="text-xs text-muted-foreground">
-                Use at least 8 characters.
-              </p>
-            ) : null}
-          </div>
-
-          <Button type="submit" size="default" className="auth-submit min-h-[48px] w-full" disabled={isSubmitting}>
-            {mode === "sign-up" ? (
-              <UserPlus className="size-4" aria-hidden="true" />
-            ) : (
-              <LogIn className="size-4" aria-hidden="true" />
-            )}
-            <span>
-              {isSubmitting
-                ? "Working..."
-                : mode === "sign-up"
-                  ? "Create account"
-                  : "Sign in"}
-            </span>
-          </Button>
-        </form>
-
-        <div className="relative flex items-center py-1" aria-hidden="true">
-          <div className="w-full border-t border-border" />
-          <span className="shrink-0 bg-card px-3 text-xs uppercase tracking-wide text-muted-foreground">
-            or
-          </span>
-          <div className="w-full border-t border-border" />
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="default"
-          className="auth-google min-h-[48px] w-full"
-          disabled={isSubmitting}
-          onClick={handleGoogleSignIn}
-        >
-          <LogIn className="size-4" aria-hidden="true" />
-          <span>Continue with Google</span>
-        </Button>
-      </CardContent>
-
-      <CardFooter className="justify-center border-0 pt-0">
-        <Button
-          type="button"
-          variant="ghost"
-          size="default"
-          className="min-h-[44px] w-full text-sm text-muted-foreground hover:text-foreground"
-          disabled={isSubmitting}
-          onClick={toggleMode}
-        >
-          {mode === "sign-up"
-            ? "Already have an account? Sign in"
-            : "Don't have an account? Create one"}
-        </Button>
-      </CardFooter>
+      <CardContent>{formBody}</CardContent>
     </Card>
   );
 }

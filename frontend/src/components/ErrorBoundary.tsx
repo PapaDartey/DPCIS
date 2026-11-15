@@ -1,6 +1,7 @@
 import { AlertTriangle, RotateCcw } from "lucide-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
@@ -54,25 +55,30 @@ export class ErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <Alert variant="destructive" role="alert" className="my-6">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
-            <div className="space-y-3">
-              <div>
-                <AlertTitle>
-                  {this.props.fallbackTitle ?? "Something unexpected interrupted this view"}
-                </AlertTitle>
-                <AlertDescription>
-                  No local data was lost. You can reload this section or return to another route.
-                </AlertDescription>
-              </div>
-              <Button variant="outline" size="sm" onClick={this.handleReset}>
-                <RotateCcw className="size-4" aria-hidden="true" />
-                Retry view
-              </Button>
-            </div>
+        <div className="my-6 space-y-4">
+          <div className="flex justify-center">
+            <BrandLogo size={64} variant="mark" />
           </div>
-        </Alert>
+          <Alert variant="destructive" role="alert">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+              <div className="space-y-3">
+                <div>
+                  <AlertTitle>
+                    {this.props.fallbackTitle ?? "Something unexpected interrupted this view"}
+                  </AlertTitle>
+                  <AlertDescription>
+                    No local data was lost. You can reload this section or return to another route.
+                  </AlertDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={this.handleReset}>
+                  <RotateCcw className="size-4" aria-hidden="true" />
+                  Retry view
+                </Button>
+              </div>
+            </div>
+          </Alert>
+        </div>
       );
     }
 

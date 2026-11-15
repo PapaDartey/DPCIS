@@ -10,6 +10,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { PageHeader } from "@/components/PageHeader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -207,6 +208,15 @@ export function StudentResultPage() {
 
   return (
     <div className="space-y-6">
+      <div className="print-only-header hidden items-center justify-between border-b border-border pb-4 print:flex">
+        <BrandLogo size={40} variant="lockup" />
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          Service Beyond Self
+        </p>
+      </div>
+      <div className="print-watermark pointer-events-none fixed inset-0 hidden items-center justify-center print:flex" aria-hidden="true">
+        <BrandLogo size={120} variant="mark" className="opacity-[0.06]" />
+      </div>
       <PageHeader
         eyebrow={result.exam_title}
         title="Your result"
@@ -284,8 +294,8 @@ export function StudentResultPage() {
       ) : (
         <div className="student-result-grid"><div className="space-y-6">
           <div className="student-card student-result-hero">
-            <div className="student-score-ring" style={{ background: `conic-gradient(${result.passed ? "#0f7a4a" : "#b8340a"} ${Math.max(0, Math.min(100, Number(result.percentage)))}%, #f0eef3 0)` }} role="img" aria-label={`${formatPercentage(result.percentage)} score`}><span>{formatPercentage(result.percentage)}</span></div>
-            <div>{result.passed ? <Badge variant="success"><CheckCircle2 className="size-4" />Passed</Badge> : <Badge variant="destructive"><XCircle className="size-4" />Did not pass</Badge>}<h2>You scored {formatDecimalValue(result.points_earned)} of {formatDecimalValue(result.points_available)} points</h2><p>The pass mark for this examination is {formatDecimalValue(result.pass_mark)}%.</p></div>
+            <div className="student-score-ring" style={{ background: `conic-gradient(${result.passed ? "var(--ok)" : "var(--danger)"} ${Math.max(0, Math.min(100, Number(result.percentage)))}%, var(--subtle) 0)` }} role="img" aria-label={`${formatPercentage(result.percentage)} score`}><span>{formatPercentage(result.percentage)}</span></div>
+            <div>{result.passed ? <Badge variant="success"><CheckCircle2 className="size-4" aria-hidden="true" />Passed</Badge> : <Badge variant="destructive"><XCircle className="size-4" aria-hidden="true" />Did not pass</Badge>}<h2>You scored {formatDecimalValue(result.points_earned)} of {formatDecimalValue(result.points_available)} points</h2><p>The pass mark for this examination is {formatDecimalValue(result.pass_mark)}%.</p></div>
           </div>
           <Card>
             <CardHeader className="gap-3 border-b border-border/70 pb-5">
@@ -387,7 +397,43 @@ export function StudentResultPage() {
             </CardContent>
           </Card>
 
-          <div className="student-card"><div className="student-card-heading"><h2>Answer breakdown</h2></div><div className="student-breakdown" role="img" aria-label={`${result.correct_answers} correct, ${result.incorrect_answers} incorrect, ${result.unanswered_questions} unanswered`}><span style={{ width: `${result.total_questions ? result.correct_answers / result.total_questions * 100 : 0}%`, background: "#0f7a4a" }} /><span style={{ width: `${result.total_questions ? result.incorrect_answers / result.total_questions * 100 : 0}%`, background: "#b8340a" }} /></div></div>
+          <div className="student-card">
+            <div className="student-card-heading">
+              <h2>Answer breakdown</h2>
+            </div>
+            <div
+              className="student-breakdown"
+              role="img"
+              aria-label={`${result.correct_answers} correct, ${result.incorrect_answers} incorrect, ${result.unanswered_questions} unanswered`}
+            >
+              <span
+                style={{
+                  width: `${result.total_questions ? (result.correct_answers / result.total_questions) * 100 : 0}%`,
+                  background: "var(--ok)",
+                }}
+              />
+              <span
+                style={{
+                  width: `${result.total_questions ? (result.incorrect_answers / result.total_questions) * 100 : 0}%`,
+                  background: "var(--danger)",
+                }}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-4 px-5 pb-5 text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 text-[var(--ok)]">
+                <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                <span>{result.correct_answers} correct</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[var(--danger)]">
+                <XCircle className="size-3.5" aria-hidden="true" />
+                <span>{result.incorrect_answers} incorrect</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                <Clock className="size-3.5" aria-hidden="true" />
+                <span>{result.unanswered_questions} unanswered</span>
+              </span>
+            </div>
+          </div>
 
           {result.show_correct_answers &&
           result.question_review &&

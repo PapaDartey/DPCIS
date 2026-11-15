@@ -983,8 +983,10 @@ async function main() {
   const mode = modeArg ? modeArg.split("=")[1] : "before";
   const outDir = path.join(repoRoot, "docs", "ui-screenshots", mode);
   if (fs.existsSync(outDir)) {
-    for (const f of fs.readdirSync(outDir)) {
-      fs.unlinkSync(path.join(outDir, f));
+    if (mode !== "brand-verify") {
+      for (const f of fs.readdirSync(outDir)) {
+        fs.unlinkSync(path.join(outDir, f));
+      }
     }
   } else {
     fs.mkdirSync(outDir, { recursive: true });
@@ -1017,9 +1019,38 @@ async function main() {
     routesCount: routes.length,
     screenshots: [],
     overflowFailures: [],
+    logoFailures: [],
     consoleErrors: [],
     axeAudit: [],
   };
+
+  async function checkBrandLogo(page, routePattern, stateLabel, viewportWidth) {
+    const result = await page.evaluate(() => {
+      const nodes = Array.from(document.querySelectorAll("[data-brand-logo]"));
+      const imgs = nodes.map((el) => {
+        const rect = el.getBoundingClientRect();
+        const style = window.getComputedStyle(el);
+        return {
+          complete: el instanceof HTMLImageElement ? el.complete : true,
+          naturalWidth: el instanceof HTMLImageElement ? el.naturalWidth : 1,
+          height: rect.height,
+          visible: style.display !== "none" && style.visibility !== "hidden",
+        };
+      });
+      const visibleLoaded = imgs.filter(
+        (i) => i.visible && i.complete && i.naturalWidth > 0 && i.height >= 28,
+      );
+      return { total: imgs.length, visibleLoadedCount: visibleLoaded.length, imgs };
+    });
+    if (result.visibleLoadedCount === 0) {
+      report.logoFailures.push({
+        route: routePattern,
+        state: stateLabel,
+        viewport: viewportWidth,
+        detail: result,
+      });
+    }
+  }
 
   async function runAxeAudit(page, routePattern, stateLabel) {
     if (!axeSource) return;
@@ -1107,6 +1138,7 @@ async function main() {
         const filePath = path.join(outDir, fileName);
         await page.screenshot({ path: filePath, fullPage: true });
         report.screenshots.push(fileName);
+        await checkBrandLogo(page, entry.routePattern, "ready", vp.width);
         if (vp.width === 1440) {
           await runAxeAudit(page, entry.routePattern, "ready");
         }
@@ -1197,6 +1229,16 @@ async function main() {
       }
 
       if (entry.routePattern === "/student/results/:attemptId") {
+        // Print preview of passed result at 1440w
+        stateRef.scenario = "ready";
+        await page.goto(`${baseUrl}${urlPath}`, { waitUntil: "domcontentloaded" });
+        await page.waitForTimeout(250);
+        await page.emulateMedia({ media: "print" });
+        const printFile = `${slug}__print-preview__1440w.png`;
+        await page.screenshot({ path: path.join(outDir, printFile), fullPage: true });
+        report.screenshots.push(printFile);
+        await page.emulateMedia({ media: "screen" });
+
         for (const subScenario of [
           "failed-result",
           "review-disabled",
@@ -1211,6 +1253,14 @@ async function main() {
           await page.screenshot({ path: path.join(outDir, subFile), fullPage: true });
           report.screenshots.push(subFile);
           await runAxeAudit(page, entry.routePattern, subScenario);
+          if (subScenario === "failed-result") {
+            await page.setViewportSize({ width: 390, height: 844 });
+            await page.waitForTimeout(150);
+            const failedMobileFile = `${slug}__failed-result__390w.png`;
+            await page.screenshot({ path: path.join(outDir, failedMobileFile), fullPage: true });
+            report.screenshots.push(failedMobileFile);
+            await page.setViewportSize({ width: 1440, height: 900 });
+          }
         }
       }
 
@@ -1260,8 +1310,17 @@ async function main() {
 
   const summaryPath = path.join(outDir, "visual-walk-report.json");
   fs.writeFileSync(summaryPath, JSON.stringify(report, null, 2));
+  const totalSeriousCritical = report.axeAudit.reduce(
+    (sum, a) => sum + (a.seriousCount || 0) + (a.criticalCount || 0),
+    0,
+  );
   console.log(`Captured ${report.screenshots.length} screenshots in ${outDir}`);
-  console.log(`Overflow failures: ${report.overflowFailures.length}, Page errors: ${report.consoleErrors.length}`);
+  console.log(
+    `Overflow failures: ${report.overflowFailures.length}, Logo failures: ${report.logoFailures.length}, Axe serious/critical: ${totalSeriousCritical}, Page errors: ${report.consoleErrors.length}`,
+  );
+  if (report.logoFailures.length > 0 || totalSeriousCritical > 0) {
+    process.exitCode = 1;
+  }
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {

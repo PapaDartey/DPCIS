@@ -1,6 +1,7 @@
 import { AlertTriangle, Inbox, RotateCcw } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,12 +11,14 @@ import { cn } from "@/lib/utils";
 export interface LoadingStatePanelProps {
   label?: string;
   cards?: number;
+  showBrandLogo?: boolean;
   className?: string;
 }
 
 export function LoadingStatePanel({
   label = "Loading content...",
   cards = 2,
+  showBrandLogo = false,
   className,
 }: LoadingStatePanelProps) {
   return (
@@ -25,6 +28,11 @@ export function LoadingStatePanel({
       aria-label={label}
       className={cn("space-y-4", className)}
     >
+      {showBrandLogo ? (
+        <div className="flex justify-center pt-4">
+          <BrandLogo size={64} variant="mark" />
+        </div>
+      ) : null}
       <span className="visually-hidden">{label}</span>
       <div className="card-grid">
         {Array.from({ length: cards }, (_, index) => (
@@ -51,6 +59,7 @@ export interface ErrorStatePanelProps {
   onRetry?: () => void;
   retryLabel?: string;
   action?: ReactNode;
+  showBrandLogo?: boolean;
   className?: string;
 }
 
@@ -60,10 +69,17 @@ export function ErrorStatePanel({
   onRetry,
   retryLabel = "Try again",
   action,
+  showBrandLogo = false,
   className,
 }: ErrorStatePanelProps) {
   return (
-    <Alert variant="destructive" role="alert" className={className}>
+    <div className={cn("space-y-4", className)}>
+      {showBrandLogo ? (
+        <div className="flex justify-center pt-4">
+          <BrandLogo size={64} variant="mark" />
+        </div>
+      ) : null}
+      <Alert variant="destructive" role="alert">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
@@ -85,6 +101,7 @@ export function ErrorStatePanel({
         ) : null}
       </div>
     </Alert>
+    </div>
   );
 }
 
