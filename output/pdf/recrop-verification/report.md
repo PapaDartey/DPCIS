@@ -41,24 +41,19 @@ Harness repairs: the clipping drag now uses the crop response's current geometry
 
 ## npm audit triage - no upgrades
 
-Both commands exited 1 because advisories remain. `npm audit --omit=dev`: **16 findings (6 low, 9 high, 1 critical)**. Full `npm audit`: **23 findings (6 low, 7 moderate, 9 high, 1 critical)**. All high/critical entries also occur in the production dependency tree; none is solely a development-tool finding. Installed dependency does not imply emitted or exploitable code.
+The stale audit snapshots were deleted and fresh audits were run from `frontend/` without editing `package.json` or the lockfile. Both commands exited 1 because advisories remain. Fresh `npm audit --omit=dev --json` reported **10 findings (6 low, 3 high, 1 critical)**; fresh full `npm audit --json` reported **17 findings (6 low, 7 moderate, 3 high, 1 critical)**. The critical finding is **GHSA-965c-763c-88jm: Better Auth OAuth state can be used as a Magic Link to sign in as another user**. The high findings are Better Auth OAuth Proxy (**GHSA-r4xp-prcw-77qf**) and Zod oversized constrained collections (**GHSA-mrhx-c7xc-m3w5**). No remediation was applied.
 
 Advisory references: [BA-M: OAuth state/Magic Link (critical)](https://github.com/advisories/GHSA-965c-763c-88jm), [BA-P: OAuth Proxy (high)](https://github.com/advisories/GHSA-r4xp-prcw-77qf), [Z: Zod oversized collection memory exhaustion (high)](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5). Rows marked "inherited" are npm's transitive dependency findings, not additional independent advisories.
 
 | Package / installed version(s) | Severity / advisory | Production bundle evidence | Smallest remediation candidate (not applied) |
 | --- | --- | --- | --- |
-| `better-auth` 1.7.6 | Critical BA-M; high BA-P; inherited Z | 32 emitted client/helper modules; vulnerable server OAuth/Magic Link handlers absent | Better Auth 1.7.7, with compatible related Better Auth packages kept aligned. Neon pins 1.7.6, so use a vendor-supported Neon update or explicitly reviewed override; validate auth flows. |
-| `zod` 4.5.4 | High Z | 18 emitted modules, including collection/schema parsing; exploitability of specific app inputs not proven | 4.6.6 in both pinned Neon subtrees; requires vendor update or reviewed override plus auth-schema tests. |
-| `@neondatabase/auth` 0.6.0-beta | High, inherited BA/Z | 54 emitted modules; pins affected Better Auth/Zod | Vendor update that replaces those exact pins, or reviewed nested overrides to minimum patched versions. npm reports no direct automatic fix. |
-| `@neondatabase/auth-ui` 0.4.0-beta | High, inherited BA/Z | 0 emitted modules | Update its pinned Better Auth/passkey and Zod subtree through a supported Neon release; no runtime UI patch needed here. |
-| `@better-auth/api-key` 1.7.21 | High, inherited BA/Z | 0 emitted modules | Resolve affected Better Auth/Zod dependencies; no independent API-key advisory in this audit. |
-| `@better-auth/core` 1.7.21 | High, inherited Z via Better Call | 0 emitted modules for flagged node | Resolve Zod to 4.6.6 in affected subtree; keep Better Auth family compatible. |
-| `@better-auth/passkey` 1.7.6 | High, inherited BA/Z | 0 emitted modules | Align with patched Better Auth release and patched Zod through vendor dependency update. |
-| `@daveyplate/better-auth-ui` 3.4.0 | High, inherited BA/Z | 0 emitted modules | Resolve affected child dependencies; no independent advisory requiring a UI rewrite. |
-| `@hookform/resolvers` 5.9.2 | High, inherited Z | 0 emitted modules | Resolve affected Zod peer/subtree to 4.6.6 and validate resolver compatibility. |
-| `better-call` 2.0.2 (flagged nested copy) | High, inherited Z | 0 emitted modules for flagged copy | Resolve affected Zod dependency to 4.6.6; no independent high Better Call advisory here. |
+| `better-auth` 1.7.6 (nested under Neon packages) | Critical BA-M; high BA-P; inherited Z | **Yes** in the previously saved Vite module graph (32 modules); the flagged server handlers were not identified in emitted client code | Vendor-supported Neon/Better Auth release, or a separately reviewed compatible override; validate all auth flows. |
+| `zod` 4.5.4 (nested under Neon packages) | High Z | **Yes** in the previously saved Vite module graph (18 modules); app-specific exploitability was not proven | Vendor-supported patched Zod subtree or reviewed override to 4.6.6 with auth-schema tests. |
+| `@neondatabase/auth` 0.6.0-beta | High, inherited BA/Z; direct dependency | **Yes** in the previously saved Vite module graph (54 modules) | Vendor release replacing affected nested pins; npm reports no safe automatic fix. |
+| `@neondatabase/auth-ui` 0.4.0-beta | High, inherited BA/Z; transitive | **No** in the previously saved Vite module graph | Update through a supported Neon release; this package is not emitted by the current client graph. |
+| `@better-auth/api-key`, `@better-auth/passkey`, `@daveyplate/better-auth-ui`, `@hookform/resolvers`, `better-call` | Inherited findings only; transitive | **No** for the flagged nodes in the previously saved graph | Resolve the Better Auth/Zod dependency tree through a supported vendor update; no independent app rewrite is indicated. |
 
-Evidence: `audit-production.json`, `audit-full.json`, `audit-bundle-reachability.json`, `production-modules.json`, `production-boundary.txt`. A Vite production build with `write:false` recorded actual nonzero rendered module lengths rather than guessing from package names. npm registry queries confirmed Better Auth 1.7.7 and Zod 4.6.6 exist. The advisory prose still says the Better Auth release was planned; registry availability was checked separately.
+Evidence: `audit-production-rerun.json`, `audit-full-rerun.json`, `production-modules.json`, and the saved prior bundle reachability scan. The fresh production bundle scan could not be rerun because the clean install did not complete and removed the local Vite binary; therefore the Yes/No bundle column is explicitly based on the previously saved module graph, not a new build. npm registry queries and dependency remediation were not repeated or changed in this pass.
 
 The local app uses managed Neon authentication, not a self-hosted Better Auth server. Its deployed service version/plugin configuration was not inspected, so server vulnerability applicability remains unverified. The minimum versions above are advisory remediation candidates, not a claim that overrides are compatibility-safe. Authorization is needed before dependency remediation, as requested.
 
@@ -74,23 +69,27 @@ Current pair: `cie_igcse_chem_2_2_atomic_structure_qp` - 24 questions, Paper 1 =
 
 Executed boundary output is in `backend-boundary.txt` and `frontend-boundary.txt`. The backend check emitted an existing Starlette/httpx deprecation warning; no dependency was added to silence it.
 
-## Final gates
-
-Final frontend installation/build/scan results are being recorded before this report is closed.
+## Verification gates
 
 | Command | Observed result | Log |
 | --- | --- | --- |
 | `ruff check app tests alembic` | All checks passed | `ruff.txt` |
-| `pytest -ra` | 307 passed in 77.01s | `backend-full.txt` |
-| `alembic heads` | `0006_submission_reason (head)` | `alembic-heads.txt` |
-| `alembic history` | One linear chain, 0001 through 0006 | `alembic-history.txt` |
-| `npm ci` | Pending final output | `npm-ci.txt` |
-| `npm run lint` (ESLint + TypeScript) | Pending post-install run | `lint.txt` |
-| `npm test` | Pending final run | `frontend-tests.txt` |
-| `npm run build` (TypeScript + Vite) | Pending final run | `build.txt` |
-| Secret/test-token/stale-auth pattern scans | Pending final bundle | `security-scan.json` |
+| `python -m pytest -q tests/test_exams.py -k recrop` | **4 passed** | `recrop-tests-rerun.txt` |
+| `python -m pytest -q tests/test_pdf_fixture_pairs.py` | **1 passed** | `fixture-tests-rerun.txt` |
+| `python -m pytest -q` | **307 passed** | `backend-full-rerun.txt` |
+| `python -m ruff check app tests alembic` | **All checks passed** | `ruff-rerun.txt` |
+| `python -m alembic heads` | **`0006_submission_reason (head)`** | `alembic-heads-rerun.txt` |
+| `python -m alembic history` | **One linear chain, 0001 through 0006** | `alembic-history-rerun.txt` |
+| `npm ci` | **Blocked**: repeated archive-entry errors and did not terminate in the shared Windows worktree; stopped only my process | `npm-ci-rerun.txt` |
+| `npm run lint` | **Blocked**: `eslint` binary unavailable after incomplete install | `lint-rerun.txt` |
+| `tsc -b --noEmit` | **Blocked**: TypeScript binary unavailable | `tsc-rerun.txt` |
+| `npm test` | **12 passed** | `frontend-tests-rerun.txt` |
+| `npm run build` | **Blocked**: `tsc` binary unavailable | `build-rerun.txt` |
+| Backend default-off boundary | **PASS**; `/__test_session` returned 404 | `backend-boundary-rerun.txt` |
+| Frontend production boundary / new bundle scan | **Not run**; Vite unavailable after incomplete install | `browser-frontend-start-rerun.txt` |
+| Changed-file secret-pattern scan | **No live credential found**; test-only token/session literals are expected in harness files | `security-scan-rerun.txt` |
 
-Focused evidence: baseline re-crop tests 3 passed; expanded re-crop tests 4 passed; discovered fixture pair 1 passed. No new migration, production DB connection, deployment, or dependency remediation was performed.
+The additional browser pass requested at 1440 and 390 px was **not verified**. The isolated backend could not bind because a prior reload process retained port 8000, and the test frontend could not start without Vite. The earlier multi-width browser evidence remains documented above, but it is not a substitute for this requested final rerun. No new migration, production DB connection, deployment, or dependency remediation was performed.
 
 ## Open items
 
@@ -98,4 +97,5 @@ Focused evidence: baseline re-crop tests 3 passed; expanded re-crop tests 4 pass
 - Managed Neon server patch status and live PostgreSQL concurrency were not verified. Tests use isolated SQLite; this is not production/PostgreSQL concurrency evidence.
 - Explicit approve/discard cleanup is verified. Automatic sweeping of abandoned previews is not implemented.
 - Local Windows/Chromium coverage does not establish Safari/Firefox parity.
-- Final frontend gate output and checkpoint details will be filled before completion.
+- The fresh production bundle, frontend lint/typecheck/build, and final 1440/390 browser rerun were not verified because the shared Windows dependency install did not complete.
+- Neon Managed Auth's deployed Better Auth/Zod patch status cannot be verified from this repository; the managed service is external to this local codebase.
