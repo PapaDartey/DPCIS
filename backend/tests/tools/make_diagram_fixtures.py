@@ -222,7 +222,12 @@ def make(kind):
         "questions": specs,
         "expected_key": {n: "A" for n in specs},
         "review_expected": kind in {14, 16},
-        "known_limit": "Overlapping watermark/tinted background requires a clean source; cannot safely erase underlying content." if kind == 16 else None,
+        "known_limit": (
+            "Overlapping watermark requires a clean source; "
+            "cannot safely erase underlying content."
+        )
+        if kind == 16
+        else None,
     }
 
 

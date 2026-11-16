@@ -6,24 +6,15 @@ from pathlib import Path
 import fitz
 import pytest
 
-from app.exams.pdf_import import detect_pdf_questions, detect_scan_questions, open_question_upload
+from app.exams.pdf_import import (
+    detect_pdf_questions,
+    detect_scan_questions,
+    open_question_upload,
+    white_crop_border,
+)
 
 ROOT = Path(__file__).parent / "fixtures/pdfs/synthetic"
 MANIFESTS = sorted(ROOT.glob("*.expected.json"))
-
-
-def all_edges_white(pix):
-    samples = pix.samples
-    return all(
-        value == 255 for value in samples[: 2 * pix.stride] + samples[-2 * pix.stride :]
-    ) and all(
-        value == 255
-        for y in range(pix.height)
-        for value in (
-            samples[y * pix.stride : y * pix.stride + 2 * pix.n]
-            + samples[(y + 1) * pix.stride - 2 * pix.n : (y + 1) * pix.stride]
-        )
-    )
 
 
 @pytest.mark.parametrize("manifest", MANIFESTS, ids=lambda p: p.name.split(".")[0])
@@ -55,7 +46,7 @@ def test_diagram_corpus(manifest):
             for r in q.regions:
                 page = doc[r.page - 1]
                 clip = fitz.Rect(r.bbox)
-                if not all_edges_white(page.get_pixmap(clip=clip, dpi=220, alpha=False)):
+                if not white_crop_border(page.get_pixmap(clip=clip, dpi=220, alpha=False)):
                     defects.append("nonwhite border")
                 text = page.get_text(clip=clip)
                 for other in spec["questions"]:

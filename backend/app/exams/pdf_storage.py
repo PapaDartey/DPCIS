@@ -148,7 +148,8 @@ def regenerate_crops(
             pix = page.get_pixmap(clip=clip, dpi=dpi, alpha=False)
             if not white_crop_border(pix):
                 raise ValueError(
-                    "Crop failed: non-white pixels touch the left/right or top or bottom 2px border."
+                    "Crop failed: non-white pixels touch the left/right "
+                    "or top or bottom 2px border."
                 )
             images.append(pix.tobytes("png"))
             normalized.append({"page": page_number, "bbox": [x0, y0, x1, y1]})

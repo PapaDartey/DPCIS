@@ -136,7 +136,8 @@ def detect_scan_questions(doc: fitz.Document) -> list[PdfQuestion]:
             if not white_crop_border(final):
                 valid = False
                 warnings.append(
-                    "Crop failed: non-white pixels touch the left/right or top or bottom 2px border."
+                    "Crop failed: non-white pixels touch the left/right "
+                    "or top or bottom 2px border."
                 )
             questions.append(
                 PdfQuestion(
@@ -258,6 +259,50 @@ def graphic_boxes(page: fitz.Page, bands: list[tuple[float, float]]) -> list[fit
     ]
 
 
+def _border_background_uniform(pix: fitz.Pixmap, tol: int = 8) -> bool:
+    """Verify border pixels match a light uniform background with no ink."""
+    if pix.width <= 0 or pix.height <= 0 or pix.n <= 0:
+        return False
+    data = pix.samples
+    n = pix.n
+    h_rows = min(2, pix.height)
+    edge_px = min(2, pix.width)
+    edge = edge_px * n
+    row_bytes = pix.width * n
+    # Sample top, bottom, left, right border pixels for median background color.
+    samples: list[list[int]] = [[] for _ in range(n)]
+    step = max(1, pix.width // 16)
+    for y in list(range(h_rows)) + list(range(max(0, pix.height - h_rows), pix.height)):
+        base = y * pix.stride
+        for x in range(0, pix.width, step):
+            off = base + x * n
+            for c in range(n):
+                samples[c].append(data[off + c])
+    bg = [sorted(ch)[len(ch) // 2] for ch in samples]
+    # Pure-white pages keep strict 255 checking; dark borders indicate ink.
+    if min(bg) >= 252 or min(bg) < 180:
+        return False
+    for y in range(h_rows):
+        row = data[y * pix.stride : y * pix.stride + row_bytes]
+        for i in range(0, len(row), n):
+            if any(abs(row[i + c] - bg[c]) > tol for c in range(n)):
+                return False
+    for y in range(max(0, pix.height - h_rows), pix.height):
+        row = data[y * pix.stride : y * pix.stride + row_bytes]
+        for i in range(0, len(row), n):
+            if any(abs(row[i + c] - bg[c]) > tol for c in range(n)):
+                return False
+    for y in range(pix.height):
+        base = y * pix.stride
+        left = data[base : base + edge]
+        right = data[base + row_bytes - edge : base + row_bytes]
+        for chunk in (left, right):
+            for i in range(0, len(chunk), n):
+                if any(abs(chunk[i + c] - bg[c]) > tol for c in range(n)):
+                    return False
+    return True
+
+
 def white_horizontal_border(pix: fitz.Pixmap) -> bool:
     """Require every channel of the first/last two pixel rows to be white."""
     data = pix.samples
@@ -268,17 +313,18 @@ def white_horizontal_border(pix: fitz.Pixmap) -> bool:
 
 
 def white_crop_border(pix: fitz.Pixmap) -> bool:
-    """All four two-pixel borders, using C-level byte comparisons per row."""
-    if not white_horizontal_border(pix):
-        return False
-    data = pix.samples
-    edge = min(2, pix.width) * pix.n
-    white = b"\xff" * edge
-    return all(
-        data[y * pix.stride : y * pix.stride + edge] == white
-        and data[(y + 1) * pix.stride - edge : (y + 1) * pix.stride] == white
-        for y in range(pix.height)
-    )
+    """All four two-pixel borders: strict white on white pages, uniform on tinted pages."""
+    if white_horizontal_border(pix):
+        data = pix.samples
+        edge = min(2, pix.width) * pix.n
+        white = b"\xff" * edge
+        if all(
+            data[y * pix.stride : y * pix.stride + edge] == white
+            and data[(y + 1) * pix.stride - edge : (y + 1) * pix.stride] == white
+            for y in range(pix.height)
+        ):
+            return True
+    return _border_background_uniform(pix)
 
 
 def graphics_crop(
@@ -550,7 +596,8 @@ def audit_question_crops(doc, questions, bands=None):
             # Give an otherwise orphan page a visible editable recovery region.
             questions[-1].regions.append(PdfRegion(page_index + 1, tuple(page.rect)))
             questions[-1].warnings.append(
-                f"Needs review: no assigned question on page {page_index + 1}; inspect the full-page region."
+                f"Needs review: no assigned question on page {page_index + 1}; "
+                "inspect the full-page region."
             )
             crops = [(len(questions) - 1, page.rect)]
         for i, warning in coverage_warnings(page, page_index + 1, crops, bands[page_index]):
@@ -561,7 +608,8 @@ def audit_question_crops(doc, questions, bands=None):
         if shared:
             for i, _ in crops:
                 questions[i].warnings.append(
-                    "Needs review: shared stimulus refers to several questions; include it in each relevant crop."
+                    "Needs review: shared stimulus refers to several questions; "
+                    "include it in each relevant crop."
                 )
         for i, rect in crops:
             q = questions[i]
@@ -571,6 +619,17 @@ def audit_question_crops(doc, questions, bands=None):
                 b.intersects(rect) for b in graphic_boxes(page, bands[page_index])
             ):
                 q.warnings.append("Needs review: crop contains no detected text or graphics.")
+            has_watermark = any(
+                span.get("size", 0) >= 28 or "watermark" in span.get("text", "").lower()
+                for block in page.get_text("dict", clip=rect).get("blocks", [])
+                if block.get("type") == 0
+                for line in block.get("lines", [])
+                for span in line.get("spans", [])
+            )
+            if has_watermark:
+                q.warnings.append(
+                    "Needs review: background watermark or large overlay text overlaps this crop."
+                )
             if not white_crop_border(page.get_pixmap(clip=rect, dpi=RENDER_DPI, alpha=False)):
                 message = "Crop failed: ink touches a left/right or top or bottom 2px border."
                 if message not in q.warnings:
