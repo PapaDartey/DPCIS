@@ -21,6 +21,8 @@ export interface EditableQuestion {
   question_text: string;
   source_file_id?: string | null;
   source_number?: number | null;
+  region_status?: "detected" | "needs-review" | "approved" | null;
+  extracted_text?: string | null;
   pdf_options_text?: Record<string, string>;
   pdf_warnings?: string[];
   pdf_confidence?: DecimalValue | null;
@@ -215,6 +217,8 @@ export function fromAdminQuestions(questions: QuestionAdminOut[]): EditableQuest
       question_text: question.question_text,
       source_file_id: question.source_file_id,
       source_number: question.source_number,
+      region_status: question.region_status,
+      extracted_text: question.extracted_text,
       pdf_options_text: question.pdf_options_text,
       pdf_warnings: question.pdf_warnings,
       pdf_confidence: question.pdf_confidence,
@@ -250,6 +254,8 @@ export function fromParsedQuestion(parsed: ParsedQuestion): EditableQuestion {
     question_text: parsed.question_text,
     source_file_id: parsed.source_file_id,
     source_number: parsed.source_number,
+    region_status: parsed.region_status,
+    extracted_text: parsed.extracted_text,
     pdf_options_text: parsed.pdf_options_text,
     pdf_warnings: parsed.warnings,
     pdf_confidence: parsed.pdf_confidence,
@@ -356,6 +362,8 @@ export function toQuestionCreates(questions: EditableQuestion[]): QuestionCreate
       question_text: question.question_text.trim(),
       source_file_id: question.source_file_id,
       source_number: question.source_number,
+      region_status: question.region_status,
+      extracted_text: question.extracted_text,
       pdf_options_text: question.pdf_options_text,
       pdf_warnings: question.pdf_warnings,
       pdf_confidence: question.pdf_confidence,
@@ -372,6 +380,8 @@ export function computeQuestionsSignature(questions: EditableQuestion[]): string
       question_text: question.question_text.trim(),
       source_file_id: question.source_file_id,
       source_number: question.source_number,
+      region_status: question.region_status,
+      extracted_text: question.extracted_text,
       pdf_options_text: question.pdf_options_text,
       pdf_warnings: question.pdf_warnings,
       pdf_confidence: question.pdf_confidence,

@@ -171,6 +171,8 @@ def _to_question_admin_out(question: exam_models.Question) -> QuestionAdminOut:
         question_text=question.question_text,
         source_file_id=question.source_file_id,
         source_number=question.source_number,
+        region_status=question.region_status,  # type: ignore[arg-type]
+        extracted_text=question.extracted_text,
         image_urls=(
             [f"/api/admin/exams/{question.exam_id}/source-images/{question.source_file_id}/{question.source_number}/{i}"
              for i, _ in enumerate(json.loads(question.image_regions or "[]"))]
@@ -247,6 +249,8 @@ def _build_question_model(
         question_text=data.question_text,
         source_file_id=data.source_file_id,
         source_number=data.source_number,
+        region_status=data.region_status or ("detected" if data.source_file_id else None),
+        extracted_text=data.extracted_text if data.source_file_id else None,
         pdf_options_text=json.dumps(data.pdf_options_text) if data.source_file_id else None,
         pdf_warnings=json.dumps(data.pdf_warnings) if data.source_file_id else None,
         pdf_confidence=data.pdf_confidence if data.source_file_id else None,
@@ -429,8 +433,21 @@ def delete_exam(
             detail="Examinations with recorded attempts cannot be deleted",
         )
 
+    source_ids = list(
+        db.execute(
+            select(exam_models.ExamSourceFile.id).where(
+                exam_models.ExamSourceFile.exam_id == exam.id
+            )
+        ).scalars().all()
+    )
+
     db.delete(exam)
     db.commit()
+
+    from app.exams.pdf_storage import delete_source_dir
+
+    for source_id in source_ids:
+        delete_source_dir(source_id)
 
 
 def save_questions(

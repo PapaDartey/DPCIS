@@ -100,14 +100,24 @@ export function updateQuestionCrops(
   examId: string,
   sourceId: string,
   questionNumber: number,
-  regions: Array<{ page: number; bbox: number[] }>,
+  regions: Array<{ page: number; bbox?: number[]; bbox_normalized?: number[] }>,
   dpi = 220,
   padding = 0,
-): Promise<{ regions: Array<{ page: number; bbox: number[] }>; image_urls: string[] }> {
+  strict = true,
+): Promise<{ regions: Array<{ page: number; bbox: number[]; bbox_normalized?: number[] }>; image_urls: string[] }> {
   return apiPut(
     `/api/admin/exams/${encodeURIComponent(examId)}/sources/${encodeURIComponent(sourceId)}/questions/${questionNumber}/crops`,
-    { body: { regions, dpi, padding }, timeoutMs: 120000 },
+    { body: { regions, dpi, padding, strict }, timeoutMs: 120000 },
   );
+}
+
+export function sourcePageImageUrl(
+  examId: string,
+  sourceId: string,
+  pageNumber: number,
+  dpi = 150,
+): string {
+  return `/api/admin/exams/${encodeURIComponent(examId)}/sources/${encodeURIComponent(sourceId)}/pages/${pageNumber}?dpi=${dpi}`;
 }
 
 export function saveExamQuestions(

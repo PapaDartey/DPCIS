@@ -56,13 +56,23 @@ export interface ExamAdminOut {
   question_count: number;
 }
 
+export type RegionStatus = "detected" | "needs-review" | "approved";
+
+export interface ImageRegion {
+  page: number;
+  bbox: number[];
+  bbox_normalized?: number[];
+}
+
 export interface QuestionAdminOut {
   id: string;
   question_text: string;
   source_file_id?: string | null;
   source_number?: number | null;
+  region_status?: RegionStatus | null;
+  extracted_text?: string | null;
   image_urls?: string[];
-  image_regions?: Array<{ page: number; bbox: number[] }>;
+  image_regions?: ImageRegion[];
   pdf_options_text?: Record<string, string>;
   pdf_warnings?: string[];
   pdf_confidence?: DecimalValue | null;
@@ -79,6 +89,8 @@ export interface QuestionCreate {
   question_text: string;
   source_file_id?: string | null;
   source_number?: number | null;
+  region_status?: RegionStatus | null;
+  extracted_text?: string | null;
   pdf_options_text?: Record<string, string>;
   pdf_warnings?: string[];
   pdf_confidence?: DecimalValue | null;
@@ -96,8 +108,10 @@ export interface ParsedQuestion {
   question_text: string;
   source_file_id?: string | null;
   source_number?: number | null;
+  region_status?: RegionStatus | null;
+  extracted_text?: string | null;
   image_urls?: string[];
-  image_regions?: Array<{ page: number; bbox: number[] }>;
+  image_regions?: ImageRegion[];
   warnings?: string[];
   pdf_options_text?: Record<string, string>;
   pdf_confidence?: DecimalValue | null;
@@ -126,6 +140,8 @@ export interface ParseQuestionsResponse {
   valid_count: number;
   error_count: number;
   normalized_answer_key?: string | null;
+  source_file_id?: string | null;
+  page_count?: number;
   page_dimensions?: Array<[number, number]>;
   ocr_used?: boolean;
   scan_mode?: boolean;

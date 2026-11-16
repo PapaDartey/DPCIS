@@ -263,4 +263,11 @@ export function fetchAuthMe(options?: ApiRequestOptions): Promise<AuthMeResponse
   });
 }
 
+export function confirmGoogleEmailProof(otp: string, password: string): Promise<void> {
+  return requestJson<void>("POST", "/auth/google-email-proof", {
+    getToken: getNeonAuthToken,
+    body: { otp, password },
+  });
+}
+
 export const fetchApplicationIdentity = fetchAuthMe;

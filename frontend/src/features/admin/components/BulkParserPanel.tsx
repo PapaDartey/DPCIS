@@ -25,18 +25,23 @@ import {
 import { ConfirmDialog } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { PdfCropEditor } from "@/features/admin/components/PdfCropEditor";
+import {
+  type PageCropRegion,
+  PdfPageCropModal,
+} from "@/features/admin/components/PdfPageCropModal";
 import { Textarea } from "@/components/ui/textarea";
 import { importQuestionPdf, parseQuestions, updateQuestionCrops } from "@/features/admin/adminApi";
 import { mergeRegions, renumberAnswers, splitRegions } from "@/features/admin/pdfStructure";
 import { extractImportText } from "@/features/admin/extractImportText";
 import { uniqueIncomingPdfQuestions } from "@/features/admin/importDedup";
+import { groupParserErrors } from "@/features/admin/validationGroups";
 import {
   extractAdminApiError,
   fromParsedQuestion,
   type EditableQuestion,
 } from "@/features/admin/adminUtils";
 import { cn } from "@/lib/utils";
-import type { ParsedQuestion, ParseQuestionsResponse } from "@/types/adminExam";
+import type { OptionLabel, ParsedQuestion, ParseQuestionsResponse } from "@/types/adminExam";
 
 const SAMPLE_FORMAT_TEXT = `1. Which protocol secures HTTP traffic using TLS?
 A. FTP
@@ -87,6 +92,9 @@ export function BulkParserPanel({
   const [requestError, setRequestError] = useState<string | null>(null);
   const [parseResult, setParseResult] = useState<ParseQuestionsResponse | null>(null);
   const [previewExpanded, setPreviewExpanded] = useState(true);
+  const [showErrorDetails, setShowErrorDetails] = useState(false);
+  const [drawNewOpen, setDrawNewOpen] = useState(false);
+  const [drawNewBusy, setDrawNewBusy] = useState(false);
   const [acknowledgedKeyMismatch, setAcknowledgedKeyMismatch] = useState(false);
   const [appliedBanner, setAppliedBanner] = useState<string | null>(null);
   const [confirmReplaceMode, setConfirmReplaceMode] = useState<"valid" | "all" | null>(null);
@@ -250,18 +258,13 @@ export function BulkParserPanel({
     try {
       let response: ParseQuestionsResponse;
       if (questionFile) {
-        try {
-          response = await importQuestionPdf(examId, questionFile, answerKeyText);
-        } catch (uploadError) {
-          if (!rawText.trim()) throw uploadError;
-          response = await parseQuestions(rawText, answerKeyText);
-          setRequestError("PDF upload failed. Showing a text-only fallback; diagrams will not be preserved.");
-        }
+        response = await importQuestionPdf(examId, questionFile, answerKeyText);
       } else {
         response = await parseQuestions(rawText, answerKeyText);
       }
       setParseResult(response);
       setPreviewExpanded(true);
+      setShowErrorDetails(response.errors.length <= 3);
       setUndoStructure(null);
       setAcknowledgedKeyMismatch(false);
     } catch (error) {
@@ -639,29 +642,46 @@ export function BulkParserPanel({
               <Alert variant="destructive" role="alert">
                 <div className="flex items-start gap-2.5">
                   <AlertTriangle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
-                  <div className="min-w-0 space-y-2">
-                    <AlertTitle>
-                      {parseResult.error_count} issue
-                      {parseResult.error_count === 1 ? "" : "s"} need attention
-                    </AlertTitle>
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <AlertTitle>
+                        {parseResult.error_count} issue
+                        {parseResult.error_count === 1 ? "" : "s"} need attention
+                      </AlertTitle>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="min-h-11 bg-background text-foreground"
+                        aria-expanded={showErrorDetails}
+                        onClick={() => setShowErrorDetails((prev) => !prev)}
+                      >
+                        {showErrorDetails ? "Hide details" : "Show details"}
+                      </Button>
+                    </div>
                     <AlertDescription>
-                      <p className="mb-2">
-                        Fix the questions or answer key and preview again. Questions needing
-                        fixes can also be edited below before saving.
-                      </p>
-                      <ul className="list-disc space-y-1 pl-5 break-words">
-                        {parseResult.errors.map((err, index) => (
-                          <li key={`${err.block_index}-${index}`}>
-                            <strong>
-                              {err.block_index === 0
-                                ? "Answer key / formatting"
-                                : `Question #${err.block_index}`}
-                              :
-                            </strong>{" "}
-                            {err.message}
+                      <ul className="space-y-1 text-sm">
+                        {groupParserErrors(parseResult.errors).map((group) => (
+                          <li key={group.id}>
+                            <strong>{group.label}:</strong> {group.summary}
                           </li>
                         ))}
                       </ul>
+                      {showErrorDetails ? (
+                        <ul className="mt-3 list-disc space-y-1 border-t border-destructive-border/40 pt-2 pl-5 break-words text-xs">
+                          {parseResult.errors.map((err, index) => (
+                            <li key={`${err.block_index}-${index}`}>
+                              <strong>
+                                {err.block_index === 0
+                                  ? "Answer key / formatting"
+                                  : `Question #${err.block_index}`}
+                                :
+                              </strong>{" "}
+                              {err.message}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </AlertDescription>
                   </div>
                 </div>
@@ -760,6 +780,7 @@ export function BulkParserPanel({
                     return (
                       <li
                         key={`preview-block-${block.position}`}
+                        id={`preview-block-${block.position}`}
                         className={cn(
                           "rounded-lg border p-4",
                           block.valid
@@ -822,7 +843,7 @@ export function BulkParserPanel({
                             ) : null}
                             <label className="flex flex-col gap-1 text-xs">
                               Split at page y (pt)
-                              <input type="number" className="w-28 rounded border p-2" min={0}
+                              <input type="number" className="min-h-11 w-28 rounded border p-2" min={0}
                                 value={splitY[block.position] ?? ""}
                                 onChange={(event) => setSplitY((current) => ({
                                   ...current, [block.position]: Number(event.target.value),
@@ -851,18 +872,73 @@ export function BulkParserPanel({
                         </label> : null}
 
                         {block.options.length > 0 ? (
-                          <ul className="mt-2.5 grid gap-1.5 sm:grid-cols-2">
-                            {block.options.map((opt) => {
-                              const isAnswer = block.answer_label === opt.label;
-                              return (
-                                <li
-                                  key={`${block.position}-${opt.label}`}
-                                  className={cn(
-                                    "min-w-0 break-words rounded-md border px-2.5 py-1.5 text-xs",
-                                    isAnswer
-                                      ? "border-success-border bg-success-subtle font-medium text-success"
-                                      : "border-border bg-background text-foreground",
-                                  )}
+                          <div className="mt-2.5 space-y-2">
+                            {block.source_file_id ? (
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-xs font-medium text-muted-foreground">
+                                  Correct answer:
+                                </span>
+                                {(["A", "B", "C", "D"] as const).map((label) => {
+                                  const selected = block.answer_label === label;
+                                  return (
+                                    <Button
+                                      key={label}
+                                      type="button"
+                                      size="sm"
+                                      variant={selected ? "default" : "outline"}
+                                      className="min-h-11 min-w-11"
+                                      aria-pressed={selected}
+                                      onClick={() => setParseResult((current) => {
+                                        if (!current) return current;
+                                        const updated = [...current.valid_questions, ...current.invalid_questions]
+                                          .sort((a, b) => a.position - b.position)
+                                          .map((q) => {
+                                            if (q.position !== block.position) return q;
+                                            const errors = q.errors.filter((m) => !m.toLowerCase().includes("answer"));
+                                            return {
+                                              ...q,
+                                              answer_label: label as OptionLabel,
+                                              errors,
+                                              valid: errors.length === 0,
+                                            };
+                                          });
+                                        return rebuildPreview(updated, current);
+                                      })}
+                                    >
+                                      {label}
+                                    </Button>
+                                  );
+                                })}
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  className="min-h-11 text-destructive"
+                                  onClick={() => setParseResult((current) => {
+                                    if (!current) return current;
+                                    const remaining = [...current.valid_questions, ...current.invalid_questions]
+                                      .filter((q) => q.position !== block.position)
+                                      .sort((a, b) => a.position - b.position)
+                                      .map((q, idx) => ({ ...q, position: idx + 1 }));
+                                    return rebuildPreview(remaining, current);
+                                  })}
+                                >
+                                  Remove
+                                </Button>
+                              </div>
+                            ) : null}
+                            <ul className="grid gap-1.5 sm:grid-cols-2">
+                              {block.options.map((opt) => {
+                                const isAnswer = block.answer_label === opt.label;
+                                return (
+                                  <li
+                                    key={`${block.position}-${opt.label}`}
+                                    className={cn(
+                                      "min-w-0 break-words rounded-md border px-2.5 py-1.5 text-xs",
+                                      isAnswer
+                                        ? "border-success-border bg-success-subtle font-medium text-success"
+                                        : "border-border bg-background text-foreground",
+                                    )}
                                 >
                                   <strong className="mr-1.5">{opt.label}.</strong>
                                   <span>{opt.option_text}</span>
@@ -870,6 +946,7 @@ export function BulkParserPanel({
                               );
                             })}
                           </ul>
+                        </div>
                         ) : null}
 
                         {block.errors.length > 0 ? (
@@ -883,6 +960,19 @@ export function BulkParserPanel({
                     );
                   })}
                 </ol>
+              </div>
+            ) : null}
+            {parseResult.source_file_id && (parseResult.page_dimensions?.length ?? 0) > 0 ? (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11"
+                  disabled={drawNewBusy}
+                  onClick={() => setDrawNewOpen(true)}
+                >
+                  Draw question from PDF page
+                </Button>
               </div>
             ) : null}
             </div>
@@ -913,6 +1003,73 @@ export function BulkParserPanel({
         description="This changes PDF crop boundaries and shifts preview question numbers and answer keys. Review answers and marks before saving. You can undo this change."
         confirmLabel={pendingStructure?.kind === "merge" ? "Merge questions" : "Split question"}
         isPending={structureBusy} onConfirm={() => void handleStructureConfirm()} />
+      {parseResult?.source_file_id && (parseResult.page_dimensions?.length ?? 0) > 0 && drawNewOpen ? (
+        <PdfPageCropModal
+          open
+          onOpenChange={(open) => { if (!open && !drawNewBusy) setDrawNewOpen(false); }}
+          examId={examId}
+          sourceId={parseResult.source_file_id}
+          pageDimensions={parseResult.page_dimensions ?? []}
+          initialRegion={{
+            page: 1,
+            bbox: [
+              36,
+              36,
+              Math.max(100, (parseResult.page_dimensions?.[0]?.[0] ?? 595) - 36),
+              Math.max(150, Math.min(260, (parseResult.page_dimensions?.[0]?.[1] ?? 842) - 36)),
+            ],
+          }}
+          title="Draw new question crop from PDF page"
+          busy={drawNewBusy}
+          onApply={async (region: PageCropRegion) => {
+            if (!parseResult.source_file_id) return;
+            setDrawNewBusy(true);
+            setRequestError(null);
+            try {
+              const all = [...parseResult.valid_questions, ...parseResult.invalid_questions];
+              const nextNum = Math.max(0, ...all.map((q) => q.source_number ?? q.position ?? 0)) + 1;
+              const nextPos = all.length + 1;
+              const rendered = await updateQuestionCrops(
+                examId,
+                parseResult.source_file_id,
+                nextNum,
+                [{ page: region.page, bbox: [...region.bbox] }],
+                200,
+                0,
+                false,
+              );
+              const created: ParsedQuestion = {
+                question_text: `Question ${nextNum}`,
+                source_file_id: parseResult.source_file_id,
+                source_number: nextNum,
+                region_status: "approved",
+                image_urls: rendered.image_urls,
+                image_regions: rendered.regions,
+                warnings: [],
+                position: nextPos,
+                points: "1.00",
+                options: (["A", "B", "C", "D"] as const).map((label) => ({
+                  label,
+                  option_text: `Option ${label} (see image)`,
+                })),
+                answer_label: null,
+                valid: false,
+                errors: ["Select a correct answer (A-D)."],
+              };
+              setParseResult((current) =>
+                current ? rebuildPreview([...all, created], current) : current,
+              );
+              setDrawNewOpen(false);
+            } catch (error) {
+              setRequestError(
+                extractAdminApiError(error, "Could not create question crop.").message,
+              );
+            } finally {
+              setDrawNewBusy(false);
+            }
+          }}
+        />
+      ) : null}
     </Card>
   );
 }

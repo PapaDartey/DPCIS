@@ -7,6 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
 from app.attempts.router import router as attempts_router
 from app.auth.dependencies import AuthIdentity, _current_managed_role, require_identity
@@ -18,9 +19,7 @@ from app.users.service import upsert_application_user
 logger = logging.getLogger("examination_hub.api")
 
 
-def _apply_security_headers[ResponseT: Response](
-    response: ResponseT, request_id: str
-) -> ResponseT:
+def _apply_security_headers[ResponseT: Response](response: ResponseT, request_id: str) -> ResponseT:
     response.headers["X-Request-ID"] = request_id
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -29,13 +28,16 @@ def _apply_security_headers[ResponseT: Response](
     return response
 
 
-_OUTER_API_ROOT_PATHS = frozenset({
-    "/api/health",
-    "/api/auth/me",
-    "/api/docs",
-    "/api/redoc",
-    "/api/openapi.json",
-})
+_OUTER_API_ROOT_PATHS = frozenset(
+    {
+        "/api/health",
+        "/api/auth/me",
+        "/api/auth/google-email-proof",
+        "/api/docs",
+        "/api/redoc",
+        "/api/openapi.json",
+    }
+)
 
 
 def _strip_api_prefix(request: Request) -> None:
@@ -144,6 +146,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         identity: AuthIdentity = Depends(require_identity),
         db=Depends(get_db),
     ) -> dict[str, str | None]:
+        from app.auth.google_email_proof import require_google_email_proof
+
+        require_google_email_proof(db, identity)
         user = upsert_application_user(
             db,
             auth_subject=identity.subject,
@@ -158,6 +163,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "display_name": user.display_name,
             "role": user.role,
         }
+
+    class GoogleEmailProofRequest(BaseModel):
+        otp: str = Field(min_length=4, max_length=16)
+        password: str = Field(min_length=8, max_length=128)
+
+    @app.post("/auth/google-email-proof", status_code=204, tags=["auth"])
+    def confirm_google_email_proof(
+        payload: GoogleEmailProofRequest,
+        identity: AuthIdentity = Depends(require_identity),
+        db=Depends(get_db),
+    ) -> None:
+        from app.auth.google_email_proof import confirm_google_email_and_password
+
+        confirm_google_email_and_password(
+            db, identity, resolved_settings, payload.otp, payload.password
+        )
 
     app.include_router(exams_router)
     app.include_router(attempts_router)

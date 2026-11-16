@@ -105,6 +105,15 @@ class Settings(BaseSettings):
     NEON_AUTH_JWKS_URL: str | None = None
     NEON_AUTH_AUDIENCE: str | None = None
 
+    EXAM_PDF_STORAGE_DIR: str | None = None
+    MAX_PDF_BYTES: int = 100 * 1024 * 1024
+    MAX_PDF_PAGES: int = 200
+    MAX_PDF_PAGE_DIMENSION_PT: float = 5000.0
+    MAX_PDF_IMAGE_PIXELS: int = 40_000_000
+    PDF_RENDER_DPI: int = 200
+    MAX_PDF_RENDER_DPI: int = 300
+    PDF_PROCESS_TIMEOUT_SECONDS: int = 60
+
     @field_validator("APP_NAME", "APP_VERSION", mode="before")
     @classmethod
     def _validate_non_empty_text(cls, value: object, info) -> str:

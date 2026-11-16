@@ -34,7 +34,11 @@ from app.exams.pdf_storage import (
     store_pdf,
 )
 
-router = APIRouter(prefix="/api/admin/exams", tags=["Admin re-crop"])
+router = APIRouter(
+    prefix="/api/admin/exams",
+    tags=["Admin re-crop"],
+    dependencies=[Depends(require_admin)],
+)
 
 
 class RecropApproval(BaseModel):

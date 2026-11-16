@@ -621,10 +621,12 @@ def test_alembic_infrastructure_has_single_linear_head_0006() -> None:
     assert not alembic_cfg.get_main_option("sqlalchemy.url")
 
     script_dir = ScriptDirectory.from_config(alembic_cfg)
-    assert script_dir.get_heads() == ["0006_submission_reason"]
+    assert script_dir.get_heads() == ["0008_google_email_proof"]
 
     history_revs = [rev.revision for rev in script_dir.walk_revisions()]
     assert history_revs == [
+        "0008_google_email_proof",
+        "0007_pdf_import_workflow",
         "0006_submission_reason",
         "0005_exam_pdf_sources",
         "0004_exam_closed_at_and_indexes",
@@ -642,6 +644,8 @@ def test_alembic_infrastructure_has_single_linear_head_0006() -> None:
         "0004_exam_closed_at_and_indexes.py",
         "0005_exam_pdf_sources.py",
         "0006_submission_reason.py",
+        "0007_pdf_import_workflow.py",
+        "0008_google_email_proof.py",
     ]
 
 
