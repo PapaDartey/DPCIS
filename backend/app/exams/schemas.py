@@ -288,10 +288,15 @@ class ExamPublish(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+RegionStatus = Literal["detected", "needs-review", "approved"]
+
+
 class QuestionCreate(BaseModel):
     question_text: str = Field(min_length=1)
     source_file_id: UUID | None = None
     source_number: int | None = Field(default=None, ge=1)
+    region_status: RegionStatus | None = None
+    extracted_text: str | None = None
     pdf_options_text: dict[str, str] = Field(default_factory=dict)
     pdf_warnings: list[str] = Field(default_factory=list)
     pdf_confidence: Decimal | None = None
@@ -360,6 +365,8 @@ class QuestionAdminOut(BaseModel):
     question_text: str
     source_file_id: UUID | None = None
     source_number: int | None = None
+    region_status: RegionStatus | None = None
+    extracted_text: str | None = None
     image_urls: list[str] = Field(default_factory=list)
     image_regions: list[dict] = Field(default_factory=list)
     pdf_options_text: dict[str, str] = Field(default_factory=dict)
@@ -385,6 +392,8 @@ class ParsedQuestion(BaseModel):
     question_text: str
     source_file_id: UUID | None = None
     source_number: int | None = None
+    region_status: RegionStatus | None = None
+    extracted_text: str | None = None
     image_urls: list[str] = Field(default_factory=list)
     image_regions: list[dict] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
@@ -416,6 +425,8 @@ class ParseQuestionsResponse(BaseModel):
     valid_count: int = 0
     error_count: int = 0
     normalized_answer_key: str | None = None
+    source_file_id: UUID | None = None
+    page_count: int = 0
     page_dimensions: list[tuple[float, float]] = Field(default_factory=list)
     ocr_used: bool = False
     scan_mode: bool = False
@@ -423,13 +434,21 @@ class ParseQuestionsResponse(BaseModel):
 
 class CropRegionInput(BaseModel):
     page: int = Field(ge=1)
-    bbox: tuple[float, float, float, float]
+    bbox: tuple[float, float, float, float] | None = None
+    bbox_normalized: tuple[float, float, float, float] | None = None
+
+    @model_validator(mode="after")
+    def _require_bbox_or_normalized(self) -> CropRegionInput:
+        if self.bbox is None and self.bbox_normalized is None:
+            raise ValueError("Either bbox or bbox_normalized is required")
+        return self
 
 
 class CropUpdateRequest(BaseModel):
     regions: list[CropRegionInput] = Field(min_length=1, max_length=20)
     dpi: int = Field(default=220, ge=72, le=300)
     padding: float = Field(default=0.0, ge=0, le=30)
+    strict: bool = True
 
 
 class CropUpdateResponse(BaseModel):

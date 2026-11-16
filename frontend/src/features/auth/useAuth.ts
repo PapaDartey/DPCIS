@@ -9,6 +9,7 @@ export interface AuthContextValue {
   sessionUser: AuthUser | null;
   identity: AuthMeResponse | null;
   errorMessage: string | null;
+  googleEmailProofRequired: boolean;
   refreshAuth: () => Promise<void>;
   signOut: () => Promise<void>;
 }

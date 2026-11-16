@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import re
 from collections.abc import Iterable
 from decimal import Decimal
+from pathlib import Path
 from typing import Any, cast
 from uuid import UUID, uuid4
 
@@ -21,17 +23,18 @@ from fastapi import (
     UploadFile,
     status,
 )
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import Response as BinaryResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import AuthIdentity, require_admin, require_student
+from app.config import get_settings
 from app.database.session import get_db
 from app.exams import models as exam_models
 from app.exams import service
 from app.exams.parser import ANSWER_KEY_ENTRY, ANSWER_KEY_ROW
 from app.exams.pdf_import import (
-    MAX_PDF_BYTES,
     OCRUnavailable,
     detect_pdf_questions,
     detect_questions_with_ocr,
@@ -41,9 +44,11 @@ from app.exams.pdf_import import (
 )
 from app.exams.pdf_recrop import router as recrop_router
 from app.exams.pdf_storage import (
+    delete_source_dir,
     load_image,
     load_regions,
     regenerate_crops,
+    render_source_page,
     source_dir,
     store_answer_key_pdf,
     store_pdf,
@@ -125,6 +130,95 @@ def parse_questions_route(
     return service.parse_questions_service(data.raw_text, data.answer_key_text)
 
 
+_ALLOWED_UPLOAD_MIME_TYPES = {
+    "",
+    "application/pdf",
+    "application/x-pdf",
+    "application/octet-stream",
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+}
+_FLEXIBLE_KEY_ENTRY = re.compile(
+    r"(?:^|[\s,;])(?:Q(?:uestion)?\s*)?(\d{1,4})\s*(?:[.):\-]|\s)\s*([A-Da-d])\b",
+    re.IGNORECASE,
+)
+
+
+def _sanitize_filename(raw_name: str | None) -> str:
+    base = Path(raw_name or "uploaded.pdf").name
+    cleaned = re.sub(r"[\x00-\x1f/\\]+", "_", base).strip(" .")
+    return (cleaned or "uploaded.pdf")[:255]
+
+
+def _parse_pdf_answer_key(answer_key_text: str) -> dict[int, tuple[str, Decimal]]:
+    key: dict[int, tuple[str, Decimal]] = {}
+    text = answer_key_text.strip()
+    if not text:
+        return key
+    compact = re.sub(r"\s+", "", text)
+    if compact and re.fullmatch(r"[A-Da-d]+", compact):
+        return {i: (letter.upper(), Decimal(1)) for i, letter in enumerate(compact, 1)}
+
+    comma_tokens = [tok.strip() for tok in text.split(",") if tok.strip()]
+    if len(comma_tokens) > 1 and all(re.fullmatch(r"[A-Da-d]", tok) for tok in comma_tokens):
+        return {i: (tok.upper(), Decimal(1)) for i, tok in enumerate(comma_tokens, 1)}
+
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if lines and all(re.fullmatch(r"[A-Da-d]", line) for line in lines):
+        return {i: (line.upper(), Decimal(1)) for i, line in enumerate(lines, 1)}
+
+    for i in range(len(lines) - 2):
+        if (
+            re.fullmatch(r"\d+", lines[i])
+            and re.fullmatch(r"[A-Da-d]", lines[i + 1])
+            and re.fullmatch(r"\d+", lines[i + 2])
+        ):
+            key[int(lines[i])] = (lines[i + 1].upper(), Decimal(lines[i + 2]))
+
+    for line in text.splitlines():
+        row = ANSWER_KEY_ROW.fullmatch(line)
+        matched_line = False
+        for match in ANSWER_KEY_ENTRY.finditer(line):
+            if match.group(2).upper() in "ABCD":
+                matched_line = True
+                key[int(match.group(1))] = (
+                    match.group(2).upper(),
+                    Decimal(row.group(3)) if row and row.group(3) else Decimal(1),
+                )
+        if not matched_line:
+            for match in _FLEXIBLE_KEY_ENTRY.finditer(line):
+                key[int(match.group(1))] = (match.group(2).upper(), Decimal(1))
+    return key
+
+
+def _process_pdf_upload_sync(
+    data: bytes,
+) -> tuple[list, int, list[tuple[float, float]], bool, bool, bytes, str | None]:
+    doc = open_question_upload(data)
+    ocr_warning: str | None = None
+    try:
+        scan_mode = not any(page.get_text("words") for page in doc)
+        detected = detect_scan_questions(doc) if scan_mode else detect_pdf_questions(doc)
+        ocr_used = not scan_mode and not detected
+        if ocr_used:
+            try:
+                detected = detect_questions_with_ocr(doc)
+            except OCRUnavailable:
+                detected = []
+                ocr_used = False
+                ocr_warning = (
+                    "Automatic question detection could not run OCR on this document. "
+                    "Draw question crops manually on the rendered pages."
+                )
+        page_count = len(doc)
+        page_dimensions = [(float(page.rect.width), float(page.rect.height)) for page in doc]
+        pdf_bytes = doc.tobytes() if not data.startswith(b"%PDF-") else data
+    finally:
+        doc.close()
+    return detected, page_count, page_dimensions, ocr_used, scan_mode, pdf_bytes, ocr_warning
+
+
 @admin_router.post("/{exam_id}/import-pdf", response_model=ParseQuestionsResponse)
 async def import_pdf_route(
     exam_id: UUID,
@@ -135,36 +229,39 @@ async def import_pdf_route(
     db: Session = Depends(get_db),
 ) -> ParseQuestionsResponse:
     service.require_admin_user_id(identity)
+    settings = get_settings()
     exam = db.get(exam_models.Exam, exam_id)
     if exam is None or exam.status != "DRAFT":
         raise HTTPException(status_code=404, detail="Draft examination not found")
-    data = await file.read(MAX_PDF_BYTES + 1)
+    content_type = (file.content_type or "").split(";", 1)[0].strip().lower()
+    if content_type not in _ALLOWED_UPLOAD_MIME_TYPES:
+        raise HTTPException(status_code=400, detail="Upload a PDF, PNG, or JPEG file.")
+    data = await file.read(settings.MAX_PDF_BYTES + 1)
     # Version crop reuse, hashing original bytes so raster re-uploads also deduplicate.
     digest = hashlib.sha256(b"graphics-crops-v2\0" + data).hexdigest()
     try:
-        doc = open_question_upload(data)
+        (
+            detected,
+            page_count,
+            page_dimensions,
+            ocr_used,
+            scan_mode,
+            data,
+            ocr_warning,
+        ) = await asyncio.wait_for(
+            run_in_threadpool(_process_pdf_upload_sync, data),
+            timeout=settings.PDF_PROCESS_TIMEOUT_SECONDS,
+        )
+    except TimeoutError as exc:
+        raise HTTPException(status_code=504, detail="PDF processing timed out.") from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    try:
-        scan_mode = not any(page.get_text("words") for page in doc)
-        detected = detect_scan_questions(doc) if scan_mode else detect_pdf_questions(doc)
-        ocr_used = not scan_mode and not detected
-        if ocr_used:
-            try:
-                detected = detect_questions_with_ocr(doc)
-            except OCRUnavailable as exc:
-                raise HTTPException(status_code=422, detail=str(exc)) from exc
-        page_count = len(doc)
-        page_dimensions = [(float(page.rect.width), float(page.rect.height)) for page in doc]
-        if not data.startswith(b"%PDF-"):
-            data = doc.tobytes()
-    finally:
-        doc.close()
-    if not detected:
-        raise HTTPException(status_code=422, detail="No numbered questions were detected")
     answer_data: bytes | None = None
     if answer_file is not None:
-        answer_data = await answer_file.read(MAX_PDF_BYTES + 1)
+        ans_mime = (answer_file.content_type or "").split(";", 1)[0].strip().lower()
+        if ans_mime not in _ALLOWED_UPLOAD_MIME_TYPES:
+            raise HTTPException(status_code=400, detail="Answer key file must be a PDF.")
+        answer_data = await answer_file.read(settings.MAX_PDF_BYTES + 1)
         try:
             answer_doc = validate_pdf(answer_data)
         except ValueError as exc:
@@ -186,46 +283,35 @@ async def import_pdf_route(
     if existing is None:
         source_id = uuid4()
         try:
-            store_pdf(source_id, data, detected)
+            await run_in_threadpool(store_pdf, source_id, data, detected)
         except OSError as exc:
             raise HTTPException(status_code=500, detail="PDF storage is unavailable") from exc
         db.add(exam_models.ExamSourceFile(
             id=source_id,
             exam_id=exam_id,
-            original_filename=(file.filename or "uploaded.pdf")[:255],
+            original_filename=_sanitize_filename(file.filename),
             sha256=digest,
             page_count=page_count,
+            page_dimensions=json.dumps(page_dimensions),
         ))
-        db.commit()
+        try:
+            db.commit()
+        except Exception:
+            db.rollback()
+            delete_source_dir(source_id)
+            raise
     else:
         source_id = existing.id
+        if existing.page_dimensions is None:
+            existing.page_dimensions = json.dumps(page_dimensions)
+            db.commit()
         if not source_dir(source_id).is_dir():
             try:
-                store_pdf(source_id, data, detected)
+                await run_in_threadpool(store_pdf, source_id, data, detected)
             except OSError as exc:
                 raise HTTPException(status_code=500, detail="PDF storage is unavailable") from exc
-    key: dict[int, tuple[str, Decimal]] = {}
-    compact = re.sub(r"\s+", "", answer_key_text)
-    if compact and re.fullmatch(r"[A-Da-d]+", compact):
-        key = {i: (letter.upper(), Decimal(1)) for i, letter in enumerate(compact, 1)}
-    else:
-        lines = [line.strip() for line in answer_key_text.splitlines() if line.strip()]
-        for i in range(len(lines) - 2):
-            if (
-                re.fullmatch(r"\d+", lines[i])
-                and re.fullmatch(r"[A-Da-d]", lines[i + 1])
-                and re.fullmatch(r"\d+", lines[i + 2])
-            ):
-                key[int(lines[i])] = (lines[i + 1].upper(), Decimal(lines[i + 2]))
-        for line in answer_key_text.splitlines():
-            row = ANSWER_KEY_ROW.fullmatch(line)
-            for match in ANSWER_KEY_ENTRY.finditer(line):
-                if match.group(2).upper() in "ABCD":
-                    key[int(match.group(1))] = (
-                        match.group(2).upper(),
-                        Decimal(row.group(3)) if row and row.group(3) else Decimal(1),
-                    )
-    mismatch = bool(answer_key_text.strip()) and (
+    key = _parse_pdf_answer_key(answer_key_text)
+    mismatch = bool(answer_key_text.strip()) and bool(detected) and (
         len(key) != len(detected) or set(key) != {question.number for question in detected}
     )
     if answer_data is not None and not mismatch:
@@ -251,8 +337,10 @@ async def import_pdf_route(
             ParsedQuestion(
                 position=question.number,
                 question_text=question.extracted_text or f"Question {question.number}",
+                extracted_text=question.extracted_text or None,
                 source_file_id=source_id,
                 source_number=question.number,
+                region_status="needs-review" if warnings else "detected",
                 image_urls=[
                     f"/api/admin/exams/{exam_id}/source-images/{source_id}/{question.number}/{i}"
                     for i in range(len(regions))
@@ -277,6 +365,28 @@ async def import_pdf_route(
                 ),
             )
         )
+    extra_errors: list[ParseQuestionsError] = []
+    if not detected:
+        extra_errors.append(
+            ParseQuestionsError(
+                block_index=0,
+                message=ocr_warning
+                or (
+                    "No questions were auto-detected. "
+                    "Use the page viewer to draw question crops manually."
+                ),
+            )
+        )
+    if mismatch:
+        extra_errors.append(
+            ParseQuestionsError(
+                block_index=0,
+                message=(
+                    f"Answer key has {len(key)} answers but {len(detected)} "
+                    "questions were detected"
+                ),
+            )
+        )
     return ParseQuestionsResponse(
         valid_questions=[q for q in items if q.valid],
         invalid_questions=[q for q in items if not q.valid],
@@ -285,24 +395,41 @@ async def import_pdf_route(
         errors=[
             ParseQuestionsError(block_index=item.position, message=message)
             for item in items for message in item.errors
-        ] + (
-            [
-                ParseQuestionsError(
-                    block_index=0,
-                    message=(
-                        f"Answer key has {len(key)} answers but {len(detected)} "
-                        "questions were detected"
-                    ),
-                )
-            ]
-            if mismatch
-            else []
-        ),
-        error_count=sum(len(item.errors) for item in items) + int(mismatch),
+        ]
+        + extra_errors,
+        error_count=sum(len(item.errors) for item in items) + len(extra_errors),
         normalized_answer_key=", ".join(f"{n}. {v[0]}" for n, v in sorted(key.items())),
+        source_file_id=source_id,
+        page_count=page_count,
         page_dimensions=page_dimensions,
         ocr_used=ocr_used,
         scan_mode=scan_mode,
+    )
+
+
+@admin_router.get("/{exam_id}/sources/{source_id}/pages/{page_number}")
+def admin_source_page_route(
+    exam_id: UUID,
+    source_id: UUID,
+    page_number: int,
+    dpi: int = Query(default=150, ge=72, le=300),
+    identity: AuthIdentity = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> BinaryResponse:
+    service.require_admin_user_id(identity)
+    source = db.get(exam_models.ExamSourceFile, source_id)
+    if source is not None and source.exam_id != exam_id:
+        source = None
+    if source is None:
+        raise HTTPException(status_code=404, detail="Source PDF not found")
+    try:
+        image = render_source_page(source.id, page_number, dpi=dpi)
+    except (FileNotFoundError, ValueError) as exc:
+        raise HTTPException(status_code=404, detail="Page image not found") from exc
+    return BinaryResponse(
+        content=image,
+        media_type="image/png",
+        headers={"Cache-Control": "no-store, private"},
     )
 
 
@@ -325,7 +452,11 @@ def admin_source_image_route(
         image = load_image(source.id, number, index)
     except (FileNotFoundError, ValueError) as exc:
         raise HTTPException(status_code=404, detail="Image not found") from exc
-    return BinaryResponse(content=image, media_type="image/png")
+    return BinaryResponse(
+        content=image,
+        media_type="image/png",
+        headers={"Cache-Control": "no-store, private"},
+    )
 
 
 @admin_router.put(
@@ -349,9 +480,10 @@ def update_question_crops_route(
         regions = regenerate_crops(
             source_id,
             number,
-            [region.model_dump() for region in payload.regions],
+            [region.model_dump(exclude_none=True) for region in payload.regions],
             dpi=payload.dpi,
             padding=payload.padding,
+            strict=payload.strict,
         )
     except (ValueError, FileNotFoundError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

@@ -49,6 +49,12 @@ function resolveAuthError(error: unknown): ResolvedAuthError {
       };
     }
     if (error.status === 403) {
+      if (error.detail === "GOOGLE_EMAIL_PROOF_REQUIRED") {
+        return {
+          message: "Verify your email and set a password to finish setting up your account.",
+          shouldSignOut: false,
+        };
+      }
       return {
         message: "You do not have access to this workspace.",
         shouldSignOut: false,
@@ -72,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [sessionUser, setSessionUser] = useState<AuthUser | null>(null);
   const [identity, setIdentity] = useState<AuthMeResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [googleEmailProofRequired, setGoogleEmailProofRequired] = useState(false);
 
   const requestSeqRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -81,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSessionUser(null);
       setIdentity(null);
       setErrorMessage(null);
+      setGoogleEmailProofRequired(false);
       setIsLoading(false);
       return;
     }
@@ -93,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setIdentity(null);
     setErrorMessage(null);
+    setGoogleEmailProofRequired(false);
 
     try {
       const currentUser = await getCurrentAuthUser();
@@ -114,6 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setIdentity(me);
       setErrorMessage(null);
+      setGoogleEmailProofRequired(false);
     } catch (error) {
       if (requestSeq !== requestSeqRef.current || controller.signal.aborted) {
         return;
@@ -128,6 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSessionUser(null);
       }
       setErrorMessage(resolvedError.message);
+      setGoogleEmailProofRequired(error instanceof ApiClientError && error.status === 403 && error.detail === "GOOGLE_EMAIL_PROOF_REQUIRED");
     } finally {
       if (requestSeq === requestSeqRef.current) {
         setIsLoading(false);
@@ -158,6 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSessionUser(null);
       setIdentity(null);
       setErrorMessage(null);
+      setGoogleEmailProofRequired(false);
       setIsLoading(false);
     }
   }, []);
@@ -169,10 +181,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sessionUser,
       identity,
       errorMessage,
+      googleEmailProofRequired,
       refreshAuth,
       signOut,
     }),
-    [isLoading, sessionUser, identity, errorMessage, refreshAuth, signOut],
+    [isLoading, sessionUser, identity, errorMessage, googleEmailProofRequired, refreshAuth, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

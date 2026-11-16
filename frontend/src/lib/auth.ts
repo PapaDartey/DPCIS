@@ -41,6 +41,26 @@ export async function signInWithEmail(email: string, password: string) {
   return neonAuthClient.signIn.email({ email, password });
 }
 
+export async function sendEmailVerificationCode(email: string) {
+  if (!neonAuthClient) throw new Error(AUTH_UNAVAILABLE_MESSAGE);
+  return neonAuthClient.emailOtp.sendVerificationOtp({ email, type: "email-verification" });
+}
+
+export async function verifyEmailCode(email: string, otp: string) {
+  if (!neonAuthClient) throw new Error(AUTH_UNAVAILABLE_MESSAGE);
+  return neonAuthClient.emailOtp.verifyEmail({ email, otp });
+}
+
+export async function requestPasswordCode(email: string) {
+  if (!neonAuthClient) throw new Error(AUTH_UNAVAILABLE_MESSAGE);
+  return neonAuthClient.emailOtp.requestPasswordReset({ email });
+}
+
+export async function resetPasswordWithCode(email: string, otp: string, password: string) {
+  if (!neonAuthClient) throw new Error(AUTH_UNAVAILABLE_MESSAGE);
+  return neonAuthClient.emailOtp.resetPassword({ email, otp, password });
+}
+
 export async function signInWithGoogle(callbackURL?: string) {
   if (!neonAuthClient) {
     throw new Error(AUTH_UNAVAILABLE_MESSAGE);

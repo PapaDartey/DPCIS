@@ -84,9 +84,20 @@ export function McqQuestionCard({
           <legend className="mb-5 block w-full select-none break-words p-0 text-lg font-semibold leading-relaxed text-foreground sm:text-xl">
             {hasImage ? `Question ${questionNumber}: choose one answer` : questionText}
           </legend>
-          {imageUrls.map((path) => (
-            <AuthenticatedPdfImage key={path} path={path} alt={questionText}
-              onError={handleImageError} className="mb-5 h-auto w-full max-w-full rounded-lg border border-border bg-white shadow-sm" />
+          {imageUrls.map((path, imgIndex) => (
+            <AuthenticatedPdfImage
+              key={path}
+              path={path}
+              alt={questionText || `Question ${questionNumber} diagram`}
+              enlargeable
+              enlargeTitle={
+                imageUrls.length > 1
+                  ? `Question ${questionNumber} (part ${imgIndex + 1})`
+                  : `Question ${questionNumber}`
+              }
+              onError={handleImageError}
+              className="h-auto w-full max-w-full rounded-lg border border-border bg-white shadow-sm"
+            />
           ))}
 
           <div className="grid gap-3">

@@ -4,6 +4,10 @@ import { AuthenticatedPdfImage } from "@/components/exam/AuthenticatedPdfImage";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { updateQuestionCrops } from "@/features/admin/adminApi";
+import {
+  type PageCropRegion,
+  PdfPageCropModal,
+} from "@/features/admin/components/PdfPageCropModal";
 import type { ParsedQuestion } from "@/types/adminExam";
 
 type Region = { page: number; bbox: number[] };
@@ -21,18 +25,19 @@ export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: P
   const [padding, setPadding] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [fullPageIndex, setFullPageIndex] = useState<number | null>(null);
   const regionsRef = useRef(regions);
   regionsRef.current = regions;
 
   useEffect(() => setRegions(question.image_regions ?? []), [question.image_regions]);
 
-  const commit = async (next: Region[]) => {
+  const commit = async (next: Region[], strict = true) => {
     if (!question.source_file_id || !question.source_number) return;
     setSaving(true);
     setError(null);
     try {
       const result = await updateQuestionCrops(
-        examId, question.source_file_id, question.source_number, next, dpi, padding,
+        examId, question.source_file_id, question.source_number, next, dpi, padding, strict,
       );
       setRegions(result.regions);
       onUpdated(result.regions, result.image_urls);
@@ -50,7 +55,7 @@ export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: P
     const imageHeight = image?.getBoundingClientRect().height ?? 0;
     const imageWidth = image?.getBoundingClientRect().width ?? 0;
     const horizontal = edge === "left" || edge === "right";
-    if (imageHeight < 20) return;
+    if (imageHeight < 20 || imageWidth < 20) return;
     event.preventDefault();
     const initial = regionsRef.current.map((region) => ({ ...region, bbox: [...region.bbox] }));
     const startY = horizontal ? event.clientX : event.clientY;
@@ -148,19 +153,63 @@ export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: P
               className={`absolute inset-y-0 w-11 touch-none cursor-ew-resize border-primary bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary ${edge === "left" ? "left-0 border-l-4" : "right-0 border-r-4"}`}
               aria-label={`Drag ${edge} crop edge for page ${region.page}`} />)}
           </div>
-          {regions.length > 1 ? <Button type="button" variant="outline" disabled={saving}
-            onClick={() => void commit(regions.filter((_, itemIndex) => itemIndex !== index))}>Remove page {region.page} region</Button> : null}
+          <div className="flex flex-wrap gap-2">
+            {question.source_file_id ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11"
+                disabled={saving}
+                onClick={() => setFullPageIndex(index)}
+              >
+                Edit on full page
+              </Button>
+            ) : null}
+            {regions.length > 1 ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11"
+                disabled={saving}
+                onClick={() => void commit(regions.filter((_, itemIndex) => itemIndex !== index))}
+              >
+                Remove page {region.page} region
+              </Button>
+            ) : null}
+          </div>
         </div>
       ))}
       <div className="flex flex-wrap items-end gap-2">
-        <Button type="button" variant="outline" disabled={saving || !regions.length}
+        <Button type="button" variant="outline" className="min-h-11" disabled={saving || !regions.length}
           onClick={() => setRegions([...regions, { page: regions.at(-1)!.page, bbox: [...regions.at(-1)!.bbox] }])}>Add same page region</Button>
-        <Button type="button" variant="outline" disabled={saving} onClick={addRegion}>Add next page region</Button>
-        <Label className="flex flex-col gap-1">DPI <input className="w-24 rounded border p-2" type="number" min={72} max={300} value={dpi} onChange={(event) => setDpi(Number(event.target.value))} /></Label>
-        <Label className="flex flex-col gap-1">Padding (pt) <input className="w-24 rounded border p-2" type="number" min={0} max={30} step={1} value={padding} onChange={(event) => setPadding(Number(event.target.value))} /></Label>
-        <Button type="button" variant="outline" disabled={saving} onClick={() => void commit(regions)}>Regenerate crops</Button>
+        <Button type="button" variant="outline" className="min-h-11" disabled={saving} onClick={addRegion}>Add next page region</Button>
+        <Label className="flex flex-col gap-1">DPI <input className="min-h-11 w-24 rounded border p-2" type="number" min={72} max={300} value={dpi} onChange={(event) => setDpi(Number(event.target.value))} /></Label>
+        <Label className="flex flex-col gap-1">Padding (pt) <input className="min-h-11 w-24 rounded border p-2" type="number" min={0} max={30} step={1} value={padding} onChange={(event) => setPadding(Number(event.target.value))} /></Label>
+        <Button type="button" variant="outline" className="min-h-11" disabled={saving} onClick={() => void commit(regions)}>Regenerate crops</Button>
       </div>
       {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+      {question.source_file_id && fullPageIndex !== null && regions[fullPageIndex] ? (
+        <PdfPageCropModal
+          open
+          onOpenChange={(isOpen) => { if (!isOpen) setFullPageIndex(null); }}
+          examId={examId}
+          sourceId={question.source_file_id}
+          pageDimensions={pageDimensions}
+          initialRegion={{
+            page: regions[fullPageIndex].page,
+            bbox: regions[fullPageIndex].bbox as [number, number, number, number],
+          }}
+          title={`Question ${question.position}: edit crop on page`}
+          busy={saving}
+          onApply={async (updated: PageCropRegion) => {
+            const next = regions.map((r, idx) =>
+              idx === fullPageIndex ? { page: updated.page, bbox: [...updated.bbox] } : r,
+            );
+            await commit(next, false);
+            setFullPageIndex(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

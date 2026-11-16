@@ -90,7 +90,11 @@ def get_question_image_route(
         image = load_image(question.source_file_id, question.source_number, index)
     except (FileNotFoundError, ValueError) as exc:
         raise HTTPException(status_code=404, detail="Image not found") from exc
-    return BinaryResponse(content=image, media_type="image/png")
+    return BinaryResponse(
+        content=image,
+        media_type="image/png",
+        headers={"Cache-Control": "no-store, private"},
+    )
 
 
 @exam_attempt_student_router.post(

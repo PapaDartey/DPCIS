@@ -182,6 +182,9 @@ def require_student(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Student role required",
         )
+    from app.auth.google_email_proof import require_google_email_proof
+
+    require_google_email_proof(db, identity)
     return AuthIdentity(
         subject=identity.subject,
         email=identity.email,
@@ -224,6 +227,9 @@ def require_admin(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin role required",
         )
+    from app.auth.google_email_proof import require_google_email_proof
+
+    require_google_email_proof(db, identity)
     return AuthIdentity(
         subject=identity.subject,
         email=identity.email,

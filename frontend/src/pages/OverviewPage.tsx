@@ -17,6 +17,7 @@ export function OverviewPage() {
     sessionUser,
     identity,
     errorMessage,
+    googleEmailProofRequired,
     refreshAuth,
     signOut,
   } = useAuth();
@@ -56,6 +57,11 @@ export function OverviewPage() {
   }
 
   if (isConfigured && sessionUser && !identity) {
+    if (googleEmailProofRequired) {
+      return <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-8">
+        <AuthBoundary embedded onAuthSuccess={refreshAuth} />
+      </div>;
+    }
     return (
       <div className="mx-auto flex min-h-dvh max-w-xl flex-col justify-center space-y-6 px-4 py-8">
         <header className="flex flex-col items-center space-y-3 text-center">

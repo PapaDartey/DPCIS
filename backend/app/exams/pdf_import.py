@@ -18,12 +18,23 @@ from typing import Any, cast
 
 import fitz
 
+from app.config import get_settings
 from app.exams.pdf_coverage import coverage_warnings
 
 MAX_PDF_BYTES = 100 * 1024 * 1024
 MAX_PAGES = 200
 RENDER_DPI = 220
 PADDING = 8.0
+
+
+def _pdf_limits() -> tuple[int, int, float, int]:
+    settings = get_settings()
+    return (
+        settings.MAX_PDF_BYTES,
+        settings.MAX_PDF_PAGES,
+        settings.MAX_PDF_PAGE_DIMENSION_PT,
+        settings.MAX_PDF_IMAGE_PIXELS,
+    )
 
 
 @dataclass(frozen=True)
@@ -49,9 +60,10 @@ class OCRUnavailable(ValueError):
 
 
 def validate_pdf(data: bytes) -> fitz.Document:
+    max_bytes, max_pages, max_dim_pt, _ = _pdf_limits()
     if not data.startswith(b"%PDF-"):
         raise ValueError("The uploaded file is not a PDF.")
-    if len(data) > MAX_PDF_BYTES:
+    if len(data) > max_bytes:
         raise ValueError("Choose a PDF up to 100 MB.")
     try:
         doc = fitz.open(stream=data, filetype="pdf")
@@ -60,17 +72,21 @@ def validate_pdf(data: bytes) -> fitz.Document:
     if doc.is_encrypted:
         doc.close()
         raise ValueError("Encrypted PDFs cannot be imported.")
-    if not 1 <= len(doc) <= MAX_PAGES:
+    if not 1 <= len(doc) <= max_pages:
         doc.close()
-        raise ValueError(f"The PDF must contain 1 to {MAX_PAGES} pages.")
+        raise ValueError(f"The PDF must contain 1 to {max_pages} pages.")
     for page in doc:
         page.set_rotation(0)  # Canonical unrotated PDF-point coordinates for all crops.
+        if page.rect.width > max_dim_pt or page.rect.height > max_dim_pt:
+            doc.close()
+            raise ValueError("PDF page dimensions exceed the maximum allowed size.")
     return doc
 
 
 def open_question_upload(data: bytes) -> fitz.Document:
     """Normalize supported raster uploads to PDF using PyMuPDF alone."""
-    if len(data) > MAX_PDF_BYTES:
+    max_bytes, _, _, max_pixels = _pdf_limits()
+    if len(data) > max_bytes:
         raise ValueError("Choose a file up to 100 MB.")
     kind = (
         "png"
@@ -81,7 +97,13 @@ def open_question_upload(data: bytes) -> fitz.Document:
         return validate_pdf(data)
     try:
         with fitz.open(stream=data, filetype=kind) as image:
+            if len(image) > 0:
+                rect = image[0].rect
+                if rect.width * rect.height > max_pixels:
+                    raise ValueError("The uploaded image exceeds the maximum allowed pixel count.")
             return validate_pdf(image.convert_to_pdf())
+    except ValueError:
+        raise
     except Exception as exc:
         raise ValueError("The uploaded image could not be opened.") from exc
 

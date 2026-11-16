@@ -15,13 +15,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useOptionalAuth } from "@/features/auth/useAuth";
+import { confirmGoogleEmailProof } from "@/lib/api";
 import {
   getCurrentAuthUser,
   isNeonAuthConfigured,
+  requestPasswordCode,
+  resetPasswordWithCode,
+  sendEmailVerificationCode,
   signInWithEmail,
   signInWithGoogle,
   signOutNeonAuth,
   signUpWithEmail,
+  verifyEmailCode,
 } from "@/lib/auth";
 import type { AuthUser } from "@/lib/auth";
 
@@ -52,6 +57,11 @@ function sanitizeAuthError(error: unknown, fallback: string): string {
   }
 
   const raw = extractRawErrorMessage(error);
+  const code = error && typeof error === "object" && "code" in error
+    ? String((error as { code?: unknown }).code ?? "") : "";
+  if (/EMAIL_NOT_VERIFIED|email.*(not verified|unverified)|verify.*email/i.test(`${code} ${raw}`)) {
+    return "Your email address needs verification. Request a code below to finish signing in.";
+  }
   if (/invalid.*(email|password|credential)|incorrect.*password|user not found/i.test(raw)) {
     return "Incorrect email address or password.";
   }
@@ -79,6 +89,13 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
     () => sharedAuth === null && isNeonAuthConfigured,
   );
   const [localError, setLocalError] = useState<string | null>(null);
+  const [signupNotice, setSignupNotice] = useState<string | null>(null);
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationBusy, setVerificationBusy] = useState(false);
+  const [passwordResetEmail, setPasswordResetEmail] = useState<string | null>(null);
+  const [passwordResetCode, setPasswordResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [email, setEmail] = useState("");
@@ -211,6 +228,7 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
     event.preventDefault();
     setHasSubmitted(true);
     setLocalError(null);
+    setSignupNotice(null);
     if (getNameError(name) || getEmailError(email) || getPasswordError(password)) {
       return;
     }
@@ -227,7 +245,24 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
           : await signInWithEmail(email.trim(), password);
       if (result.error) {
         setLocalError(sanitizeAuthError(result.error, fallbackError));
+        if (mode === "sign-in" && /EMAIL_NOT_VERIFIED|email.*(not verified|unverified)|verify.*email/i.test(
+          `${"code" in result.error ? result.error.code : ""} ${result.error.message}`,
+        )) setVerificationEmail(email.trim());
         return;
+      }
+
+      if (mode === "sign-up") {
+        const currentUser = await getCurrentAuthUser();
+        if (!currentUser) {
+          setPassword("");
+          setMode("sign-in");
+          setVerificationEmail(email.trim());
+          const sent = await sendEmailVerificationCode(email.trim());
+          setSignupNotice(sent.error
+            ? "Your account was created, but we could not send a verification code. Use Resend code below."
+            : "Your account was created. Enter the verification code sent to your email.");
+          return;
+        }
       }
 
       setPassword("");
@@ -251,6 +286,9 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
 
   const toggleMode = () => {
     setLocalError(null);
+    setSignupNotice(null);
+    setVerificationEmail(null);
+    setPasswordResetEmail(null);
     setHasSubmitted(false);
     setTouched({ name: false, email: false, password: false });
     setMode((prev) => (prev === "sign-in" ? "sign-up" : "sign-in"));
@@ -300,6 +338,7 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
   }
 
   if (user) {
+    const googleProofRequired = sharedAuth?.googleEmailProofRequired ?? false;
     return (
       <Card className="mx-auto w-full max-w-md">
         <CardHeader className="space-y-1.5">
@@ -309,6 +348,43 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {googleProofRequired ? <div className="space-y-3 rounded-md border p-4">
+            <p className="text-sm">We need a code sent to {user.email ?? "your email"} before opening your workspace. The code will also let you create a password for future email sign-in.</p>
+            <Button type="button" variant="outline" disabled={verificationBusy || !user.email}
+              onClick={() => void (async () => {
+                setVerificationBusy(true);
+                setLocalError(null);
+                try {
+                  const sent = await requestPasswordCode(user.email!);
+                  if (sent.error) throw sent.error;
+                  setSignupNotice("A verification code was sent to your email.");
+                } catch (error) {
+                  setLocalError(sanitizeAuthError(error, "We could not send a code. Try again."));
+                } finally { setVerificationBusy(false); }
+              })()}>Send verification code</Button>
+            {signupNotice ? <p role="status" className="text-sm">{signupNotice}</p> : null}
+            <Label htmlFor={`${baseId}-google-code`}>Verification code</Label>
+            <Input id={`${baseId}-google-code`} inputMode="numeric" autoComplete="one-time-code"
+              value={passwordResetCode} onChange={(event) => setPasswordResetCode(event.target.value.trim())} />
+            <Label htmlFor={`${baseId}-google-password`}>Create a password</Label>
+            <Input id={`${baseId}-google-password`} type="password" autoComplete="new-password"
+              value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
+            <Button type="button" disabled={verificationBusy || !passwordResetCode || newPassword.length < 8}
+              onClick={() => void (async () => {
+                setVerificationBusy(true);
+                setLocalError(null);
+                try {
+                  await confirmGoogleEmailProof(passwordResetCode, newPassword);
+                  setPasswordResetCode("");
+                  setNewPassword("");
+                  setSignupNotice(null);
+                  if (sharedAuth) await sharedAuth.refreshAuth();
+                  if (onAuthSuccess && onAuthSuccess !== sharedAuth?.refreshAuth) await onAuthSuccess();
+                } catch (error) {
+                  setLocalError(sanitizeAuthError(error, "The code or password could not be accepted."));
+                } finally { setVerificationBusy(false); }
+              })()}>Verify and create password</Button>
+          </div> : null}
           {displayError ? (
             <Alert id={errorAlertId} variant="destructive" role="alert">
               <AlertTitle>Unable to continue</AlertTitle>
@@ -355,10 +431,89 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
     <div className="space-y-4">
       {displayError ? (
         <Alert id={errorAlertId} variant="destructive" role="alert">
-          <AlertTitle>Unable to sign in</AlertTitle>
+          <AlertTitle>{mode === "sign-up" ? "Unable to create account" : "Unable to sign in"}</AlertTitle>
           <AlertDescription>{displayError}</AlertDescription>
         </Alert>
       ) : null}
+      {signupNotice ? <Alert role="status"><AlertTitle>Account created</AlertTitle>
+        <AlertDescription>{signupNotice}</AlertDescription></Alert> : null}
+      {verificationEmail ? <div className="space-y-3 rounded-md border p-4">
+        <Label htmlFor={`${baseId}-verification-code`}>Email verification code</Label>
+        <Input id={`${baseId}-verification-code`} inputMode="numeric" autoComplete="one-time-code"
+          value={verificationCode} onChange={(event) => setVerificationCode(event.target.value.trim())}
+          aria-label="Email verification code" />
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" disabled={verificationBusy || !verificationCode} onClick={() => void (async () => {
+            setVerificationBusy(true);
+            setLocalError(null);
+            try {
+              const result = await verifyEmailCode(verificationEmail, verificationCode);
+              if (result.error) throw result.error;
+              setVerificationEmail(null);
+              setVerificationCode("");
+              setSignupNotice("Email verified. You can sign in now.");
+              if (sharedAuth) await sharedAuth.refreshAuth();
+              else setLocalUser(await getCurrentAuthUser());
+              if (onAuthSuccess && onAuthSuccess !== sharedAuth?.refreshAuth) await onAuthSuccess();
+            } catch (error) {
+              setLocalError(sanitizeAuthError(error, "That code could not be verified. Check it and try again."));
+            } finally { setVerificationBusy(false); }
+          })()}>Verify email</Button>
+          <Button type="button" variant="outline" disabled={verificationBusy} onClick={() => void (async () => {
+            setVerificationBusy(true);
+            try {
+              const result = await sendEmailVerificationCode(verificationEmail);
+              if (result.error) throw result.error;
+              setSignupNotice("A new verification code was sent to your email.");
+              setLocalError(null);
+            } catch (error) {
+              setLocalError(sanitizeAuthError(error, "We could not send a code. Please try again."));
+            } finally { setVerificationBusy(false); }
+          })()}>Resend code</Button>
+        </div>
+      </div> : null}
+      {mode === "sign-in" ? <div className="space-y-3">
+        <Button type="button" variant="ghost" className="min-h-11 px-0 underline"
+          disabled={verificationBusy} onClick={() => void (async () => {
+            if (getEmailError(email)) {
+              setLocalError("Enter your email address above to set or reset a password.");
+              return;
+            }
+            setVerificationBusy(true);
+            setLocalError(null);
+            try {
+              const result = await requestPasswordCode(email.trim());
+              if (result.error) throw result.error;
+              setPasswordResetEmail(email.trim());
+              setSignupNotice("If this email has an account, a password code will arrive shortly.");
+            } catch (error) {
+              setLocalError(sanitizeAuthError(error, "We could not request a password code. Try again."));
+            } finally { setVerificationBusy(false); }
+          })()}>Set or reset your password</Button>
+        {passwordResetEmail ? <div className="space-y-3 rounded-md border p-4">
+          <Label htmlFor={`${baseId}-password-code`}>Password code</Label>
+          <Input id={`${baseId}-password-code`} inputMode="numeric" autoComplete="one-time-code"
+            value={passwordResetCode} onChange={(event) => setPasswordResetCode(event.target.value.trim())} />
+          <Label htmlFor={`${baseId}-new-password`}>New password</Label>
+          <Input id={`${baseId}-new-password`} type="password" autoComplete="new-password"
+            value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
+          <Button type="button" disabled={verificationBusy || !passwordResetCode || newPassword.length < 8}
+            onClick={() => void (async () => {
+              setVerificationBusy(true);
+              setLocalError(null);
+              try {
+                const result = await resetPasswordWithCode(passwordResetEmail, passwordResetCode, newPassword);
+                if (result.error) throw result.error;
+                setPasswordResetEmail(null);
+                setPasswordResetCode("");
+                setNewPassword("");
+                setSignupNotice("Password saved. Sign in with your email and new password.");
+              } catch (error) {
+                setLocalError(sanitizeAuthError(error, "The code or password could not be accepted. Try again."));
+              } finally { setVerificationBusy(false); }
+            })()}>Save new password</Button>
+        </div> : null}
+      </div> : null}
 
       <form className="space-y-4" noValidate onSubmit={handleSubmitEmailAuth}>
         {mode === "sign-up" ? (

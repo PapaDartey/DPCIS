@@ -16,6 +16,7 @@ function ProtectedRouteInner({ requiredRole }: { requiredRole: ApplicationRole }
     sessionUser,
     identity,
     errorMessage,
+    googleEmailProofRequired,
     refreshAuth,
     signOut,
   } = useAuth();
@@ -49,14 +50,14 @@ function ProtectedRouteInner({ requiredRole }: { requiredRole: ApplicationRole }
         onRetry={() => void refreshAuth()}
         retryLabel="Try Again"
         action={
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-[44px]"
-            onClick={() => void signOut()}
-          >
-            Sign out
-          </Button>
+          googleEmailProofRequired
+            ? <Button asChild variant="outline" className="min-h-[44px]"><Link to="/">Verify email</Link></Button>
+            : <Button
+                type="button"
+                variant="outline"
+                className="min-h-[44px]"
+                onClick={() => void signOut()}
+              >Sign out</Button>
         }
       />
     );
