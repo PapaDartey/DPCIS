@@ -16,7 +16,7 @@ from app.exams.pdf_import import (
     render_region,
     repeated_bands,
     validate_pdf,
-    white_horizontal_border,
+    white_crop_border,
 )
 
 MIN_CROP_HEIGHT = 30.0
@@ -115,8 +115,8 @@ def regenerate_crops(
             bbox = region.get("bbox")
             if not isinstance(page_number, int) or not 1 <= page_number <= len(doc):
                 raise ValueError("Crop page is outside the PDF")
-            if page_number <= previous_page:
-                raise ValueError("Page regions must be in increasing page order")
+            if page_number < previous_page:
+                raise ValueError("Page regions must be in nondecreasing page order")
             if not isinstance(bbox, (list, tuple)) or len(bbox) != 4:
                 raise ValueError("Crop bbox needs four coordinates")
             try:
@@ -140,13 +140,15 @@ def regenerate_crops(
                 min(page.rect.width, x1 + padding),
                 min(page.rect.height, y1 + padding),
             )
-            if any(box.intersects(clip) and not clip.contains(box)
-                   for box in graphic_boxes(page, bands[page_number - 1])):
+            if any(
+                box.intersects(clip) and not clip.contains(box)
+                for box in graphic_boxes(page, bands[page_number - 1])
+            ):
                 raise ValueError("Crop failed: partially clipped graphic; expand the crop.")
             pix = page.get_pixmap(clip=clip, dpi=dpi, alpha=False)
-            if not white_horizontal_border(pix):
+            if not white_crop_border(pix):
                 raise ValueError(
-                    "Crop failed: non-white pixels touch the top or bottom 2px border."
+                    "Crop failed: non-white pixels touch the left/right or top or bottom 2px border."
                 )
             images.append(pix.tobytes("png"))
             normalized.append({"page": page_number, "bbox": [x0, y0, x1, y1]})

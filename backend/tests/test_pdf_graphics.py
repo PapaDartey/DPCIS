@@ -86,7 +86,9 @@ def test_background_empty_and_band_exclusions():
         page.draw_rect(fitz.Rect(20, 10, 100, 20))
         page.draw_rect(fitz.Rect(20, 460, 100, 480))
         page.draw_rect(fitz.Rect(40, 150, 150, 250))
-        assert graphic_boxes(page, [(0, 25), (450, 500)]) == [fitz.Rect(40, 150, 150, 250)]
+        assert graphic_boxes(page, [(0, 25), (450, 500)]) == [
+            fitz.Rect(39.5, 99.5, 200.5, 100.5), fitz.Rect(40, 150, 150, 250)
+        ]
         page.insert_text((40, 80), "1 Question outside the table")
         assert [q.number for q in detect_pdf_questions(doc)] == [1]
 

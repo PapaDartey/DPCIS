@@ -112,7 +112,12 @@ export function BulkParserPanel({
   const keyMismatch = parseResult?.errors.some((error) =>
     error.message.startsWith("Answer key has "),
   ) ?? false;
-  const importBlocked = keyMismatch && !acknowledgedKeyMismatch;
+  const [reviewedCrops, setReviewedCrops] = useState<Record<string, string>>({});
+  const reviewKey = (q: ParsedQuestion) => `${q.source_file_id}:${q.source_number}`;
+  const reviewSignature = (q: ParsedQuestion) => JSON.stringify([q.warnings, q.image_regions]);
+  const needsReview = (q: ParsedQuestion) => !!q.source_file_id && !!q.warnings?.length
+    && reviewedCrops[reviewKey(q)] !== reviewSignature(q);
+  const importBlocked = (keyMismatch && !acknowledgedKeyMismatch) || orderedBlocks.some(needsReview);
 
   const rebuildPreview = (questions: ParsedQuestion[], original: ParseQuestionsResponse): ParseQuestionsResponse => {
     const { questions: renumbered, normalizedKey } = renumberAnswers(questions);
@@ -283,6 +288,10 @@ export function BulkParserPanel({
         setRequestError("The answer key or questions need attention. Review the preview, correct the issues, and try again.");
         return;
       }
+      if (response.valid_questions.some((q) => q.source_file_id && q.warnings?.length)) {
+        setRequestError("Review and acknowledge the flagged PDF crops in the preview before saving.");
+        return;
+      }
       const error = await onSaveImportedQuestions(response.valid_questions.map(fromParsedQuestion));
       if (error) setRequestError(error);
     } catch (error) {
@@ -299,6 +308,10 @@ export function BulkParserPanel({
   ) => {
     if (items.some((item) => item.errors.some((message) => message.startsWith("Crop failed:")))) {
       setRequestError("Repair failed crops in the preview before importing these questions.");
+      return;
+    }
+    if (items.some(needsReview)) {
+      setRequestError("Review and acknowledge each flagged PDF question before importing.");
       return;
     }
     const mapped = items.map(fromParsedQuestion);
@@ -822,9 +835,20 @@ export function BulkParserPanel({
                           </div>
                         ) : null}
                         <p className="mt-2 text-xs">Marks: {block.points}</p>
-                        {block.warnings?.map((warning) => (
-                          <p key={warning} className="mt-1 text-xs text-[var(--warn)]">{warning}</p>
-                        ))}
+                        {block.warnings?.map((warning) => {
+                          const [message, thumbnail] = warning.split("\nthumbnail:");
+                          return <div key={warning} className="mt-1 text-xs text-[var(--warn)]">
+                            <p>{message}</p>
+                            {thumbnail?.startsWith("data:image/png;base64,") ? <img src={thumbnail} alt={message}
+                              className="mt-2 max-h-40 max-w-full border border-border" /> : null}
+                          </div>;
+                        })}
+                        {block.source_file_id && !!block.warnings?.length ? <label className="mt-2 flex min-h-11 items-center gap-2 text-sm">
+                          <input type="checkbox" aria-label={`Acknowledge crop warnings for question ${block.position}`}
+                            checked={!needsReview(block)} onChange={(event) => setReviewedCrops((current) => ({ ...current,
+                              [reviewKey(block)]: event.target.checked ? reviewSignature(block) : "" }))} />
+                          I reviewed these crop warnings and all question content. Clipping errors still require a repair.
+                        </label> : null}
 
                         {block.options.length > 0 ? (
                           <ul className="mt-2.5 grid gap-1.5 sm:grid-cols-2">

@@ -44,20 +44,28 @@ export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: P
     }
   };
 
-  const startDrag = (event: PointerEvent<HTMLButtonElement>, index: number, edge: "top" | "bottom") => {
+  const startDrag = (event: PointerEvent<HTMLButtonElement>, index: number, edge: "top" | "bottom" | "left" | "right") => {
     if (saving) return;
     const image = event.currentTarget.parentElement?.querySelector("img");
     const imageHeight = image?.getBoundingClientRect().height ?? 0;
+    const imageWidth = image?.getBoundingClientRect().width ?? 0;
+    const horizontal = edge === "left" || edge === "right";
     if (imageHeight < 20) return;
     event.preventDefault();
     const initial = regionsRef.current.map((region) => ({ ...region, bbox: [...region.bbox] }));
-    const startY = event.clientY;
-    const scale = (initial[index].bbox[3] - initial[index].bbox[1]) / imageHeight;
+    const startY = horizontal ? event.clientX : event.clientY;
+    const scale = horizontal ? (initial[index].bbox[2] - initial[index].bbox[0]) / imageWidth
+      : (initial[index].bbox[3] - initial[index].bbox[1]) / imageHeight;
     const move = (pointer: globalThis.PointerEvent) => {
       const next = initial.map((region) => ({ ...region, bbox: [...region.bbox] }));
       const pageHeight = pageDimensions[next[index].page - 1]?.[1] ?? 10000;
-      const delta = (pointer.clientY - startY) * scale;
-      if (edge === "top") {
+      const delta = ((horizontal ? pointer.clientX : pointer.clientY) - startY) * scale;
+      const pageWidth = pageDimensions[next[index].page - 1]?.[0] ?? 10000;
+      if (edge === "left") {
+        next[index].bbox[0] = Math.max(0, Math.min(next[index].bbox[2] - 30, initial[index].bbox[0] + delta));
+      } else if (edge === "right") {
+        next[index].bbox[2] = Math.min(pageWidth, Math.max(next[index].bbox[0] + 30, initial[index].bbox[2] + delta));
+      } else if (edge === "top") {
         next[index].bbox[1] = Math.max(0, Math.min(next[index].bbox[3] - 30, initial[index].bbox[1] + delta));
       } else {
         next[index].bbox[3] = Math.min(pageHeight, Math.max(next[index].bbox[1] + 30, initial[index].bbox[3] + delta));
@@ -74,10 +82,15 @@ export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: P
     window.addEventListener("pointerup", up, { once: true });
   };
 
-  const nudgeEdge = (index: number, edge: "top" | "bottom", direction: number) => {
+  const nudgeEdge = (index: number, edge: "top" | "bottom" | "left" | "right", direction: number) => {
     const next = regions.map((region) => ({ ...region, bbox: [...region.bbox] }));
     const pageHeight = pageDimensions[next[index].page - 1]?.[1] ?? 10000;
-    if (edge === "top") {
+    const pageWidth = pageDimensions[next[index].page - 1]?.[0] ?? 10000;
+    if (edge === "left") {
+      next[index].bbox[0] = Math.max(0, Math.min(next[index].bbox[2] - 30, next[index].bbox[0] + direction * 2));
+    } else if (edge === "right") {
+      next[index].bbox[2] = Math.min(pageWidth, Math.max(next[index].bbox[0] + 30, next[index].bbox[2] + direction * 2));
+    } else if (edge === "top") {
       next[index].bbox[1] = Math.max(0, Math.min(next[index].bbox[3] - 30,
         next[index].bbox[1] + direction * 2));
     } else {
@@ -100,6 +113,17 @@ export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: P
       {regions.map((region, index) => (
         <div key={`${region.page}-${index}`} className="space-y-1">
           <p className="text-xs text-muted-foreground">Page {region.page}, top {region.bbox[1].toFixed(1)} pt, bottom {region.bbox[3].toFixed(1)} pt</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <Label>Page <input aria-label={`Region ${index + 1} page`} type="number" min={1} max={pageDimensions.length}
+              className="min-h-11 w-full rounded border p-2" value={region.page}
+              onChange={(event) => setRegions(regions.map((r, i) => i === index ? { ...r, page: Number(event.target.value) } : r))} /></Label>
+            {["Left", "Top", "Right", "Bottom"].map((label, coordinate) => <Label key={label}>{label} (pt)
+              <input aria-label={`Region ${index + 1} ${label.toLowerCase()}`} type="number" step={1}
+                className="min-h-11 w-full rounded border p-2" value={Number(region.bbox[coordinate].toFixed(1))}
+                onChange={(event) => setRegions(regions.map((r, i) => i === index
+                  ? { ...r, bbox: r.bbox.map((v, c) => c === coordinate ? Number(event.target.value) : v) } : r))} />
+            </Label>)}
+          </div>
           <div className="relative border border-border">
             {question.image_urls?.[index] ? (
               <AuthenticatedPdfImage path={question.image_urls[index]} alt={question.question_text} className="h-auto w-full max-w-full" allowOpenFullSize />
@@ -108,20 +132,29 @@ export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: P
               onKeyDown={(event) => { if (event.key === "ArrowUp" || event.key === "ArrowDown") {
                 event.preventDefault(); nudgeEdge(index, "top", event.key === "ArrowUp" ? -1 : 1);
               } }}
-              className="absolute inset-x-0 top-0 h-4 cursor-ns-resize border-t-4 border-primary bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary"
+              className="absolute inset-x-11 top-0 h-11 touch-none cursor-ns-resize border-t-4 border-primary bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary"
               aria-label={`Drag top crop edge for page ${region.page}`} />
             <button type="button" disabled={saving} onPointerDown={(event) => startDrag(event, index, "bottom")}
               onKeyDown={(event) => { if (event.key === "ArrowUp" || event.key === "ArrowDown") {
                 event.preventDefault(); nudgeEdge(index, "bottom", event.key === "ArrowUp" ? -1 : 1);
               } }}
-              className="absolute inset-x-0 bottom-0 h-4 cursor-ns-resize border-b-4 border-primary bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary"
+              className="absolute inset-x-11 bottom-0 h-11 touch-none cursor-ns-resize border-b-4 border-primary bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary"
               aria-label={`Drag bottom crop edge for page ${region.page}`} />
+            {(["left", "right"] as const).map((edge) => <button key={edge} type="button" disabled={saving}
+              onPointerDown={(event) => startDrag(event, index, edge)}
+              onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+                event.preventDefault(); nudgeEdge(index, edge, event.key === "ArrowLeft" ? -1 : 1);
+              } }}
+              className={`absolute inset-y-0 w-11 touch-none cursor-ew-resize border-primary bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary ${edge === "left" ? "left-0 border-l-4" : "right-0 border-r-4"}`}
+              aria-label={`Drag ${edge} crop edge for page ${region.page}`} />)}
           </div>
           {regions.length > 1 ? <Button type="button" variant="outline" disabled={saving}
             onClick={() => void commit(regions.filter((_, itemIndex) => itemIndex !== index))}>Remove page {region.page} region</Button> : null}
         </div>
       ))}
       <div className="flex flex-wrap items-end gap-2">
+        <Button type="button" variant="outline" disabled={saving || !regions.length}
+          onClick={() => setRegions([...regions, { page: regions.at(-1)!.page, bbox: [...regions.at(-1)!.bbox] }])}>Add same page region</Button>
         <Button type="button" variant="outline" disabled={saving} onClick={addRegion}>Add next page region</Button>
         <Label className="flex flex-col gap-1">DPI <input className="w-24 rounded border p-2" type="number" min={72} max={300} value={dpi} onChange={(event) => setDpi(Number(event.target.value))} /></Label>
         <Label className="flex flex-col gap-1">Padding (pt) <input className="w-24 rounded border p-2" type="number" min={0} max={30} step={1} value={padding} onChange={(event) => setPadding(Number(event.target.value))} /></Label>
