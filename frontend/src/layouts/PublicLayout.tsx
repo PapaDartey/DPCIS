@@ -48,7 +48,7 @@ export function PublicLayout({ mainRef, children }: PublicLayoutProps) {
           <div className="mx-auto flex max-w-[1160px] flex-col gap-2 px-4 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="flex items-center gap-2">
               <BrandLogo size={24} variant="mark" />
-              <span>DPS International School — Examination Hub</span>
+              <span>DPS International Ghana — Examination Hub</span>
             </div>
             <p>Service Beyond Self</p>
           </div>

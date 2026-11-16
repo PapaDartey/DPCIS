@@ -43,7 +43,7 @@ export function OverviewPage() {
             Examination Hub
           </h1>
           <p className="text-sm text-muted-foreground sm:text-base">
-            DPS International School · Checking your session...
+            DPS International Ghana · Checking your session...
           </p>
         </header>
         <LoadingStatePanel label="Checking your session..." cards={1} />
@@ -67,7 +67,7 @@ export function OverviewPage() {
             Examination Hub
           </h1>
           <p className="text-sm text-muted-foreground sm:text-base">
-            DPS International School · Service Beyond Self
+            DPS International Ghana · Service Beyond Self
           </p>
         </header>
 
@@ -105,7 +105,7 @@ export function OverviewPage() {
                 Welcome to Examination Hub
               </h1>
               <p className="text-sm font-medium text-muted-foreground">
-                DPS International School
+                DPS International Ghana
               </p>
             </div>
           </div>
@@ -134,7 +134,7 @@ export function OverviewPage() {
 
         <footer className="mx-auto mt-8 flex w-full max-w-md items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
           <span>Service Beyond Self</span>
-          <span>DPS International School</span>
+          <span>DPS International Ghana</span>
         </footer>
       </section>
     </div>

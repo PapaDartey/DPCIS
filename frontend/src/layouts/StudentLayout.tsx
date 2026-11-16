@@ -142,7 +142,7 @@ export function StudentLayout({ mainRef, children }: StudentLayoutProps) {
           <div className="flex items-center gap-2">
             <BrandLogo size={24} variant="mark" />
             <p className="font-medium text-foreground">
-              DPS International School · Service Beyond Self
+              DPS International Ghana · Service Beyond Self
             </p>
           </div>
           <p>Examination Hub — Progress saved automatically during your sitting</p>

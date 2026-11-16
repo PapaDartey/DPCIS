@@ -60,7 +60,7 @@ export const SCHOOL_SLIDES: readonly SlideDefinition[] = [
     w1280: 1280,
     width: 1920,
     height: 1280,
-    alt: "Main campus building of DPS International School in Tema Community 25",
+    alt: "Main campus building of DPS International Ghana in Tema Community 25",
     objectPosition: "center 65%",
     approvalStatus: "pending approval",
   },
@@ -71,7 +71,7 @@ export const SCHOOL_SLIDES: readonly SlideDefinition[] = [
     w1280: 1280,
     width: 1920,
     height: 1280,
-    alt: "Pupils and teacher conducting a science experiment in the DPS International School laboratory",
+    alt: "Pupils and teacher conducting a science experiment in the DPS International Ghana laboratory",
     objectPosition: "center 35%",
     approvalStatus: "pending approval",
   },
@@ -82,7 +82,7 @@ export const SCHOOL_SLIDES: readonly SlideDefinition[] = [
     w1280: 1280,
     width: 1920,
     height: 1282,
-    alt: "Students and teacher collaborating in a smartboard classroom at DPS International School",
+    alt: "Students and teacher collaborating in a smartboard classroom at DPS International Ghana",
     objectPosition: "center 35%",
     approvalStatus: "pending approval",
   },
@@ -93,7 +93,7 @@ export const SCHOOL_SLIDES: readonly SlideDefinition[] = [
     w1280: 1280,
     width: 1920,
     height: 1280,
-    alt: "Students playing basketball on the DPS International School campus court",
+    alt: "Students playing basketball on the DPS International Ghana campus court",
     objectPosition: "center 45%",
     approvalStatus: "pending approval",
   },
@@ -104,7 +104,7 @@ export const SCHOOL_SLIDES: readonly SlideDefinition[] = [
     w1280: 1280,
     width: 1920,
     height: 1282,
-    alt: "Students participating in a group classroom discussion at DPS International School",
+    alt: "Students participating in a group classroom discussion at DPS International Ghana",
     objectPosition: "center 35%",
     approvalStatus: "pending approval",
   },
@@ -418,7 +418,7 @@ export function LoginSlideshow({ fit = "cover", className }: LoginSlideshowProps
             </span>
           </div>
           <p className="text-lg font-bold tracking-tight text-white sm:text-xl lg:text-2xl">
-            DPS International School
+            DPS International Ghana
           </p>
         </div>
 
