@@ -37,7 +37,30 @@ NAMES = [
 def art(page, kind, x, y, variant):
     """Draw a labelled figure and return independent enclosing bounds."""
     r = fitz.Rect(x, y, x + 180, y + 90)
-    if kind in {2, 3}:
+    if kind == 1:
+        if variant == 0:
+            # Apparatus diagram: beaker, funnel, stand.
+            page.draw_rect((x + 20, y + 25, x + 70, y + 80))
+            page.draw_line((x + 15, y + 80), (x + 85, y + 80))
+            page.draw_polyline(
+                [(x + 35, y + 5), (x + 55, y + 5), (x + 48, y + 25), (x + 42, y + 25)],
+                closePath=True,
+            )
+            page.insert_text((x + 90, y + 55), "Beaker", fontsize=9)
+        elif variant == 1:
+            # Circuit diagram: cell, resistor, switch loop.
+            page.draw_rect((x + 15, y + 15, x + 145, y + 75))
+            page.draw_line((x + 75, y + 5), (x + 75, y + 25), width=1.5)
+            page.draw_line((x + 83, y + 10), (x + 83, y + 20), width=1.5)
+            page.draw_rect((x + 60, y + 68, x + 100, y + 82), fill=(0.9, 0.9, 0.9))
+            page.insert_text((x + 152, y + 48), "6 V", fontsize=9)
+        else:
+            # Ray diagram: vertical lens + incident and refracted rays.
+            page.draw_line((x + 80, y + 5), (x + 80, y + 85), width=1.2)
+            page.draw_line((x + 10, y + 45), (x + 165, y + 45), width=0.5)
+            page.draw_polyline([(x + 15, y + 20), (x + 80, y + 20), (x + 155, y + 65)])
+            page.insert_text((x + 125, y + 20), "F", fontsize=9)
+    elif kind in {2, 3}:
         with fitz.open() as source:
             p = source.new_page(width=180, height=90)
             p.draw_circle((70, 40), 28, color=(0, 0, 0), fill=(0.5, 0.7, 0.8))
@@ -47,23 +70,40 @@ def art(page, kind, x, y, variant):
                 pix = p.get_pixmap(alpha=True)
                 p.insert_image(p.rect, pixmap=pix)
                 page.show_pdf_page(r, source, 0, clip=fitz.Rect(5, 5, 175, 85))
+                if variant == 2:
+                    # Additional arbitrary triangular vector clip path.
+                    shape = page.new_shape()
+                    shape.draw_polyline(
+                        [(x + 10, y + 80), (x + 90, y + 10), (x + 170, y + 80)]
+                    )
+                    shape.finish(closePath=True, color=(0.1, 0.1, 0.1))
+                    shape.commit()
+            elif variant == 0:
+                page.insert_image(r, stream=p.get_pixmap(alpha=False).tobytes("jpeg"))
+            elif variant == 1:
+                page.insert_image(r, pixmap=p.get_pixmap(alpha=True))
             else:
-                page.insert_image(r, pixmap=p.get_pixmap(alpha=variant != 0))
+                page.insert_image(r, pixmap=p.get_pixmap(colorspace=fitz.csGRAY, alpha=False))
     elif kind == 4:
         for dx in range(0, 151, 30):
             page.draw_line((x + dx, y), (x + dx, y + 65), width=0.25)
+            tick = f"{-1 + dx // 30}" if variant == 0 else f"{dx * 0.1:.1f}"
+            page.insert_text((x + dx - 4, y + 77), tick, fontsize=8)
         for dy in range(0, 66, 13):
             page.draw_line((x, y + dy), (x + 150, y + dy), width=0.25)
         page.draw_polyline([(x, y + 60), (x + 30, y + 50), (x + 90, y + 15), (x + 150, y + 5)])
-        page.insert_text((x + 145, y + 85), "Time / s", fontsize=9)
+        page.insert_text((x + 145, y + 90), "Time / s", fontsize=9)
         page.insert_text((x + 190, y + 25), "Legend: current", fontsize=9)
         page.insert_text((x + 60, y + 105), "Axis title far from plot", fontsize=9)
-        r = fitz.Rect(x, y, x + 255, y + 108)
+        r = fitz.Rect(x - 6, y, x + 255, y + 108)
     elif kind == 5:
         if variant == 1:
-            page.draw_circle((x + 50, y + 45), 40, fill=(0.8, 0.8, 0.8))
+            page.draw_circle((x + 50, y + 45), 40, fill=(0.82, 0.82, 0.82))
             page.draw_line((x + 50, y + 45), (x + 90, y + 45))
             page.draw_line((x + 50, y + 45), (x + 50, y + 5))
+            page.draw_line((x + 50, y + 45), (x + 22, y + 73))
+            page.insert_text((x + 62, y + 32), "25%", fontsize=8)
+            page.insert_text((x + 26, y + 35), "50%", fontsize=8)
         else:
             for i in range(4):
                 page.draw_rect(
@@ -101,9 +141,15 @@ def art(page, kind, x, y, variant):
                 page.draw_line((x + i * 30, y + 45), (x + i * 30, y + 55))
                 page.insert_text((x + i * 30, y + 70), str(i), fontsize=8)
         else:
-            page.insert_text((x + 50, y + 30), "x + 1", fontsize=12)
-            page.draw_line((x + 40, y + 40), (x + 100, y + 40))
-            page.insert_text((x + 60, y + 60), "2", fontsize=12)
+            # Coordinate grid with axes and plotted points.
+            for gx in range(0, 121, 20):
+                page.draw_line((x + gx, y), (x + gx, y + 80), width=0.25)
+            for gy in range(0, 81, 20):
+                page.draw_line((x, y + gy), (x + 120, y + gy), width=0.25)
+            page.draw_line((x + 60, y), (x + 60, y + 80), width=1.0)
+            page.draw_line((x, y + 40), (x + 120, y + 40), width=1.0)
+            page.draw_circle((x + 80, y + 20), 3, fill=(0, 0, 0))
+            page.insert_text((x + 85, y + 18), "(1, 1)", fontsize=8)
     elif kind == 9:
         page.draw_circle((x + 50, y + 40), 25)
         page.draw_polyline([(x + 60, y + 30), (x + 190, y + 5), (x + 230, y + 5)])
@@ -111,16 +157,20 @@ def art(page, kind, x, y, variant):
         r.x1 = x + 285
     elif kind == 10:
         for i, label in enumerate("ABCD"):
-            dx, dy = (
-                (i * 90, 0)
-                if variant == 0
-                else ((i % 2) * 130, (i // 2) * 60)
-                if variant == 1
-                else (i * 65, i * 23)
-            )
-            page.insert_text((x + dx, y + dy), label, fontsize=11)
-            page.draw_circle((x + dx + 25, y + dy + 25), 18)
-        r = fitz.Rect(x - 2, y - 13, x + 320, y + 113)
+            if variant == 2:
+                # True vertical stacked option diagrams with letter above-left.
+                dx, dy = 0, i * 44
+                page.insert_text((x + dx, y + dy + 16), label, fontsize=11)
+                page.draw_circle((x + dx + 45, y + dy + 14), 14)
+            else:
+                dx, dy = (
+                    (i * 90, 0)
+                    if variant == 0
+                    else ((i % 2) * 130, (i // 2) * 60)
+                )
+                page.insert_text((x + dx, y + dy), label, fontsize=11)
+                page.draw_circle((x + dx + 25, y + dy + 25), 18)
+        r = fitz.Rect(x - 2, y - 13, x + 320, y + (175 if variant == 2 else 113))
     else:
         page.draw_circle((x + 50, y + 45), 35)
         page.draw_line((x + 15, y + 45), (x + 140, y + 45))

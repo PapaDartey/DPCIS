@@ -545,5 +545,5 @@
     "3": "A"
   },
   "review_expected": true,
-  "known_limit": "Overlapping watermark/tinted background requires a clean source; cannot safely erase underlying content."
+  "known_limit": "Overlapping watermark requires a clean source; cannot safely erase underlying content."
 }

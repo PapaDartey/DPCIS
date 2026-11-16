@@ -14,9 +14,15 @@ from __future__ import annotations
 
 import base64
 import re
+import time
 from dataclasses import dataclass
 
 import fitz
+
+MAX_RUNS_PER_PAGE = 6000
+MAX_THUMBNAILS_PER_PAGE = 5
+MAX_WARNINGS_PER_PAGE = 8
+MAX_SECONDS_PER_PAGE = 0.75
 
 
 @dataclass
@@ -41,7 +47,10 @@ def ink_regions(page: fitz.Page, bands: list[tuple[float, float]]) -> list[InkRe
         return i
 
     previous = []
+    deadline = time.monotonic() + MAX_SECONDS_PER_PAGE
     for y in range(pix.height):
+        if (y & 31) == 0 and (time.monotonic() > deadline or len(parents) > MAX_RUNS_PER_PAGE):
+            break
         if any(lo <= y / scale <= hi for lo, hi in bands):
             previous = []
             continue
@@ -68,15 +77,28 @@ def ink_regions(page: fitz.Page, bands: list[tuple[float, float]]) -> list[InkRe
                 j += 1
             current.append((x0, x1, label))
         previous = current
-    return [
-        InkRegion(fitz.Rect(*(v / scale for v in bounds[i])), counts[i])
-        for i in range(len(parents))
-        if root(i) == i
-        and (
+    page_w, page_h = page.rect.width, page.rect.height
+    regions = []
+    for i in range(len(parents)):
+        if root(i) != i:
+            continue
+        if not (
             counts[i] > 80
             or (bounds[i][2] - bounds[i][0] >= 12 and bounds[i][3] - bounds[i][1] >= 12)
-        )
-    ]
+        ):
+            continue
+        rect = fitz.Rect(*(v / scale for v in bounds[i]))
+        # Skip known page-frame decorations and header/footer rules near outer margins.
+        if rect.width > page_w * 0.88 and rect.height > page_h * 0.88:
+            continue
+        if (
+            (rect.y1 < 45 or rect.y0 > page_h - 45)
+            and rect.height <= 3
+            and rect.width > page_w * 0.5
+        ):
+            continue
+        regions.append(InkRegion(rect, counts[i]))
+    return regions
 
 
 def coverage_warnings(page, page_number, crops, bands):
@@ -84,10 +106,13 @@ def coverage_warnings(page, page_number, crops, bands):
     warnings = []
     if not crops:
         return warnings
+    thumb_count = 0
     for ink in ink_regions(page, bands):
         # One analysis pixel tolerance for raster rounding, not missing artwork.
         if any((rect + (-0.72, -0.72, 0.72, 0.72)).contains(ink.rect) for _, rect in crops):
             continue
+        if len(warnings) >= MAX_WARNINGS_PER_PAGE:
+            break
         centre = (ink.rect.tl + ink.rect.br) / 2
         index, _ = min(
             crops,
@@ -101,13 +126,15 @@ def coverage_warnings(page, page_number, crops, bands):
             f"Needs review: Unassigned content on page {page_number} at "
             f"({rect.x0:.1f}, {rect.y0:.1f}, {rect.width:.1f}, {rect.height:.1f})"
         )
-        # Existing preview warning strings carry the thumbnail without new routes.
-        clip = (rect + (-3, -3, 3, 3)) & page.rect
-        zoom = min(1, 160 / max(clip.width, clip.height))
-        thumbnail = page.get_pixmap(clip=clip, matrix=fitz.Matrix(zoom, zoom), alpha=False)
-        message += (
-            "\nthumbnail:data:image/png;base64,"
-            + base64.b64encode(thumbnail.tobytes("png")).decode()
-        )
+        if thumb_count < MAX_THUMBNAILS_PER_PAGE:
+            # Existing preview warning strings carry the thumbnail without new routes.
+            clip = (rect + (-3, -3, 3, 3)) & page.rect
+            zoom = min(1, 160 / max(clip.width, clip.height))
+            thumbnail = page.get_pixmap(clip=clip, matrix=fitz.Matrix(zoom, zoom), alpha=False)
+            message += (
+                "\nthumbnail:data:image/png;base64,"
+                + base64.b64encode(thumbnail.tobytes("png")).decode()
+            )
+            thumb_count += 1
         warnings.append((index, message))
     return warnings

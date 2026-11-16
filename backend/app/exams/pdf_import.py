@@ -119,6 +119,7 @@ def detect_scan_questions(doc: fitz.Document) -> list[PdfQuestion]:
             runs.append((start, last_content + 1))
         if noisy or not runs:
             runs = [(0, pix.height)]
+        page_crops: list[tuple[int, fitz.Rect]] = []
         for first, last in runs:
             rect = fitz.Rect(
                 0,
@@ -139,6 +140,7 @@ def detect_scan_questions(doc: fitz.Document) -> list[PdfQuestion]:
                     "Crop failed: non-white pixels touch the left/right "
                     "or top or bottom 2px border."
                 )
+            page_crops.append((len(questions), rect))
             questions.append(
                 PdfQuestion(
                     number=len(questions) + 1,
@@ -147,6 +149,8 @@ def detect_scan_questions(doc: fitz.Document) -> list[PdfQuestion]:
                     crop_valid=valid,
                 )
             )
+        for q_idx, cov_warning in coverage_warnings(page, page_index + 1, page_crops, []):
+            questions[q_idx].warnings.append(cov_warning)
     return questions
 
 
