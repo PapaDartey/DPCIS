@@ -725,7 +725,7 @@ export function BulkParserPanel({
                     <Button
                       type="button"
                       variant="outline"
-                      disabled={disabled || importBlocked}
+                      disabled={disabled || (keyMismatch && !acknowledgedKeyMismatch)}
                       onClick={() =>
                         applyParsedBlocks(
                           parseResult.invalid_questions,

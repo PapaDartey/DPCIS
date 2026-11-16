@@ -137,7 +137,17 @@ for (const width of (process.env.VERIFY_WIDTHS || "1440,1024,768,390").split(","
     await screenshot("crop-editor", handle);
     result.checks.push("Bottom drag accepted");
     stage = "import";
-    await page.getByRole("button", { name: "Add ready questions (24)", exact: true }).click();
+    const addReadyBtn = page.getByRole("button", { name: "Add ready questions (24)", exact: true });
+    const ackBoxes = page.getByLabel(/Acknowledge crop warnings for question/i);
+    const ackCount = await ackBoxes.count();
+    if (ackCount > 0) {
+      assert.equal(await addReadyBtn.isDisabled(), true, "Warnings must block import until acknowledged");
+      for (let k = 0; k < ackCount; k++) {
+        await ackBoxes.nth(k).check();
+      }
+      result.checks.push(`Confirmed warning acknowledgment gate (${ackCount} flagged questions)`);
+    }
+    await addReadyBtn.click();
     const saved = page.waitForResponse((r) => r.url().endsWith(`/exams/${exam.id}/questions`) && r.request().method() === "PUT");
     await page.getByRole("button", { name: "Save Questions", exact: true }).first().click();
     assert.equal((await saved).status(), 200);

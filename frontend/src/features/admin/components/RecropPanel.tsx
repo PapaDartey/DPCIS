@@ -79,7 +79,21 @@ export function RecropPanel({ examId, disabled, onApplied }: {
               ? [...current, candidate.question_id] : current.filter((id) => id !== candidate.question_id))} />
           Question {candidate.position + 1}: {candidate.valid ? "Approve this re-crop" : "Failed checks — old crop kept"}
         </label>
-        {candidate.warnings.map((warning, index) => <p className="text-sm" key={index}>{warning}</p>)}
+        {candidate.warnings.map((warning, index) => {
+          const [message, thumbnail] = warning.split("\nthumbnail:");
+          return (
+            <div key={index} className="min-w-0 space-y-1 text-sm">
+              <p className="break-words">{message}</p>
+              {thumbnail?.startsWith("data:image/png;base64,") ? (
+                <img
+                  src={thumbnail}
+                  alt={message}
+                  className="max-h-40 max-w-full border border-border"
+                />
+              ) : null}
+            </div>
+          );
+        })}
         <div className="grid min-w-0 gap-4 md:grid-cols-2">
           <div className="min-w-0 space-y-2"><h3 className="font-medium">Before</h3>
             {candidate.before_urls.map((url, index) => <AuthenticatedPdfImage key={url} path={url}
