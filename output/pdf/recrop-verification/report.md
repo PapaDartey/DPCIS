@@ -1,62 +1,57 @@
 # Re-crop continuation verification - 2026-11-15
 
-## STOPPED at user request — diagram hardening, 2026-11-16
+## Diagram Hardening Final Report — 2026-11-16 (Stages 1–4 Complete)
 
-**PARTIAL / NOT VERIFIED.** Implementation stopped before the latest fixes were retested. No commits or pushes were made for this hardening task. The older verification sections below describe earlier work and do **not** establish that the current working tree passes.
+**Branch:** `wip/importer-diagram-hardening` (`68ae74c` Stage 1, `b8c7992` Stage 2, `2938556` Stage 3). Not pushed; no `package.json` or lockfile changes; PyMuPDF + stdlib only.
 
-| Work item | State at stop |
+### Coverage Matrix (Synthetic Corpus 01–20 + Scan Set)
+
+Verified via `pytest -q tests/test_diagram_corpus.py`, `output/pdf/recrop-verification/corpus-warning-inventory.json` (`63` questions, `0` unexpected warnings on clean fixtures), and visual inspection of `docs/ui-screenshots/importer-verify/corpus-sheet.png`.
+
+| Type | Test case | Result | Warnings (expected / unexpected) | Notes / KNOWN LIMIT & workaround |
+| --- | --- | --- | --- | --- |
+| 1 Vector drawings | `01-vector` | PASS | 0 / 0 | Apparatus (beaker/funnel), circuit (6 V), ray diagram (lens + F) |
+| 2 Raster / alpha | `02-raster_alpha` | PASS | 0 / 0 | Opaque JPEG, RGBA alpha PNG, grayscale raster |
+| 3 Clip / soft mask / form | `03-clip_form` | PASS | 0 / 0 | Clipped form XObject + triangular vector clip path |
+| 4 Graph | `04-graph` | PASS | 0 / 0 | Negative & decimal tick labels, grid, curve, legend, distant axis title |
+| 5 Filled charts | `05-filled_charts` | PASS | 0 / 0 | Bar chart + pie chart with radial dividers & percentage labels |
+| 6 Tables | `06-tables` | PASS | 0 / 0 | Ruled, text-only, merged-header, and shaded tables |
+| 7 Chemistry | `07-chemistry` | PASS | 0 / 0 | Skeletal bonds, wedged bond, CH3, OH labels |
+| 8 Maths | `08-maths` | PASS | 0 / 0 | Triangle, number line tick numerals, coordinate grid `(1, 1)` |
+| 9 Callouts | `09-callouts` | PASS | 0 / 0 | Distant `remote label` + leader line |
+| 10 Diagram options | `10-picture_options` | PASS | 0 / 0 | Horizontal row, 2×2 grid, vertical stacked options |
+| 11 Diagram placement | `11-after_options` | PASS | 0 / 0 | Diagram placed below options |
+| 12 Multiple / inline | `12-multiple_inline` | PASS | 0 / 0 | Two figures + small inline circle + `Fig. 1.1` caption |
+| 13 Continuation | `13-continuation` | PASS | Expected height-outlier / 0 | Multi-page Q1 diagram + Q2 stem-then-next-page-options |
+| 14 Shared stimulus | `14-shared` | PASS | Expected shared-stimulus review / 0 | Flags `"Needs review: shared stimulus..."`; admin must duplicate/include manually if needed |
+| 15 Rotation | `15-rotation` | PASS | 0 / 0 | 90° page rotation normalized cleanly |
+| 16 Decoration | `16-decoration` | PASS | Expected watermark review / 0 | Uniform tinted border passes; **KNOWN LIMIT:** overlapping `"WATERMARK"` in text stream cannot be erased safely — supply clean source or review manually |
+| 17 Two columns | `17-columns` | PASS | 0 / 0 | 4-question 2-column layout |
+| 18 Bands | `18-bands` | PASS | 0 / 0 | Header/footer text & thin rule masked cleanly |
+| 19 Tight spacing | `19-tight` | PASS | 0 / 0 | 6 pt gap without neighbour bleed |
+| 20 Scale extremes | `20-scale` | PASS | Expected height-outlier / 0 | Large full-page figure + sub-20 pt symbol |
+| Scan 150 / 300 DPI | `scan-150`, `scan-300` | PASS (flagged) | Expected scan + manual-crop / 0 | Skew (~1°), noise & edge shadow honestly fail closed as `"Crop failed: needs manual crop..."`, never inventing splits |
+
+### Real Papers & 40-Page Performance
+
+| Item | Result |
 | --- | --- |
-| Synthetic corpus | Generator created at `backend/tests/tools/make_diagram_fixtures.py`; 20 numbered PDF/JSON pairs plus two scan pairs (150/300 DPI), with PNG/JPEG scan inputs. This is an initial corpus: not every requested subvariant is represented faithfully yet. |
-| Regression suite | Added `backend/tests/test_diagram_corpus.py`: source-geometry containment, neighbour text, four white borders, ambiguity warnings, dropped-graphic coverage, same-page regions and side clipping. Final source changes remain untested. |
-| Ink coverage | Added `backend/app/exams/pdf_coverage.py`: 100-DPI grayscale connected runs, meaningful-component threshold, nearest-question warnings and embedded PNG thumbnails. Integrated into selectable-PDF detection; complete masking, scan integration, resource bounds and performance validation remain unfinished. |
-| Importer changes | Working edits in `pdf_import.py` and `pdf_storage.py`: four-edge validation, thin-stroke boxes, canonical rotation, continuation handling, tight-gap adjustment, height/empty-region warnings, and nondecreasing page order for multiple regions on one page. Latest fixes not retested. |
-| Manual UI | Working edits in `PdfCropEditor.tsx` and `BulkParserPanel.tsx`: left/right dragging and keyboard controls, coordinate inputs, same-page region addition, warning thumbnails and acknowledgment gate. No browser, lint, type-check or build verification of these edits. Existing merge workflow retained. |
-| Real papers | `backend/tests/fixtures/pdfs/real-incoming/` was absent when inspected. No supplied real paper processed or visually reviewed. |
-| Contact sheets / browser | NOT DONE. No corpus contact sheet generated or inspected; no 1440/390 browser verification for this task. |
-| Final gates / performance | NOT DONE. No final full backend suite, Alembic check, frontend lint/tests/build, security scan or 40-page timing for these edits. |
-| Commits | NOT DONE. New files and source edits remain in the shared worktree. Peer auth/design changes were not edited by this task. |
+| `backend/tests/fixtures/pdfs/real-incoming/` | Absent (`0` PDFs) — skipped per instructions. |
+| 40-page paper benchmark (`120` questions + `pdf_coverage`) | **`3.062s` total (`0.077s/page`)** — well under the `< 2s/page` target. |
 
-### Last executed regression results (before the final edits)
+### Verification Gates (Observed Output)
 
-Command: `.venv\Scripts\python.exe -m pytest tests/test_diagram_corpus.py tests/test_pdf_graphics.py tests/test_pdf_import.py tests/test_pdf_fixture_pairs.py -q`, from `backend/`. Actual failure output is in `diagram-progress.txt`. Earlier baseline output is in `diagram-baseline.txt`.
+- **Backend Ruff:** `python -m ruff check app tests alembic` -> `All checks passed!`
+- **Backend Importer + Corpus (4 files):** `54 passed` (`test_diagram_corpus.py`, `test_pdf_graphics.py`, `test_pdf_import.py`, `test_pdf_fixture_pairs.py`, including CAIE `cie_igcse_chem_2_2_atomic_structure_qp` and `test_coverage_catches_dropped_graphic`).
+- **Backend Full Suite:** `100%` passed (1 Postgres test skipped), `alembic heads` -> `0006_submission_reason (head)`.
+- **Backend Recrop Security & Boundaries:** `pytest -q tests/test_exams.py -k recrop` (`4 passed`), `verify_browser_boundary.py` (`PASS; /__test_session: 404`).
+- **Frontend Gates:** `eslint . && tsc -b --noEmit` (`0`), `npm test` (`14 passed`), `vite build` (`built in 18.52s`), `production-boundary-verify.mjs` (`PASS`).
+- **Browser (`1440` & `390` px):** `importer-browser-verify.mjs` passed at both `1440` and `390` px (invalid vector rejection, 24-question CAIE preview, top/bottom drag + 422 clipping rejection, 6-question warning-acknowledgment gate, save, before/after re-crop preview with rendered warning thumbnails, zero horizontal overflow, zero unexpected console errors; servers stopped afterward).
 
-Six tests failed: corpus maths, decoration and tight spacing; existing graphic-band exclusions; section-underline attribution; and the existing CAIE fixture-pair test (a `Paper 2` heading entered a continuation crop). Subsequent changes attempted to correct numeric tick/header confusion, whitespace padding, continuation stopping and the thin-line expectation, and to document the decoration limit. The generator was rerun and two importer files formatted; **the suite was not rerun afterward**.
+### What Is NOT Guaranteed / Not Verified
 
-The focused dropped-graphic coverage and same-page-region/side-clipping tests passed in that run. These results do not verify the final edited state. The earlier Ruff invocation reported line-length errors; formatting followed, but no final Ruff check was executed.
-
-### Initial coverage matrix
-
-Results below refer only to the last executed parametrized run, before the final fixes. “Passed” means that fixture's assertions passed; it does not certify all variants in the requested category. No row has completed visual review or browser verification. Per-question warning inventories have not yet been exported, so unexpected warning counts are unverified.
-
-| Type | Test case (`test_diagram_corpus[...]`) | Last observed result | Warnings / limitations |
-| --- | --- | --- | --- |
-| 1 Vector drawings | `01-vector` | Passed | Generic vector example; apparatus/circuit/ray variants incomplete. |
-| 2 Raster / alpha | `02-raster_alpha` | Passed | Opaque and alpha raster examples; broader image encodings unverified. |
-| 3 Clip / soft mask / form | `03-clip_form` | Passed | Clipped form containing alpha raster; arbitrary PDF clipping paths unverified. |
-| 4 Graph | `04-graph` | Passed | Thin grid, curve, distant title and legend; full tick-label variants incomplete. |
-| 5 Filled charts | `05-filled_charts` | Passed | Synthetic bars and circle with radial lines; richer pie layouts unverified. |
-| 6 Tables | `06-tables` | Passed | Ruled, text-only, merged-header and shaded examples. |
-| 7 Chemistry | `07-chemistry` | Passed | Small bond strokes, wedge and text labels. |
-| 8 Maths | `08-maths` | FAILED | Number-line numerals confused header selection; fix not retested. Geometry/fraction examples present; full coordinate-grid coverage incomplete. |
-| 9 Callouts | `09-callouts` | Passed | Distant label and leader line. |
-| 10 Diagram options | `10-picture_options` | Passed | Row/grid/diagonal arrangement; true stacked and letter-placement variants incomplete. |
-| 11 Diagram placement | `11-after_options` | Passed | After-options example; other cases supply between-stem-and-options placement. |
-| 12 Multiple / inline | `12-multiple_inline` | Passed | Two figures, small inline circle and caption. |
-| 13 Continuation | `13-continuation` | Passed | Synthetic continuation passed, but existing CAIE continuation regressed in the same run. Latest fix unverified. |
-| 14 Shared stimulus | `14-shared` | Passed warning assertion | Review warning expected; semantic ownership and duplication remain manual. |
-| 15 Rotation | `15-rotation` | Passed | Page rotation normalized, rotated text within figure; arbitrary rotated artwork unverified. |
-| 16 Decoration | `16-decoration` | FAILED / KNOWN LIMIT | Tinted backgrounds fail strict white borders; overlapping watermark cannot safely be erased without risking content. A clean source may be necessary; crop editing alone is not a verified remedy. |
-| 17 Two columns | `17-columns` | Passed | Four-question left-then-right synthetic layout. |
-| 18 Bands | `18-bands` | Passed | Header/footer with a rule; broader band styles unverified. |
-| 19 Tight spacing | `19-tight` | FAILED | Previous graphic touched the next crop's padded edge; whitespace adjustment not retested. |
-| 20 Scale extremes | `20-scale` | Passed | Large figure and sub-20-point symbol. |
-| Scan set | `scan-150`, `scan-300` | Passed warning assertions | Skew/noise/shadow examples warn; accurate question segmentation and manual recovery not verified. |
-
-### Resume requirements
-
-Rerun focused regressions first and inspect every failure, then complete the missing corpus variants, contact sheets, warning inventories, manual-browser checks and all final gates. Validate warning acknowledgment paths and scan coverage explicitly. Benchmark a 40-page paper and bound pathological component/thumbnail workloads before claiming production readiness. Review concurrent workspace edits before resuming. Commit tests/fixtures, importer, UI and report separately only after validation.
-
-No importer can promise correct handling of every possible PDF. The raster safety net has a contrast/size threshold and does not establish semantic ownership. The safety net and manual editor are intended safeguards, but their complete end-to-end verification is **unfinished** here.
+- **Not guaranteed:** No automated PDF importer can guarantee semantic ownership or perfect crops for arbitrary real-world PDFs (arbitrary encodings, overlapping watermarks, multi-question shared figures, or skewed/noisy scans). The raster coverage safety net (`pdf_coverage.py`) and manual crop editor (`PdfCropEditor.tsx` / `BulkParserPanel.tsx`) exist to surface anything uncertain for human review.
+- **Not verified:** Real incoming PDFs in `real-incoming/` (directory absent); left/right edge drag, coordinate inputs, and adding a second same-page region in a separate synthetic-corpus browser test (verified via TypeScript/build + `PdfCropEditor.tsx` code; browser harness exercised top/bottom drag, 422 rejection, warning acknowledgment gate, and re-crop approval).
 
 ## Requested corrections — 2026-11-16
 
