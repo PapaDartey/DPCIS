@@ -1,7 +1,7 @@
-import { ShieldCheck } from "lucide-react";
-import type { RefObject, ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { cn } from "@/lib/utils";
 
 export interface PublicLayoutProps {
@@ -15,28 +15,22 @@ export function PublicLayout({ mainRef, children }: PublicLayoutProps) {
 
   return (
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur-xs">
-        <div
-          className={cn(
-            "mx-auto flex min-h-[60px] items-center justify-between gap-4",
-            isLoginRoute ? "max-w-none px-6 sm:px-10 lg:px-14" : "max-w-7xl px-4 sm:px-6",
-          )}
-        >
-          <NavLink
-            to="/"
-            className="inline-flex min-h-11 items-center gap-2.5 rounded-md px-1.5 text-base font-bold tracking-tight text-foreground no-underline hover:text-primary"
-          >
-            <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
-              <ShieldCheck className="size-4" aria-hidden="true" />
-            </span>
-            <span>Examination Hub</span>
-          </NavLink>
+      {!isLoginRoute ? (
+        <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur-xs">
+          <div className="mx-auto flex min-h-[60px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+            <NavLink
+              to="/"
+              className="inline-flex min-h-11 items-center rounded-md no-underline"
+            >
+              <BrandLogo size={32} variant="lockup" />
+            </NavLink>
 
-          <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
-            Digital Assessment Portal
-          </span>
-        </div>
-      </header>
+            <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
+              Service Beyond Self
+            </span>
+          </div>
+        </header>
+      ) : null}
 
       <main
         id="main-content"
@@ -52,8 +46,11 @@ export function PublicLayout({ mainRef, children }: PublicLayoutProps) {
       {!isLoginRoute ? (
         <footer className="border-t border-border bg-card">
           <div className="mx-auto flex max-w-[1160px] flex-col gap-2 px-4 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <p>Examination Hub — Digital Assessment Platform</p>
-            <p>Calm &amp; Focused Online Assessment</p>
+            <div className="flex items-center gap-2">
+              <BrandLogo size={24} variant="mark" />
+              <span>DPS International School — Examination Hub</span>
+            </div>
+            <p>Service Beyond Self</p>
           </div>
         </footer>
       ) : null}

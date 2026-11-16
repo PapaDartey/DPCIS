@@ -1,0 +1,75 @@
+[
+  {
+    "width": 320,
+    "checks": [],
+    "errors": [],
+    "screenshots": [],
+    "exam_id": "bbb873bc-8933-466c-8db4-905cb22f9410",
+    "status": "failed",
+    "stage": "invalid upload",
+    "failure": "Horizontal overflow: invalid-preview"
+  },
+  {
+    "width": 375,
+    "checks": [
+      "Invalid vector crops rejected in preview and blocked from import",
+      "PDF upload and 24-question graphics-aware preview",
+      "Top drag accepted; deliberate bottom clipping rejected (422), old image kept",
+      "Bottom drag accepted",
+      "Imported and saved 24 questions through browser UI",
+      "Before/after preview read-only; only approved Q1 changed; keys and marks identical"
+    ],
+    "errors": [],
+    "screenshots": [
+      "docs/ui-screenshots/importer-verify/375-invalid-preview.png",
+      "docs/ui-screenshots/importer-verify/375-invalid-drag.png",
+      "docs/ui-screenshots/importer-verify/375-crop-editor.png",
+      "docs/ui-screenshots/importer-verify/375-recrop-before-after.png"
+    ],
+    "exam_id": "0ca80164-b123-4eb0-9607-5bfa56bc56df",
+    "status": "passed",
+    "expected_http_errors": 1
+  },
+  {
+    "width": 412,
+    "checks": [
+      "Invalid vector crops rejected in preview and blocked from import",
+      "PDF upload and 24-question graphics-aware preview",
+      "Top drag accepted; deliberate bottom clipping rejected (422), old image kept",
+      "Bottom drag accepted",
+      "Imported and saved 24 questions through browser UI",
+      "Before/after preview read-only; only approved Q1 changed; keys and marks identical"
+    ],
+    "errors": [],
+    "screenshots": [
+      "docs/ui-screenshots/importer-verify/412-invalid-preview.png",
+      "docs/ui-screenshots/importer-verify/412-invalid-drag.png",
+      "docs/ui-screenshots/importer-verify/412-crop-editor.png",
+      "docs/ui-screenshots/importer-verify/412-recrop-before-after.png"
+    ],
+    "exam_id": "38e0aea7-ac44-48a1-8695-18690247e389",
+    "status": "passed",
+    "expected_http_errors": 1
+  },
+  {
+    "width": 1280,
+    "checks": [
+      "Invalid vector crops rejected in preview and blocked from import",
+      "PDF upload and 24-question graphics-aware preview",
+      "Top drag accepted; deliberate bottom clipping rejected (422), old image kept",
+      "Bottom drag accepted",
+      "Imported and saved 24 questions through browser UI",
+      "Before/after preview read-only; only approved Q1 changed; keys and marks identical"
+    ],
+    "errors": [],
+    "screenshots": [
+      "docs/ui-screenshots/importer-verify/1280-invalid-preview.png",
+      "docs/ui-screenshots/importer-verify/1280-invalid-drag.png",
+      "docs/ui-screenshots/importer-verify/1280-crop-editor.png",
+      "docs/ui-screenshots/importer-verify/1280-recrop-before-after.png"
+    ],
+    "exam_id": "30c4b51c-4342-4d9f-8bb1-5656d3e53c39",
+    "status": "passed",
+    "expected_http_errors": 1
+  }
+]

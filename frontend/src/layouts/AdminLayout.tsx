@@ -1,6 +1,7 @@
 import { useState, type ReactNode, type RefObject } from "react";
 import { NavLink } from "react-router-dom";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { useOptionalAuth } from "@/features/auth/useAuth";
 
 export interface AdminLayoutProps {
@@ -46,16 +47,7 @@ export function AdminLayout({ mainRef, children }: AdminLayoutProps) {
     <div className="admin-app">
       <aside className="admin-side" aria-label="Admin console">
         <NavLink to="/admin" className="admin-brand">
-          <div className="admin-logo" aria-hidden="true">
-            <svg className="admin-icon" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="9" />
-              <circle cx="12" cy="12" r="4" />
-            </svg>
-          </div>
-          <div>
-            <b>Examination Hub</b>
-            <small>Admin console</small>
-          </div>
+          <BrandLogo size={32} variant="lockup" onDark />
         </NavLink>
 
         <div className="admin-nav-h">Management</div>
@@ -125,7 +117,10 @@ export function AdminLayout({ mainRef, children }: AdminLayoutProps) {
         <main id="main-content" ref={mainRef} className="admin-wrap outline-none">
           {children}
         </main>
-        <footer className="admin-footer">Examination Hub, administration</footer>
+        <footer className="admin-footer flex items-center gap-2">
+          <BrandLogo size={24} variant="mark" />
+          <span>DPS International School — Examination Hub · Administration</span>
+        </footer>
       </div>
     </div>
   );

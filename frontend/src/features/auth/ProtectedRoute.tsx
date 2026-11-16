@@ -23,6 +23,7 @@ function ProtectedRouteInner({ requiredRole }: { requiredRole: ApplicationRole }
   if (!isConfigured) {
     return (
       <ErrorStatePanel
+        showBrandLogo
         title="Examination Hub is temporarily unavailable"
         message="The authentication service has not been configured for this environment. Please contact the system administrator."
         onRetry={() => void refreshAuth()}
@@ -32,7 +33,7 @@ function ProtectedRouteInner({ requiredRole }: { requiredRole: ApplicationRole }
   }
 
   if (isLoading) {
-    return <LoadingStatePanel label="Checking your session..." cards={1} />;
+    return <LoadingStatePanel showBrandLogo label="Checking your session..." cards={1} />;
   }
 
   if (!sessionUser) {
@@ -42,6 +43,7 @@ function ProtectedRouteInner({ requiredRole }: { requiredRole: ApplicationRole }
   if (errorMessage || !identity) {
     return (
       <ErrorStatePanel
+        showBrandLogo
         title="Unable to open your workspace"
         message={errorMessage ?? "We could not verify your account right now. Please try again."}
         onRetry={() => void refreshAuth()}
@@ -64,6 +66,7 @@ function ProtectedRouteInner({ requiredRole }: { requiredRole: ApplicationRole }
     const safeHomePath = identity.role === "STUDENT" ? "/student" : "/admin";
     return (
       <ErrorStatePanel
+        showBrandLogo
         title="Access denied"
         message="You do not have permission to view this page."
         action={

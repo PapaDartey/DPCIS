@@ -1,7 +1,8 @@
-import { LogOut, Menu, ShieldCheck } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { useOptionalAuth } from "@/features/auth/useAuth";
@@ -69,9 +70,7 @@ export function AppHeader({
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur-xs">
         <div className="mx-auto flex min-h-[56px] max-w-[1280px] flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6">
           <div className="flex min-w-0 items-center gap-2.5">
-            <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <ShieldCheck className="size-4" aria-hidden="true" />
-            </span>
+            <BrandLogo size={32} variant="mark" />
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-tight text-foreground sm:text-base">
                 {examTitle ?? "Active Examination"}
@@ -101,10 +100,7 @@ export function AppHeader({
             to="/"
             className="inline-flex min-h-11 items-center gap-2.5 rounded-md px-1.5 text-base font-bold tracking-tight text-foreground no-underline hover:text-primary"
           >
-            <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
-              <ShieldCheck className="size-4" aria-hidden="true" />
-            </span>
-            <span>Examination Hub</span>
+            <BrandLogo size={32} variant="lockup" />
           </NavLink>
         </div>
 

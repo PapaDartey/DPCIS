@@ -1,7 +1,7 @@
 # Examination Hub — Frontend UI Route & Component Manifest (`STEP 0` & `PHASE A`)
 
-> **Status:** `APPROVED` (Phase A Foundation Complete; Ready for Phase B Student Journey)
-> **Scope:** Presentation-only redesign of the Examination Hub frontend (`frontend/`). Zero changes to business logic, API contracts, route paths, authentication, grading, or data shapes.
+> **Status:** `APPROVED` (Delhi Private School Rebrand Applied; Ready for Visual Verification)
+> **Scope:** Presentation-only redesign of the Examination Hub frontend (`frontend/`) with Delhi Private School ("Service Beyond Self") identity. Zero changes to business logic, API contracts, route paths, authentication, grading, or data shapes.
 
 ---
 

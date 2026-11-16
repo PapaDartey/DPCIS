@@ -1,0 +1,59 @@
+
+> examination-hub-frontend@0.1.0 build
+> tsc -b && vite build
+
+[36mvite v6.4.6 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 1950 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                                      [39m[1m[2m    2.53 kB[22m[1m[22m[2m │ gzip:   0.98 kB[22m
+[2mdist/[22m[32massets/dps-logo-tile-128-DnmSzPi1.webp          [39m[1m[2m    4.97 kB[22m[1m[22m
+[2mdist/[22m[32massets/dps-logo-128-Dnt07j06.webp               [39m[1m[2m    7.30 kB[22m[1m[22m
+[2mdist/[22m[32massets/dps-logo-tile-256-BKPxDI4n.webp          [39m[1m[2m   13.72 kB[22m[1m[22m
+[2mdist/[22m[32massets/dps-logo-256-Dvk-aGoM.webp               [39m[1m[2m   18.45 kB[22m[1m[22m
+[2mdist/[22m[32massets/dps-logo-tile-512-B9jF8KBq.webp          [39m[1m[2m   36.31 kB[22m[1m[22m
+[2mdist/[22m[32massets/dps-logo-512-C2gQk_X-.webp               [39m[1m[2m   45.74 kB[22m[1m[22m
+[2mdist/[22m[32massets/slide-4-lab@1280-ByFrANNQ.webp           [39m[1m[2m   85.41 kB[22m[1m[22m
+[2mdist/[22m[32massets/slide-4-lab@1920-Cl38QUDN.webp           [39m[1m[2m  134.41 kB[22m[1m[22m
+[2mdist/[22m[32massets/slide-2-trophy@1280-zaANs2lc.webp        [39m[1m[2m  166.70 kB[22m[1m[22m
+[2mdist/[22m[32massets/slide-1-building@1280-Bb0zbuhs.webp      [39m[1m[2m  175.95 kB[22m[1m[22m
+[2mdist/[22m[32massets/slide-3-art@1280-BcNFWg-c.webp           [39m[1m[2m  176.15 kB[22m[1m[22m
+[2mdist/[22m[32massets/slide-2-trophy@1920-CSg7YIVH.webp        [39m[1m[2m  197.57 kB[22m[1m[22m
+[2mdist/[22m[32massets/slide-3-art@1920-BgGy-1q_.webp           [39m[1m[2m  234.41 kB[22m[1m[22m
+[2mdist/[22m[32massets/slide-1-building@1920-C08B466c.webp      [39m[1m[2m  248.49 kB[22m[1m[22m
+[2mdist/[22m[32massets/pdf.worker.min-yatZIOMy.mjs              [39m[1m[2m1,375.84 kB[22m[1m[22m
+[2mdist/[22m[35massets/index-ClF1LOfX.css                       [39m[1m[2m   80.93 kB[22m[1m[22m[2m │ gzip:  15.99 kB[22m
+[2mdist/[22m[36massets/pdf.worker.min-ocdtAcA3.js               [39m[1m[2m    0.07 kB[22m[1m[22m[2m │ gzip:   0.09 kB[22m
+[2mdist/[22m[36massets/arrow-right-B8d4gsDK.js                  [39m[1m[2m    0.34 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/circle-minus-TbrsjdSs.js                 [39m[1m[2m    0.34 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/circle-check-CruxgbFu.js                 [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/clock-CA5lHZnm.js                        [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/info-BqXRRsXJ.js                         [39m[1m[2m    0.37 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+[2mdist/[22m[36massets/lock-JbyhV27f.js                         [39m[1m[2m    0.37 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+[2mdist/[22m[36massets/circle-x-bv_yurOB.js                     [39m[1m[2m    0.37 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+[2mdist/[22m[36massets/flag-Ch6-x08B.js                         [39m[1m[2m    0.39 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+[2mdist/[22m[36massets/timer-FcKLYShQ.js                        [39m[1m[2m    0.41 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+[2mdist/[22m[36massets/segmented-control-Dm-YQStT.js            [39m[1m[2m    0.46 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+[2mdist/[22m[36massets/save-CV_MRB1C.js                         [39m[1m[2m    0.50 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/ExamStatusBadge-zfJnrE6Z.js              [39m[1m[2m    0.80 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+[2mdist/[22m[36massets/badge-CgebFWmV.js                        [39m[1m[2m    0.94 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+[2mdist/[22m[36massets/AdminExamNewPage-5kLCNqty.js             [39m[1m[2m    1.09 kB[22m[1m[22m[2m │ gzip:   0.67 kB[22m
+[2mdist/[22m[36massets/AuthenticatedPdfImage-otZxKac6.js        [39m[1m[2m    1.56 kB[22m[1m[22m[2m │ gzip:   0.94 kB[22m
+[2mdist/[22m[36massets/studentApi-CtoxAzFw.js                   [39m[1m[2m    3.16 kB[22m[1m[22m[2m │ gzip:   1.37 kB[22m
+[2mdist/[22m[36massets/AttemptDetailDialog-D-vntp-G.js          [39m[1m[2m    6.56 kB[22m[1m[22m[2m │ gzip:   2.01 kB[22m
+[2mdist/[22m[36massets/adminUtils-b4oFL7W6.js                   [39m[1m[2m    6.58 kB[22m[1m[22m[2m │ gzip:   2.49 kB[22m
+[2mdist/[22m[36massets/StudentExamInstructionsPage-BCB37iHh.js  [39m[1m[2m    7.51 kB[22m[1m[22m[2m │ gzip:   2.41 kB[22m
+[2mdist/[22m[36massets/AdminDashboardPage-C4j-jDSK.js           [39m[1m[2m    9.31 kB[22m[1m[22m[2m │ gzip:   3.08 kB[22m
+[2mdist/[22m[36massets/AdminOverviewPage-DslYPziD.js            [39m[1m[2m    9.34 kB[22m[1m[22m[2m │ gzip:   2.48 kB[22m
+[2mdist/[22m[36massets/popover-JQqW_zUn.js                      [39m[1m[2m    9.94 kB[22m[1m[22m[2m │ gzip:   3.37 kB[22m
+[2mdist/[22m[36massets/AdminExamResultsPage-CvBEaMsW.js         [39m[1m[2m   11.07 kB[22m[1m[22m[2m │ gzip:   3.34 kB[22m
+[2mdist/[22m[36massets/ExamSettingsForm-DpzqqqBp.js             [39m[1m[2m   13.45 kB[22m[1m[22m[2m │ gzip:   3.77 kB[22m
+[2mdist/[22m[36massets/AdminResultsPage-CCjBCVPd.js             [39m[1m[2m   13.84 kB[22m[1m[22m[2m │ gzip:   4.03 kB[22m
+[2mdist/[22m[36massets/StudentDashboardPage-BPC5AO70.js         [39m[1m[2m   15.35 kB[22m[1m[22m[2m │ gzip:   4.54 kB[22m
+[2mdist/[22m[36massets/StudentResultPage-Dy3uwQT6.js            [39m[1m[2m   15.97 kB[22m[1m[22m[2m │ gzip:   3.78 kB[22m
+[2mdist/[22m[36massets/StudentAttemptPage-CeWQDLVU.js           [39m[1m[2m   26.59 kB[22m[1m[22m[2m │ gzip:   7.92 kB[22m
+[2mdist/[22m[36massets/AdminExamEditorPage-DB9IFcZN.js          [39m[1m[2m   57.72 kB[22m[1m[22m[2m │ gzip:  16.00 kB[22m
+[2mdist/[22m[36massets/pdf-CcZYcL52.js                          [39m[1m[2m  365.12 kB[22m[1m[22m[2m │ gzip: 107.61 kB[22m
+[2mdist/[22m[36massets/index-C1zMN9sY.js                        [39m[1m[2m  511.95 kB[22m[1m[22m[2m │ gzip: 156.42 kB[22m
+[32m✓ built in 48.88s[39m

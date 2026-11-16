@@ -39,16 +39,18 @@ export function AppShell({
     }
     const heading = mainEl.querySelector<HTMLElement>("h1");
     if (heading) {
+      heading.setAttribute("data-route-heading", "");
       if (!heading.hasAttribute("tabindex")) {
         heading.setAttribute("tabindex", "-1");
       }
-      heading.focus();
+      heading.focus({ preventScroll: true });
       return;
     }
+    mainEl.setAttribute("data-route-heading", "");
     if (!mainEl.hasAttribute("tabindex")) {
       mainEl.setAttribute("tabindex", "-1");
     }
-    mainEl.focus();
+    mainEl.focus({ preventScroll: true });
   };
 
   useEffect(() => {

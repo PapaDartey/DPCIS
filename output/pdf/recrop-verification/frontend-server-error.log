@@ -1,0 +1,4 @@
+The file does not exist at "C:/Users/EricAppiahOwusu/Music/DPCIS/frontend/node_modules/.vite/deps/@neondatabase_auth.js?v=d0f4b1e5" which is in the optimize deps directory. The dependency might be incompatible with the dep optimizer. Try adding it to `optimizeDeps.exclude`.
+failed to load config from C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\tests\vite.importer.config.ts
+2:35:20 pm [vite] Local browser harness requires DPCIS_BROWSER_TEST=1
+2:35:20 pm [vite] server restart failed

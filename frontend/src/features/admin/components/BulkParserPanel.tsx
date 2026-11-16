@@ -112,7 +112,12 @@ export function BulkParserPanel({
   const keyMismatch = parseResult?.errors.some((error) =>
     error.message.startsWith("Answer key has "),
   ) ?? false;
-  const importBlocked = keyMismatch && !acknowledgedKeyMismatch;
+  const [reviewedCrops, setReviewedCrops] = useState<Record<string, string>>({});
+  const reviewKey = (q: ParsedQuestion) => `${q.source_file_id}:${q.source_number}`;
+  const reviewSignature = (q: ParsedQuestion) => JSON.stringify([q.warnings, q.image_regions]);
+  const needsReview = (q: ParsedQuestion) => !!q.source_file_id && !!q.warnings?.length
+    && reviewedCrops[reviewKey(q)] !== reviewSignature(q);
+  const importBlocked = (keyMismatch && !acknowledgedKeyMismatch) || orderedBlocks.some(needsReview);
 
   const rebuildPreview = (questions: ParsedQuestion[], original: ParseQuestionsResponse): ParseQuestionsResponse => {
     const { questions: renumbered, normalizedKey } = renumberAnswers(questions);
@@ -283,6 +288,10 @@ export function BulkParserPanel({
         setRequestError("The answer key or questions need attention. Review the preview, correct the issues, and try again.");
         return;
       }
+      if (response.valid_questions.some((q) => q.source_file_id && q.warnings?.length)) {
+        setRequestError("Review and acknowledge the flagged PDF crops in the preview before saving.");
+        return;
+      }
       const error = await onSaveImportedQuestions(response.valid_questions.map(fromParsedQuestion));
       if (error) setRequestError(error);
     } catch (error) {
@@ -297,6 +306,14 @@ export function BulkParserPanel({
     mode: "append" | "replace",
     includeInvalidNote: boolean,
   ) => {
+    if (items.some((item) => item.errors.some((message) => message.startsWith("Crop failed:")))) {
+      setRequestError("Repair failed crops in the preview before importing these questions.");
+      return;
+    }
+    if (items.some(needsReview)) {
+      setRequestError("Review and acknowledge each flagged PDF question before importing.");
+      return;
+    }
     const mapped = items.map(fromParsedQuestion);
     const editable = mode === "replace"
       ? mapped
@@ -471,7 +488,7 @@ export function BulkParserPanel({
             <input
               id={`${baseId}-file`}
               type="file"
-              accept=".pdf,application/pdf"
+              accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
               disabled={disabled || isParsing || isReadingFile}
               className="sr-only"
               onChange={(event) => {
@@ -480,8 +497,8 @@ export function BulkParserPanel({
               }}
             />
           </Label>
-          <p className="mt-2 text-xs text-muted-foreground">Or drag and drop a PDF up to 100 MB. The PDF must contain selectable text. Preview before publishing.</p>
-          {questionFile ? <p className="mt-2 text-xs font-medium text-foreground">Question PDF ready: {questionFile.name}</p> : null}
+          <p className="mt-2 text-xs text-muted-foreground">Or drag and drop a PDF, PNG, or JPG up to 100 MB. Scans use white-gap detection; review the suggested question boundaries before saving.</p>
+          {questionFile ? <p className="mt-2 text-xs font-medium text-foreground">Question file ready: {questionFile.name}</p> : null}
         </div>
         </div>
 
@@ -538,7 +555,7 @@ export function BulkParserPanel({
         {questionFile && answerFileName ? (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
             <div>
-              <p className="font-semibold">Both PDF files are ready</p>
+              <p className="font-semibold">Both import files are ready</p>
               <p className="text-sm text-muted-foreground">Save the matched questions and correct answers, then continue to Settings.</p>
             </div>
             <Button type="button" disabled={disabled || isSavingImport || isParsing || isReadingFile}
@@ -606,6 +623,11 @@ export function BulkParserPanel({
               </div>
             </div>
             <div id={`${baseId}-preview-content`} hidden={!previewExpanded} className="space-y-4">
+            {parseResult.scan_mode ? (
+              <p role="status" className="text-sm text-muted-foreground">
+                Scan mode: questions were split at white gaps. Review boundaries and provisional numbering before saving.
+              </p>
+            ) : null}
             {parseResult.ocr_used ? (
               <Alert role="status">
                 <AlertTitle>OCR used</AlertTitle>
@@ -671,7 +693,7 @@ export function BulkParserPanel({
                     I have reviewed the answer-key count mismatch and will correct any missing answers before saving.
                   </label>
                 ) : null}
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-2.5 [&_button]:max-w-full [&_button]:whitespace-normal">
                   {parseResult.valid_questions.length > 0 ? (
                     <>
                       <Button
@@ -703,7 +725,7 @@ export function BulkParserPanel({
                     <Button
                       type="button"
                       variant="outline"
-                      disabled={disabled || importBlocked}
+                      disabled={disabled || (keyMismatch && !acknowledgedKeyMismatch)}
                       onClick={() =>
                         applyParsedBlocks(
                           parseResult.invalid_questions,
@@ -778,14 +800,16 @@ export function BulkParserPanel({
                             pageDimensions={parseResult.page_dimensions ?? []}
                             onUpdated={(regions, imageUrls) => setParseResult((current) => {
                               if (!current) return current;
-                              const update = (question: ParsedQuestion) => question.position === block.position
-                                ? { ...question, image_regions: regions, image_urls: imageUrls }
-                                : question;
-                              return {
-                                ...current,
-                                valid_questions: current.valid_questions.map(update),
-                                invalid_questions: current.invalid_questions.map(update),
-                              };
+                              const updated = [...current.valid_questions, ...current.invalid_questions]
+                                .sort((a, b) => a.position - b.position)
+                                .map((question) => {
+                                  if (question.position !== block.position) return question;
+                                  const errors = question.errors.filter((message) => !message.startsWith("Crop failed:"));
+                                  return { ...question, image_regions: regions, image_urls: imageUrls,
+                                    errors, valid: !!question.answer_label && errors.length === 0 && !keyMismatch,
+                                    warnings: (question.warnings ?? []).filter((message) => !message.startsWith("Crop failed:")) };
+                                });
+                              return rebuildPreview(updated, current);
                             })} />
                         ) : null}
                         {block.source_file_id && block.image_regions?.length ? (
@@ -811,9 +835,20 @@ export function BulkParserPanel({
                           </div>
                         ) : null}
                         <p className="mt-2 text-xs">Marks: {block.points}</p>
-                        {block.warnings?.map((warning) => (
-                          <p key={warning} className="mt-1 text-xs text-amber-700">{warning}</p>
-                        ))}
+                        {block.warnings?.map((warning) => {
+                          const [message, thumbnail] = warning.split("\nthumbnail:");
+                          return <div key={warning} className="mt-1 text-xs text-[var(--warn)]">
+                            <p>{message}</p>
+                            {thumbnail?.startsWith("data:image/png;base64,") ? <img src={thumbnail} alt={message}
+                              className="mt-2 max-h-40 max-w-full border border-border" /> : null}
+                          </div>;
+                        })}
+                        {block.source_file_id && !!block.warnings?.length ? <label className="mt-2 flex min-h-11 items-center gap-2 text-sm">
+                          <input type="checkbox" aria-label={`Acknowledge crop warnings for question ${block.position}`}
+                            checked={!needsReview(block)} onChange={(event) => setReviewedCrops((current) => ({ ...current,
+                              [reviewKey(block)]: event.target.checked ? reviewSignature(block) : "" }))} />
+                          I reviewed these crop warnings and all question content. Clipping errors still require a repair.
+                        </label> : null}
 
                         {block.options.length > 0 ? (
                           <ul className="mt-2.5 grid gap-1.5 sm:grid-cols-2">

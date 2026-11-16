@@ -244,7 +244,8 @@ def test_pdf_upload_preview_and_private_image_delivery(
     monkeypatch.setenv("EXAM_PDF_STORAGE_DIR", str(tmp_path))
     exam = _create_draft_exam(exam_env)
     fixture_dir = Path(__file__).parent / "fixtures"
-    with fitz.open(fixture_dir / "atomic_structure_ms.pdf") as doc:
+    mark_scheme = fixture_dir / "pdfs/answer-keys/cie_igcse_chem_2_2_atomic_structure_ms.pdf"
+    with fitz.open(mark_scheme) as doc:
         key_text = doc[0].get_text()
     upload = exam_env.client.post(
         f"/api/admin/exams/{exam['id']}/import-pdf",
@@ -252,12 +253,12 @@ def test_pdf_upload_preview_and_private_image_delivery(
         files={
             "file": (
                 "paper.pdf",
-                (fixture_dir / "atomic_structure_qp.pdf").read_bytes(),
+                (fixture_dir / "pdfs/cie_igcse_chem_2_2_atomic_structure_qp.pdf").read_bytes(),
                 "application/pdf",
             ),
             "answer_file": (
                 "mark-scheme.pdf",
-                (fixture_dir / "atomic_structure_ms.pdf").read_bytes(),
+                mark_scheme.read_bytes(),
                 "application/pdf",
             ),
         },
@@ -269,7 +270,7 @@ def test_pdf_upload_preview_and_private_image_delivery(
     assert preview["valid_questions"][0]["answer_label"] == "B"
     source_id = preview["valid_questions"][0]["source_file_id"]
     assert (tmp_path / source_id / "answer-key.pdf").read_bytes() == (
-        fixture_dir / "atomic_structure_ms.pdf"
+        fixture_dir / "pdfs/answer-keys/cie_igcse_chem_2_2_atomic_structure_ms.pdf"
     ).read_bytes()
     repeated = exam_env.client.post(
         f"/api/admin/exams/{exam['id']}/import-pdf",
@@ -277,7 +278,7 @@ def test_pdf_upload_preview_and_private_image_delivery(
         files={
             "file": (
                 "same-paper.pdf",
-                (fixture_dir / "atomic_structure_qp.pdf").read_bytes(),
+                (fixture_dir / "pdfs/cie_igcse_chem_2_2_atomic_structure_qp.pdf").read_bytes(),
                 "application/pdf",
             )
         },
@@ -315,8 +316,14 @@ def test_pdf_upload_preview_and_private_image_delivery(
         headers=exam_env.admin_headers,
         json={"regions": [{"page": 2, "bbox": [0, 90, 595, 220]}]},
     )
+    assert edited_crop.status_code == 422, edited_crop.text
+    assert "Crop failed:" in edited_crop.json()["detail"]
+    edited_crop = exam_env.client.put(
+        crop_path,
+        headers=exam_env.admin_headers,
+        json={"regions": preview["valid_questions"][3]["image_regions"]},
+    )
     assert edited_crop.status_code == 200, edited_crop.text
-    assert edited_crop.json()["regions"][0]["bbox"][1] == 90
     assert (
         exam_env.client.get(
             edited_crop.json()["image_urls"][0], headers=exam_env.admin_headers
@@ -371,31 +378,10 @@ def test_pdf_upload_preview_and_private_image_delivery(
     assert exam_env.client.get(student_image_url, headers=exam_env.admin_headers).status_code == 403
 
 
-def test_scanned_pdf_upload_uses_ocr_fallback_flag(
+def test_scanned_pdf_upload_uses_real_projection_profile(
     exam_env: SimpleNamespace, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    from app.exams import router as exam_router
-    from app.exams.pdf_import import PdfQuestion, PdfRegion
-
     monkeypatch.setenv("EXAM_PDF_STORAGE_DIR", str(tmp_path))
-    monkeypatch.setattr(
-        exam_router,
-        "detect_questions_with_ocr",
-        lambda _doc: [
-            PdfQuestion(
-                number=1,
-                regions=[PdfRegion(1, (0, 70, 600, 260))],
-                extracted_text="OCR question one",
-                options_text={"A": "", "B": ""},
-            ),
-            PdfQuestion(
-                number=2,
-                regions=[PdfRegion(1, (0, 270, 600, 460))],
-                extracted_text="OCR question two",
-                options_text={"A": "", "B": ""},
-            ),
-        ],
-    )
     exam = _create_draft_exam(exam_env)
     data = (Path(__file__).parent / "fixtures" / "scanned_image_only.pdf").read_bytes()
     response = exam_env.client.post(
@@ -406,9 +392,223 @@ def test_scanned_pdf_upload_uses_ocr_fallback_flag(
     )
     assert response.status_code == 200, response.text
     payload = response.json()
-    assert payload["ocr_used"] is True
+    assert payload["ocr_used"] is False
+    assert payload["scan_mode"] is True
     assert payload["valid_count"] == 2
     assert all(item["pdf_confidence"] == "0.50" for item in payload["valid_questions"])
+
+
+@pytest.mark.parametrize("kind", ["png", "jpeg"])
+def test_raster_upload_uses_scan_pipeline(
+    exam_env: SimpleNamespace,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    kind: str,
+) -> None:
+    import fitz
+
+    monkeypatch.setenv("EXAM_PDF_STORAGE_DIR", str(tmp_path))
+    with fitz.open(Path(__file__).parent / "fixtures" / "scanned_image_only.pdf") as doc:
+        image = doc[0].get_pixmap(dpi=120).tobytes(kind)
+    exam = _create_draft_exam(exam_env)
+    response = exam_env.client.post(
+        f"/api/admin/exams/{exam['id']}/import-pdf",
+        headers=exam_env.admin_headers,
+        files={"file": (f"scan.{kind}", image, f"image/{kind}")},
+        data={"answer_key_text": "1 B\n2 A"},
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["scan_mode"] is True
+    assert response.json()["valid_count"] == 2
+
+
+def test_ambiguous_graphic_fails_preview_even_with_answer_key(
+    exam_env: SimpleNamespace,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("EXAM_PDF_STORAGE_DIR", str(tmp_path))
+    exam = _create_draft_exam(exam_env)
+    data = (Path(__file__).parent / "fixtures" / "graphics_boundaries.pdf").read_bytes()
+    response = exam_env.client.post(
+        f"/api/admin/exams/{exam['id']}/import-pdf",
+        headers=exam_env.admin_headers,
+        files={"file": ("graphics.pdf", data, "application/pdf")},
+        data={"answer_key_text": "1 B\n2 A\n3 C"},
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["valid_count"] == 1
+    invalid = response.json()["invalid_questions"]
+    assert [q["position"] for q in invalid] == [2, 3]
+    assert all(q["errors"] and any("Crop failed:" in w for w in q["warnings"]) for q in invalid)
+
+
+def _saved_pdf_exam(exam_env, filename="two_column.pdf"):
+    exam = _create_draft_exam(exam_env)
+    count = 3 if filename == "graphics_boundaries.pdf" else 4
+    response = exam_env.client.post(
+        f"/api/admin/exams/{exam['id']}/import-pdf",
+        headers=exam_env.admin_headers,
+        files={
+            "file": (
+                filename,
+                (Path(__file__).parent / "fixtures" / filename).read_bytes(),
+                "application/pdf",
+            )
+        },
+        data={"answer_key_text": "A" * count},
+    )
+    assert response.status_code == 200, response.text
+    preview = response.json()
+    items = sorted(
+        preview["valid_questions"] + preview["invalid_questions"], key=lambda q: q["position"]
+    )
+    response = exam_env.client.put(
+        f"/api/admin/exams/{exam['id']}/questions",
+        headers=exam_env.admin_headers,
+        json={
+            "questions": [
+                {
+                    "question_text": q["question_text"],
+                    "source_file_id": q["source_file_id"],
+                    "source_number": q["source_number"],
+                    "points": "3.50",
+                    "options": [{**o, "is_correct": o["label"] == "A"} for o in q["options"]],
+                }
+                for q in items
+            ]
+        },
+    )
+    assert response.status_code == 200, response.text
+    return response.json()
+
+
+def test_recrop_partial_approval_preserves_old_files_keys_marks_and_rejects_replay(
+    exam_env,
+    monkeypatch,
+    tmp_path,
+):
+    monkeypatch.setenv("EXAM_PDF_STORAGE_DIR", str(tmp_path))
+    exam = _saved_pdf_exam(exam_env)
+    old = {str(p.relative_to(tmp_path)): p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+    base = f"/api/admin/exams/{exam['id']}"
+    response = exam_env.client.post(base + "/recrop-preview", headers=exam_env.admin_headers)
+    assert response.status_code == 200, response.text
+    preview = response.json()
+    assert len(preview["questions"]) == 4
+    assert all(q["valid"] for q in preview["questions"])
+    assert exam_env.client.get(base, headers=exam_env.admin_headers).json() == exam
+    for name, data in old.items():
+        assert (tmp_path / name).read_bytes() == data
+    image = preview["questions"][0]["after_urls"][0]
+    assert preview["questions"][0]["position"] == 0
+    assert preview["questions"][0]["question_id"] == exam["questions"][0]["id"]
+    assert exam_env.client.get(image).status_code == 401
+    assert exam_env.client.get(image, headers=exam_env.student_headers).status_code == 403
+    assert exam_env.client.get(image, headers=exam_env.admin_headers).status_code == 200
+    apply = base + f"/recrop-preview/{preview['preview_id']}/apply"
+    selected = {"question_ids": [exam["questions"][0]["id"]]}
+    assert (
+        exam_env.client.post(apply, headers=exam_env.admin_headers, json=selected).status_code
+        == 200
+    )
+    after = exam_env.client.get(base, headers=exam_env.admin_headers).json()
+    candidate_dir = tmp_path / after["questions"][0]["source_file_id"]
+    assert {p.name for p in candidate_dir.iterdir()} == {"source.pdf", "1.json", "1-0.png"}
+    for index, (before_q, after_q) in enumerate(
+        zip(exam["questions"], after["questions"], strict=True)
+    ):
+        for key in ("id", "question_text", "position", "points", "options", "source_number"):
+            assert before_q[key] == after_q[key]
+        assert (before_q["source_file_id"] != after_q["source_file_id"]) == (index == 0)
+        if index:
+            assert before_q == after_q
+    for name, data in old.items():
+        assert (tmp_path / name).read_bytes() == data
+    assert (
+        exam_env.client.post(apply, headers=exam_env.admin_headers, json=selected).status_code
+        == 409
+    )
+
+
+def test_recrop_invalid_mixed_batch_is_atomic_and_role_scoped(exam_env, monkeypatch, tmp_path):
+    monkeypatch.setenv("EXAM_PDF_STORAGE_DIR", str(tmp_path))
+    exam = _saved_pdf_exam(exam_env, "graphics_boundaries.pdf")
+    base = f"/api/admin/exams/{exam['id']}"
+    assert exam_env.client.post(base + "/recrop-preview").status_code == 401
+    assert (
+        exam_env.client.post(
+            base + "/recrop-preview",
+            headers=exam_env.student_headers,
+        ).status_code
+        == 403
+    )
+    preview = exam_env.client.post(base + "/recrop-preview", headers=exam_env.admin_headers).json()
+    assert [q["valid"] for q in preview["questions"]] == [True, False, False]
+    response = exam_env.client.post(
+        base + f"/recrop-preview/{preview['preview_id']}/apply",
+        headers=exam_env.admin_headers,
+        json={"question_ids": [q["id"] for q in exam["questions"]]},
+    )
+    assert response.status_code == 422
+    assert exam_env.client.get(base, headers=exam_env.admin_headers).json() == exam
+    other = _create_draft_exam(exam_env)
+    assert (
+        exam_env.client.get(
+            preview["questions"][0]["after_urls"][0].replace(exam["id"], other["id"]),
+            headers=exam_env.admin_headers,
+        ).status_code
+        == 404
+    )
+
+
+def test_recrop_stale_preview_and_published_exam_rejected(exam_env, monkeypatch, tmp_path):
+    monkeypatch.setenv("EXAM_PDF_STORAGE_DIR", str(tmp_path))
+    exam = _saved_pdf_exam(exam_env)
+    base = f"/api/admin/exams/{exam['id']}"
+    preview = exam_env.client.post(base + "/recrop-preview", headers=exam_env.admin_headers).json()
+    question = exam["questions"][0]
+    path = tmp_path / question["source_file_id"] / "1-0.png"
+    path.write_bytes(path.read_bytes() + b"changed")
+    response = exam_env.client.post(
+        base + f"/recrop-preview/{preview['preview_id']}/apply",
+        headers=exam_env.admin_headers,
+        json={"question_ids": [question["id"]]},
+    )
+    assert response.status_code == 409
+    assert (
+        exam_env.client.post(base + "/publish", headers=exam_env.admin_headers).status_code == 200
+    )
+    assert (
+        exam_env.client.post(
+            base + "/recrop-preview",
+            headers=exam_env.admin_headers,
+        ).status_code
+        == 409
+    )
+    assert exam_env.client.post(
+        base + f"/recrop-preview/{preview['preview_id']}/apply",
+        headers=exam_env.admin_headers,
+        json={"question_ids": [question["id"]]},
+    ).status_code == 409
+
+
+def test_recrop_discard_removes_candidates_and_preserves_originals(exam_env, monkeypatch, tmp_path):
+    monkeypatch.setenv("EXAM_PDF_STORAGE_DIR", str(tmp_path))
+    exam = _saved_pdf_exam(exam_env)
+    old = {str(p.relative_to(tmp_path)): p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+    base = f"/api/admin/exams/{exam['id']}"
+    preview = exam_env.client.post(base + "/recrop-preview", headers=exam_env.admin_headers).json()
+    endpoint = base + f"/recrop-preview/{preview['preview_id']}"
+    assert exam_env.client.delete(endpoint).status_code == 401
+    assert exam_env.client.delete(endpoint, headers=exam_env.student_headers).status_code == 403
+    assert exam_env.client.delete(endpoint, headers=exam_env.admin_headers).status_code == 200
+    assert exam_env.client.get(base, headers=exam_env.admin_headers).json() == exam
+    remaining = {str(p.relative_to(tmp_path)): p.read_bytes() for p in tmp_path.rglob("*")
+                 if p.is_file() and p.parent.name != "recrop-previews"}
+    assert remaining == old
+    assert exam_env.client.get(preview["questions"][0]["after_urls"][0],
+                               headers=exam_env.admin_headers).status_code == 409
 
 
 def test_crop_endpoint_adds_and_removes_page_region(

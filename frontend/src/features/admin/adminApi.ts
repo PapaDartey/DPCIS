@@ -101,7 +101,7 @@ export function updateQuestionCrops(
   sourceId: string,
   questionNumber: number,
   regions: Array<{ page: number; bbox: number[] }>,
-  dpi = 200,
+  dpi = 220,
   padding = 0,
 ): Promise<{ regions: Array<{ page: number; bbox: number[] }>; image_urls: string[] }> {
   return apiPut(

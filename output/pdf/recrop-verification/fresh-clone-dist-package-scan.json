@@ -1,0 +1,62 @@
+[
+  {
+    "package": "better-auth",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "zod",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "@neondatabase/auth",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "@neondatabase/auth-ui",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "@better-auth/api-key",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "@better-auth/core",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "@better-auth/passkey",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "@daveyplate/better-auth-ui",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "@hookform/resolvers",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  },
+  {
+    "package": "better-call",
+    "emitted": false,
+    "module_hits": [],
+    "dist_string_hits": []
+  }
+]

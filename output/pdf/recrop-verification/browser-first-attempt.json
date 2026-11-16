@@ -1,0 +1,17 @@
+[
+  {
+    "width": 1440,
+    "checks": [
+      "Invalid vector crops rejected in preview and blocked from import"
+    ],
+    "errors": [],
+    "screenshots": [
+      "1440-invalid-preview.png",
+      "1440-failure.png"
+    ],
+    "exam_id": "5df92c41-a62d-40b7-ba91-a88ccb72e82d",
+    "status": "failed",
+    "stage": "valid upload",
+    "failure": "Expected values to be strictly equal:\n\n0 !== 24\n"
+  }
+]

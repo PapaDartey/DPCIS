@@ -1,0 +1,211 @@
+{
+  "viewports": [],
+  "slideshow": {
+    "domCheck": {
+      "fit": "cover",
+      "arrowCount": 0,
+      "dotButtonCount": 0,
+      "pauseButtonExists": true,
+      "pauseHiddenInitially": true
+    },
+    "pauseFocusedRect": {
+      "ariaLabel": "Pause slideshow",
+      "width": 146.234375,
+      "height": 44
+    },
+    "autoAdvance": {
+      "idxBefore": 1,
+      "idxAfter": 2,
+      "advanced": true
+    },
+    "reducedMotionStopsAutoAdvance": true
+  },
+  "noCssUpscaling": [
+    {
+      "viewport": "1440",
+      "slide": 1,
+      "currentSrc": "hr-slide-0-building@1920-C8akvBm2.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1280,
+      "displayWidth": 835,
+      "displayHeight": 926,
+      "ok": true
+    },
+    {
+      "viewport": "1440",
+      "slide": 2,
+      "currentSrc": "hr-slide-1-lab@1920-BR8f-WUW.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1280,
+      "displayWidth": 835,
+      "displayHeight": 926,
+      "ok": true
+    },
+    {
+      "viewport": "1440",
+      "slide": 3,
+      "currentSrc": "hr-slide-2-classroom@1920-8vjNqlrs.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1282,
+      "displayWidth": 835,
+      "displayHeight": 926,
+      "ok": true
+    },
+    {
+      "viewport": "1440",
+      "slide": 4,
+      "currentSrc": "hr-slide-3-sports@1920-BEHsxw-s.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1280,
+      "displayWidth": 835,
+      "displayHeight": 926,
+      "ok": true
+    },
+    {
+      "viewport": "1920",
+      "slide": 5,
+      "currentSrc": "hr-slide-4-debate@1920-BIFcRjBU.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1282,
+      "displayWidth": 1114,
+      "displayHeight": 1080,
+      "ok": true
+    },
+    {
+      "viewport": "1920",
+      "slide": 1,
+      "currentSrc": "hr-slide-0-building@1920-C8akvBm2.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1280,
+      "displayWidth": 1114,
+      "displayHeight": 1080,
+      "ok": true
+    },
+    {
+      "viewport": "1920",
+      "slide": 2,
+      "currentSrc": "hr-slide-1-lab@1920-BR8f-WUW.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1280,
+      "displayWidth": 1114,
+      "displayHeight": 1080,
+      "ok": true
+    },
+    {
+      "viewport": "1920",
+      "slide": 3,
+      "currentSrc": "hr-slide-2-classroom@1920-8vjNqlrs.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1282,
+      "displayWidth": 1114,
+      "displayHeight": 1080,
+      "ok": true
+    },
+    {
+      "viewport": "390",
+      "slide": 3,
+      "currentSrc": "hr-slide-2-classroom@1920-8vjNqlrs.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1282,
+      "displayWidth": 390,
+      "displayHeight": 220,
+      "ok": true
+    },
+    {
+      "viewport": "390",
+      "slide": 4,
+      "currentSrc": "hr-slide-3-sports@1920-BEHsxw-s.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1280,
+      "displayWidth": 390,
+      "displayHeight": 220,
+      "ok": true
+    },
+    {
+      "viewport": "390",
+      "slide": 5,
+      "currentSrc": "hr-slide-4-debate@1920-BIFcRjBU.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1282,
+      "displayWidth": 390,
+      "displayHeight": 220,
+      "ok": true
+    },
+    {
+      "viewport": "390",
+      "slide": 1,
+      "currentSrc": "hr-slide-0-building@1920-C8akvBm2.webp",
+      "naturalWidth": 1920,
+      "naturalHeight": 1280,
+      "displayWidth": 390,
+      "displayHeight": 220,
+      "ok": true
+    }
+  ],
+  "assets404": [],
+  "axe": [
+    {
+      "route": "/",
+      "totalViolations": 0,
+      "seriousOrCriticalCount": 0,
+      "violations": []
+    }
+  ],
+  "passed": true,
+  "formErrorStylingCheck": {
+    "initialInvalidCount": 0,
+    "emailInvalidAfterEmptyBlur": "true",
+    "passwordInvalidAfterShortBlur": "true",
+    "passwordTypeAfterShow": "text",
+    "nameInputVisibleInSignUp": true,
+    "signUpInitialInvalidCount": 0,
+    "passed": true
+  },
+  "routeFocusCheck": {
+    "skippedFirstLoad": true,
+    "heading": {
+      "tagName": "H1",
+      "hasAttr": true,
+      "outlineStyle": "none",
+      "outlineWidth": "3px"
+    },
+    "button": {
+      "tagName": "BUTTON",
+      "outlineStyle": "solid",
+      "outlineWidth": "2px"
+    },
+    "passed": true
+  },
+  "googleButtonCheck": {
+    "signInAudit": {
+      "text": "Sign in with Google",
+      "ariaHidden": "true",
+      "fills": [
+        "#EA4335",
+        "#4285F4",
+        "#FBBC05",
+        "#34A853"
+      ],
+      "contrastRatio": 16.48,
+      "height": 48,
+      "hasUnableToSignIn": false
+    },
+    "signUpText1440": "Sign up with Google",
+    "focusRing": {
+      "outlineWidth": "3px",
+      "outlineStyle": "solid"
+    },
+    "mobile390": {
+      "height": 48,
+      "overflowX": false,
+      "lineCount": 1
+    },
+    "mobile360": {
+      "height": 48,
+      "overflowX": false,
+      "lineCount": 1
+    },
+    "externalIconRequests": [],
+    "passed": true
+  }
+}

@@ -1,0 +1,1 @@
+Production bundle scan: NOT RUN (frontend production build was blocked by missing Vite/TypeScript binaries).

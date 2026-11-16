@@ -1,0 +1,418 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@better-auth/drizzle-adapter": {
+      "name": "@better-auth/drizzle-adapter",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1243465,
+          "name": "@better-auth/drizzle-adapter",
+          "dependency": "@better-auth/drizzle-adapter",
+          "title": "@better-auth/drizzle-adapter: Concurrent requests can exceed rate limits on PostgreSQL",
+          "url": "https://github.com/advisories/GHSA-44jh-23m7-hpcf",
+          "severity": "low",
+          "cwe": [
+            "CWE-307",
+            "CWE-362"
+          ],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N"
+          },
+          "range": ">=1.6.17 <1.7.7"
+        }
+      ],
+      "effects": [
+        "better-auth"
+      ],
+      "range": "1.6.17 - 1.7.6",
+      "nodes": [
+        "node_modules/@better-auth/drizzle-adapter"
+      ],
+      "fixAvailable": {
+        "isSemVerMajor": true
+      }
+    },
+    "@daveyplate/better-auth-ui": {
+      "name": "@daveyplate/better-auth-ui",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@react-email/components"
+      ],
+      "effects": [],
+      "range": ">=1.2.0",
+      "nodes": [
+        "node_modules/@neondatabase/auth-ui/node_modules/@daveyplate/better-auth-ui"
+      ],
+      "fixAvailable": true
+    },
+    "@neondatabase/auth": {
+      "name": "@neondatabase/auth",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@neondatabase/auth-ui",
+        "better-auth",
+        "zod"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@neondatabase/auth"
+      ],
+      "fixAvailable": {
+        "isSemVerMajor": true
+      }
+    },
+    "@neondatabase/auth-ui": {
+      "name": "@neondatabase/auth-ui",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@daveyplate/better-auth-ui",
+        "@neondatabase/auth",
+        "better-auth",
+        "zod"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@neondatabase/auth-ui"
+      ],
+      "fixAvailable": true
+    },
+    "@react-email/components": {
+      "name": "@react-email/components",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@react-email/render"
+      ],
+      "effects": [
+        "@daveyplate/better-auth-ui"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@react-email/components"
+      ],
+      "fixAvailable": true
+    },
+    "@react-email/render": {
+      "name": "@react-email/render",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "html-to-text"
+      ],
+      "effects": [
+        "@react-email/components"
+      ],
+      "range": "0.0.4 - 2.1.1",
+      "nodes": [
+        "node_modules/@react-email/render"
+      ],
+      "fixAvailable": true
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "name": "@typescript-eslint/eslint-plugin",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@typescript-eslint/parser",
+        "@typescript-eslint/type-utils",
+        "@typescript-eslint/utils"
+      ],
+      "effects": [],
+      "range": "6.16.0 - 8.72.2",
+      "nodes": [
+        "node_modules/@typescript-eslint/eslint-plugin"
+      ],
+      "fixAvailable": true
+    },
+    "@typescript-eslint/parser": {
+      "name": "@typescript-eslint/parser",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@typescript-eslint/typescript-estree"
+      ],
+      "effects": [
+        "@typescript-eslint/eslint-plugin",
+        "typescript-eslint"
+      ],
+      "range": "6.16.0 - 8.72.2",
+      "nodes": [
+        "node_modules/@typescript-eslint/parser"
+      ],
+      "fixAvailable": true
+    },
+    "@typescript-eslint/type-utils": {
+      "name": "@typescript-eslint/type-utils",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@typescript-eslint/typescript-estree",
+        "@typescript-eslint/utils"
+      ],
+      "effects": [
+        "@typescript-eslint/eslint-plugin"
+      ],
+      "range": "6.16.0 - 8.72.2",
+      "nodes": [
+        "node_modules/@typescript-eslint/type-utils"
+      ],
+      "fixAvailable": true
+    },
+    "@typescript-eslint/typescript-estree": {
+      "name": "@typescript-eslint/typescript-estree",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "minimatch"
+      ],
+      "effects": [
+        "@typescript-eslint/parser",
+        "@typescript-eslint/type-utils",
+        "@typescript-eslint/utils",
+        "typescript-eslint"
+      ],
+      "range": "6.16.0 - 8.72.2",
+      "nodes": [
+        "node_modules/@typescript-eslint/typescript-estree"
+      ],
+      "fixAvailable": true
+    },
+    "@typescript-eslint/utils": {
+      "name": "@typescript-eslint/utils",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@typescript-eslint/typescript-estree"
+      ],
+      "effects": [
+        "typescript-eslint"
+      ],
+      "range": "6.16.0 - 8.72.2",
+      "nodes": [
+        "node_modules/@typescript-eslint/utils"
+      ],
+      "fixAvailable": true
+    },
+    "better-auth": {
+      "name": "better-auth",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@better-auth/drizzle-adapter",
+        {
+          "source": 1243463,
+          "name": "better-auth",
+          "dependency": "better-auth",
+          "title": "@better-auth/drizzle-adapter: Concurrent requests can exceed rate limits on PostgreSQL",
+          "url": "https://github.com/advisories/GHSA-44jh-23m7-hpcf",
+          "severity": "low",
+          "cwe": [
+            "CWE-307",
+            "CWE-362"
+          ],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N"
+          },
+          "range": ">=1.6.17 <1.7.7"
+        },
+        {
+          "source": 1243466,
+          "name": "better-auth",
+          "dependency": "better-auth",
+          "title": "better-auth: OAuth Proxy lets an attacker sign in as another user",
+          "url": "https://github.com/advisories/GHSA-r4xp-prcw-77qf",
+          "severity": "high",
+          "cwe": [
+            "CWE-287",
+            "CWE-345"
+          ],
+          "cvss": {
+            "score": 7.4,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N"
+          },
+          "range": ">=1.5.0-beta.12 <1.7.7"
+        },
+        {
+          "source": 1243467,
+          "name": "better-auth",
+          "dependency": "better-auth",
+          "title": "better-auth: OAuth state can be used as a Magic Link to sign in as another user",
+          "url": "https://github.com/advisories/GHSA-965c-763c-88jm",
+          "severity": "critical",
+          "cwe": [
+            "CWE-287"
+          ],
+          "cvss": {
+            "score": 9.1,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N"
+          },
+          "range": ">=1.4.0-beta.18 <1.7.7"
+        }
+      ],
+      "effects": [
+        "@neondatabase/auth",
+        "@neondatabase/auth-ui"
+      ],
+      "range": "1.4.0-beta.18 - 1.7.6",
+      "nodes": [
+        "node_modules/@neondatabase/auth-ui/node_modules/better-auth",
+        "node_modules/@neondatabase/auth/node_modules/better-auth"
+      ],
+      "fixAvailable": {
+        "isSemVerMajor": true
+      }
+    },
+    "deepmerge": {
+      "name": "deepmerge",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1243505,
+          "name": "deepmerge",
+          "dependency": "deepmerge",
+          "title": "deepmerge mergeObject() allows prototype poisoning of returned objects",
+          "url": "https://github.com/advisories/GHSA-gcqx-w48m-w2h4",
+          "severity": "low",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": ">=4.2.0 <=4.3.1"
+        }
+      ],
+      "effects": [
+        "html-to-text"
+      ],
+      "range": ">=4.2.0",
+      "nodes": [
+        "node_modules/deepmerge"
+      ],
+      "fixAvailable": true
+    },
+    "html-to-text": {
+      "name": "html-to-text",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "deepmerge"
+      ],
+      "effects": [
+        "@react-email/render"
+      ],
+      "range": "6.0.0 - 9.0.5",
+      "nodes": [
+        "node_modules/html-to-text"
+      ],
+      "fixAvailable": true
+    },
+    "minimatch": {
+      "name": "minimatch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1244623,
+          "name": "minimatch",
+          "dependency": "minimatch",
+          "title": "minimatch has potential denial of service via globparts amplification",
+          "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-405"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=7.0.0 <11.0.1"
+        }
+      ],
+      "effects": [
+        "@typescript-eslint/typescript-estree"
+      ],
+      "range": "7.0.0 - 11.0.0",
+      "nodes": [
+        "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch"
+      ],
+      "fixAvailable": true
+    },
+    "typescript-eslint": {
+      "name": "typescript-eslint",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/parser",
+        "@typescript-eslint/typescript-estree",
+        "@typescript-eslint/utils"
+      ],
+      "effects": [],
+      "range": "<=8.72.2",
+      "nodes": [
+        "node_modules/typescript-eslint"
+      ],
+      "fixAvailable": true
+    },
+    "zod": {
+      "name": "zod",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1243066,
+          "name": "zod",
+          "dependency": "zod",
+          "title": "Zod can exhaust memory while validating oversized constrained collections",
+          "url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+          "severity": "high",
+          "cwe": [
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<4.6.6"
+        }
+      ],
+      "effects": [],
+      "range": "<4.6.6",
+      "nodes": [
+        "node_modules/@neondatabase/auth-ui/node_modules/zod",
+        "node_modules/@neondatabase/auth/node_modules/zod"
+      ],
+      "fixAvailable": true
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 6,
+      "moderate": 7,
+      "high": 3,
+      "critical": 1,
+      "total": 17
+    },
+    "dependencies": {
+      "prod": 201,
+      "dev": 255,
+      "optional": 98,
+      "peer": 29,
+      "peerOptional": 0,
+      "total": 496
+    }
+  }
+}

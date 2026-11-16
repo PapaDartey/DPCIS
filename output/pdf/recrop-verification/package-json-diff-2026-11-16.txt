@@ -1,0 +1,12 @@
+diff --git a/frontend/package.json b/frontend/package.json
+index f1ab68a..1eeea0b 100644
+--- a/frontend/package.json
++++ b/frontend/package.json
+@@ -16,6 +16,7 @@
+     "@radix-ui/react-slot": "^1.1.2",
+     "class-variance-authority": "^0.7.1",
+     "clsx": "^2.1.1",
++    "dpcis": "file:..",
+     "lucide-react": "^0.475.0",
+     "pdfjs-dist": "^4.10.38",
+     "react": "^19.0.0",

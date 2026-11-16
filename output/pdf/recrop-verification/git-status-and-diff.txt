@@ -1,0 +1,94 @@
+ M .gitignore
+ M backend/app/exams/pdf_import.py
+ M backend/app/exams/pdf_storage.py
+ M backend/app/exams/router.py
+ M backend/app/exams/schemas.py
+ D backend/tests/fixtures/atomic_structure_ms.pdf
+ D backend/tests/fixtures/atomic_structure_qp.pdf
+ M backend/tests/fixtures/pdfs/cie_igcse_chem_2_2_atomic_structure_qp.expected.json
+ M backend/tests/test_exams.py
+ M backend/tests/test_pdf_import.py
+ M docs/agent-coordination.md
+ M docs/brand/README.md
+ M docs/design-research/design-direction.md
+ M frontend/src/App.tsx
+ D frontend/src/assets/brand/slides/slide-1-building.webp
+ D frontend/src/assets/brand/slides/slide-2-trophy.webp
+ D frontend/src/assets/brand/slides/slide-3-art.webp
+ D frontend/src/assets/brand/slides/slide-4-lab.webp
+ M frontend/src/components/ErrorBoundary.tsx
+ M frontend/src/components/PageHeader.tsx
+ M frontend/src/features/admin/adminApi.ts
+ M frontend/src/features/admin/components/BulkParserPanel.tsx
+ M frontend/src/features/admin/components/PdfCropEditor.tsx
+ M frontend/src/features/auth/LoginSlideshow.tsx
+ M frontend/src/index.css
+ M frontend/src/layouts/AppShell.tsx
+ M frontend/src/pages/AdminExamEditorPage.tsx
+ M frontend/src/pages/OverviewPage.tsx
+ M frontend/src/types/adminExam.ts
+ M frontend/tests/brand-rebrand-verify.mjs
+ M frontend/tests/brandLogoCoverage.test.mjs
+?? backend/app/exams/pdf_recrop.py
+?? backend/tests/browser_server.py
+?? backend/tests/fixtures/graphics_boundaries.pdf
+?? backend/tests/fixtures/pdfs/answer-keys/
+?? backend/tests/fixtures/pdfs/cie_igcse_chem_2_2_atomic_structure_qp.pdf
+?? backend/tests/test_pdf_fixture_pairs.py
+?? backend/tests/test_pdf_graphics.py
+?? backend/tests/verify_browser_boundary.py
+?? backend/var/
+?? docs/brand/enhance-compare/
+?? docs/design-research/mockups/admin-pages-design-spec.html
+?? docs/ui-screenshots/brand-verify/
+?? docs/ui-screenshots/importer-verify/
+?? docs/ui-screenshots/live-verify/
+?? frontend/src/assets/brand/slides/slide-1-building@1280.webp
+?? frontend/src/assets/brand/slides/slide-1-building@1920.webp
+?? frontend/src/assets/brand/slides/slide-2-trophy@1280.webp
+?? frontend/src/assets/brand/slides/slide-2-trophy@1920.webp
+?? frontend/src/assets/brand/slides/slide-3-art@1280.webp
+?? frontend/src/assets/brand/slides/slide-3-art@1920.webp
+?? frontend/src/assets/brand/slides/slide-4-lab@1280.webp
+?? frontend/src/assets/brand/slides/slide-4-lab@1920.webp
+?? frontend/src/features/admin/components/RecropPanel.tsx
+?? frontend/tests/importer-browser-verify.mjs
+?? frontend/tests/importer-test-auth.ts
+?? frontend/tests/production-boundary-verify.mjs
+?? frontend/tests/vite.importer.config.ts
+?? output/
+?? tools/
+
+=== DIFF STAT ===
+ .gitignore                                         |   9 +
+ backend/app/exams/pdf_import.py                    | 185 +++++++++++--
+ backend/app/exams/pdf_storage.py                   |  22 +-
+ backend/app/exams/router.py                        |  29 +-
+ backend/app/exams/schemas.py                       |   3 +-
+ backend/tests/fixtures/atomic_structure_ms.pdf     | Bin 993452 -> 0 bytes
+ backend/tests/fixtures/atomic_structure_qp.pdf     | Bin 1194885 -> 0 bytes
+ ...gcse_chem_2_2_atomic_structure_qp.expected.json | 212 ++++++++++++---
+ backend/tests/test_exams.py                        | 258 ++++++++++++++++--
+ backend/tests/test_pdf_import.py                   |  22 +-
+ docs/agent-coordination.md                         |  14 +
+ docs/brand/README.md                               |  80 ++----
+ docs/design-research/design-direction.md           |   1 +
+ frontend/src/App.tsx                               |  95 ++++---
+ .../src/assets/brand/slides/slide-1-building.webp  | Bin 48280 -> 0 bytes
+ .../src/assets/brand/slides/slide-2-trophy.webp    | Bin 40988 -> 0 bytes
+ frontend/src/assets/brand/slides/slide-3-art.webp  | Bin 49464 -> 0 bytes
+ frontend/src/assets/brand/slides/slide-4-lab.webp  | Bin 25204 -> 0 bytes
+ frontend/src/components/ErrorBoundary.tsx          |  51 +++-
+ frontend/src/components/PageHeader.tsx             |   2 +-
+ frontend/src/features/admin/adminApi.ts            |   2 +-
+ .../features/admin/components/BulkParserPanel.tsx  |  39 ++-
+ .../features/admin/components/PdfCropEditor.tsx    |   2 +-
+ frontend/src/features/auth/LoginSlideshow.tsx      | 156 +++++------
+ frontend/src/index.css                             |   6 +
+ frontend/src/layouts/AppShell.tsx                  |   6 +-
+ frontend/src/pages/AdminExamEditorPage.tsx         |   6 +
+ frontend/src/pages/OverviewPage.tsx                |   2 +-
+ frontend/src/types/adminExam.ts                    |   1 +
+ frontend/tests/brand-rebrand-verify.mjs            | 294 +++++++++++++--------
+ frontend/tests/brandLogoCoverage.test.mjs          |  30 ++-
+ 31 files changed, 1116 insertions(+), 411 deletions(-)

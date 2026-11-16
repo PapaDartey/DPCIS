@@ -1,7 +1,8 @@
-import { LogOut, Menu, ShieldCheck } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useState, type ReactNode, type RefObject } from "react";
 import { NavLink } from "react-router-dom";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { useOptionalAuth } from "@/features/auth/useAuth";
@@ -44,10 +45,7 @@ export function StudentLayout({ mainRef, children }: StudentLayoutProps) {
               to="/student"
               className="inline-flex min-h-11 items-center gap-2.5 rounded-md px-1.5 text-base font-bold tracking-tight text-foreground no-underline hover:text-primary"
             >
-              <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
-                <ShieldCheck className="size-4" aria-hidden="true" />
-              </span>
-              <span>Examination Hub</span>
+              <BrandLogo size={32} variant="lockup" />
             </NavLink>
 
             <nav aria-label="Student primary" className="hidden items-center gap-1 sm:flex">
@@ -141,8 +139,13 @@ export function StudentLayout({ mainRef, children }: StudentLayoutProps) {
 
       <footer className="border-t border-border bg-card">
         <div className="flex w-full flex-col gap-2 px-5 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between lg:px-10">
-          <p>Examination Hub — Student Assessment Portal</p>
-          <p>Progress saved automatically during your sitting</p>
+          <div className="flex items-center gap-2">
+            <BrandLogo size={24} variant="mark" />
+            <p className="font-medium text-foreground">
+              DPS International School · Service Beyond Self
+            </p>
+          </div>
+          <p>Examination Hub — Progress saved automatically during your sitting</p>
         </div>
       </footer>
     </div>

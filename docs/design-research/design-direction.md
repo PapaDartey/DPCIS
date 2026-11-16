@@ -1,7 +1,8 @@
 # Examination Hub — One-Page Design Direction Brief (`design-direction.md`)
 
 > **Status:** `APPROVED`
-> **Brand Anchor:** Deep Rose-Burgundy Brand (`#9f1239` / `--accent-primary`) on a calm, warm off-white assessment canvas (`#f7f8fa`), with a visibly distinct Warm Vermilion Danger hue (`#c2250a` / `--danger`) and a Deep Slate-Ink Selected-Answer state (`#0f172a` / `--selected-border`).
+> **Brand Anchor:** Delhi Private School Forest Green (`#067a1f` / `--accent-primary`, derived from `DPS_LOGO.jpg` `#029022`) on a calm, green-tinted off-white assessment canvas (`#f4f7f5`), with a visibly distinct Orange-Red Danger hue (`#b8340a` / `--danger`) and a Deep Slate-Ink Selected-Answer state (`#0f172a` / `--selected-border`). Decorative logo accents (`--accent-flame-red: #ef1e24`, `--accent-flame-yellow: #fec600`, `--accent-fist-gold: #c98f21`) are reserved strictly for non-text decorative indicators.
+> **Visual Reference Mockup:** [`docs/design-research/mockups/admin-pages-design-spec.html`](./mockups/admin-pages-design-spec.html) (recolored to the DPS green palette and shield crest) is the canonical visual reference for the Admin Console (`Overview`, `Examinations`, and `Results`). Note: `student-pages-design-spec.html` was not present in `.user_uploaded/`, so only the admin spec was archived and recolored here.
 
 ---
 
@@ -37,17 +38,17 @@
 
 ## 3. Color Swatches, Hue Separation & Verified WCAG Contrast Ratios
 
-Brand Crimson (`343°` deep rose-burgundy), Danger (`9°` warm vermilion-scarlet — **26° hue separation**), and Selected-Answer (`222°` deep slate-ink) are strictly separated:
+Brand Green (`133°` Delhi Private School green), Danger (`14°` warm orange-red), and Selected-Answer (`222°` deep slate-ink) are strictly separated:
 
 | Semantic Role | Token Name | Hex Swatch | Paired Surface / Text | Verified WCAG 2.1 Contrast Ratio | Usage Scope |
 | --- | --- | --- | --- | --- | --- |
-| **Brand Primary** | `--accent-primary` / `--accent-hover` | `■ #9f1239` / `■ #881337` | On `#ffffff` (`--bg-surface` / `--text-on-accent`) | **`7.49 : 1`** (AAA) / **`9.18 : 1`** (AAA) | Brand mark, primary CTAs (`Sign in`, `Start Examination`, `Next`, `Save`), active nav indicator, eyebrow kickers. |
-| **Brand Subtle** | `--accent-subtle` / `--accent-border` | `■ #fff1f2` / `■ #fecdd3` | Text `#9f1239` on `#fff1f2` | **`6.92 : 1`** (AA/AAA) | Active nav pill background, subtle brand callouts. |
+| **Brand Primary** | `--accent-primary` / `--accent-hover` | `■ #067a1f` / `■ #086a1c` | `#ffffff` on `#067a1f` (`--text-on-accent`); `#086a1c` on `#ffffff` | **`5.51 : 1`** (AA) / **`6.80 : 1`** (AA) | Primary CTAs (`Sign in`, `Start Examination`, `Next`, `Save`), active nav indicator, eyebrow kickers. |
+| **Brand Subtle** | `--accent-subtle` / `--accent-border` | `■ #eef8f0` / `■ #b8e4c5` | Text `#086a1c` / `#064a18` on `#eef8f0` | **`6.26 : 1`** (AA) / **`9.66 : 1`** (AAA) | Active nav pill background, subtle brand callouts. |
 | **Selected Answer (Ink)** | `--selected-border` / `--selected-badge-bg` | `■ #0f172a` (`slate-900`) | `#ffffff` on `#0f172a` badge; `#0f172a` text on `--selected-bg` (`#f1f5f9`) | **`17.85 : 1`** (AAA) / **`16.12 : 1`** (AAA) | Selected MCQ option border (`2px`), solid `A`–`D` badge fill, `✓ Selected` indicator, current question tile in navigator. |
-| **Danger / Error / Incorrect** | `--danger` / `--danger-hover` | `■ #c2250a` / `■ #9e1c06` | `#ffffff` on `#c2250a`; `#c2250a` text on `--danger-subtle` (`#fff4f1`) | **`5.78 : 1`** (AA) / **`5.37 : 1`** (AA) | Validation errors, destructive buttons (`Delete`), critical timer (`<= 60s`), `Incorrect` / `Failed` result badges. |
-| **Success / Correct** | `--success` / `--success-subtle` | `■ #166534` / `■ #f0fdf4` | `#166534` on `#f0fdf4` (`--success-border: #86efac`) | **`6.76 : 1`** (AA) | `Passed`, `Correct answer`, `Published` status, `Saved` indicator. |
-| **Warning / Caution** | `--warning` / `--warning-subtle` | `■ #92400e` / `■ #fffbeb` | `#92400e` on `#fffbeb` (`--warning-border: #fcd34d`) | **`6.68 : 1`** (AA) | Timer warning (`<= 5m`), `Auto-submitted`, parser warnings, `409` in-progress notice. |
-| **Info / Neutral Active** | `--info` / `--info-subtle` | `■ #1e40af` / `■ #eff6ff` | `#1e40af` on `#eff6ff` (`--info-border: #93c5fd`) | **`6.70 : 1`** (AA) | `In progress` attempt pills, informational notices. |
+| **Danger / Error / Incorrect** | `--danger` / `--danger-hover` | `■ #b8340a` / `■ #992a07` | `#ffffff` on `#b8340a`; `#b8340a` text on `--danger-subtle` (`#fdeee7`) | **`5.25 : 1`** (AA) | Validation errors, destructive buttons (`Delete`), critical timer (`<= 60s`), `Incorrect` / `Failed` result badges. |
+| **Success / Correct** | `--success` / `--success-subtle` | `■ #0f766e` / `■ #e7f6f4` | `#0f766e` on `#e7f6f4` (`--success-border: #99d8d1`) | **`4.92 : 1`** (AA) | `Passed`, `Correct answer`, `Published` status, `Saved` indicator. |
+| **Warning / Caution** | `--warning` / `--warning-subtle` | `■ #a15c07` / `■ #fff4dc` | `#a15c07` on `#fff4dc` (`--warning-border: #f3d79a`) | **`4.75 : 1`** (AA) | Timer warning (`<= 5m`), `Auto-submitted`, parser warnings, `409` in-progress notice. |
+| **Info / Neutral Active** | `--info` / `--info-subtle` | `■ #1d4ed8` / `■ #eaf0ff` | `#1d4ed8` on `#eaf0ff` (`--info-border: #bfdbfe`) | **`5.87 : 1`** (AA) | `In progress` attempt pills, informational notices. |
 
 ---
 

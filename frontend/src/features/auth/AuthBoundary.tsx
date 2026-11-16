@@ -1,14 +1,14 @@
-import { Eye, EyeOff, LogIn, LogOut, RotateCcw, UserPlus } from "lucide-react";
+import { Eye, EyeOff, Loader2, LogIn, LogOut, RotateCcw, UserPlus } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import type { FormEvent } from "react";
 
+import { GoogleLogo } from "@/components/GoogleLogo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -27,6 +27,7 @@ import type { AuthUser } from "@/lib/auth";
 
 export interface AuthBoundaryProps {
   onAuthSuccess?: () => void | Promise<void>;
+  embedded?: boolean;
 }
 
 function extractRawErrorMessage(error: unknown): string {
@@ -69,7 +70,7 @@ function sanitizeAuthError(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
+export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryProps = {}) {
   const sharedAuth = useOptionalAuth();
   const baseId = useId();
 
@@ -84,7 +85,10 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [touched, setTouched] = useState({ name: false, email: false, password: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
 
   const isConfigured = sharedAuth ? sharedAuth.isConfigured : isNeonAuthConfigured;
 
@@ -143,6 +147,7 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
     }
     setLocalError(null);
     setIsSubmitting(true);
+    setIsGoogleSubmitting(true);
     try {
       const result = await signInWithGoogle();
       if (result.error) {
@@ -161,6 +166,7 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
         ),
       );
     } finally {
+      setIsGoogleSubmitting(false);
       setIsSubmitting(false);
     }
   };
@@ -183,9 +189,31 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
     }
   };
 
+  const getNameError = (val: string) =>
+    mode === "sign-up" && val.trim().length === 0 ? "Enter your full name." : null;
+  const getEmailError = (val: string) => {
+    const trimmed = val.trim();
+    if (!trimmed) return "Enter your email address.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return "Enter a valid email address.";
+    return null;
+  };
+  const getPasswordError = (val: string) => {
+    if (!val) return "Enter your password.";
+    if (val.length < 8) return "Password must be at least 8 characters.";
+    return null;
+  };
+
+  const nameError = hasSubmitted || touched.name ? getNameError(name) : null;
+  const emailError = hasSubmitted || touched.email ? getEmailError(email) : null;
+  const passwordError = hasSubmitted || touched.password ? getPasswordError(password) : null;
+
   const handleSubmitEmailAuth = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setHasSubmitted(true);
     setLocalError(null);
+    if (getNameError(name) || getEmailError(email) || getPasswordError(password)) {
+      return;
+    }
     setIsSubmitting(true);
     const fallbackError =
       mode === "sign-up"
@@ -223,6 +251,8 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
 
   const toggleMode = () => {
     setLocalError(null);
+    setHasSubmitted(false);
+    setTouched({ name: false, email: false, password: false });
     setMode((prev) => (prev === "sign-in" ? "sign-up" : "sign-in"));
   };
 
@@ -321,6 +351,189 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
       .filter(Boolean)
       .join(" ") || undefined;
 
+  const formBody = (
+    <div className="space-y-4">
+      {displayError ? (
+        <Alert id={errorAlertId} variant="destructive" role="alert">
+          <AlertTitle>Unable to sign in</AlertTitle>
+          <AlertDescription>{displayError}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      <form className="space-y-4" noValidate onSubmit={handleSubmitEmailAuth}>
+        {mode === "sign-up" ? (
+          <div className="field-group space-y-1.5">
+            <Label htmlFor={nameInputId}>Full name</Label>
+            <Input
+              id={nameInputId}
+              name="name"
+              required
+              className="auth-input min-h-[48px]"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
+              autoComplete="name"
+              enterKeyHint="next"
+              aria-invalid={Boolean(nameError)}
+              aria-describedby={nameError ? `${nameInputId}-error` : undefined}
+            />
+            {nameError ? (
+              <p id={`${nameInputId}-error`} className="text-xs font-medium text-destructive">
+                {nameError}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className="field-group space-y-1.5">
+          <Label htmlFor={emailInputId}>Email</Label>
+          <Input
+            id={emailInputId}
+            name="email"
+            required
+            type="email"
+            className="auth-input min-h-[48px]"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
+            autoComplete="email"
+            spellCheck={false}
+            autoCorrect="off"
+            autoCapitalize="none"
+            enterKeyHint="next"
+            aria-invalid={Boolean(emailError)}
+            aria-describedby={
+              [emailError ? `${emailInputId}-error` : null, emailDescribedBy]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
+          />
+          {emailError ? (
+            <p id={`${emailInputId}-error`} className="text-xs font-medium text-destructive">
+              {emailError}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="field-group space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor={passwordInputId}>Password</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="default"
+              className="min-h-[44px] min-w-[44px] px-2.5 text-xs"
+              aria-pressed={showPassword}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? (
+                <EyeOff className="size-4" aria-hidden="true" />
+              ) : (
+                <Eye className="size-4" aria-hidden="true" />
+              )}
+              <span>{showPassword ? "Hide" : "Show"}</span>
+            </Button>
+          </div>
+          <Input
+            id={passwordInputId}
+            name="password"
+            required
+            minLength={8}
+            type={showPassword ? "text" : "password"}
+            className="auth-input min-h-[48px]"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
+            autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
+            enterKeyHint="done"
+            aria-invalid={Boolean(passwordError)}
+            aria-describedby={
+              [passwordError ? `${passwordInputId}-error` : null, passwordDescribedBy]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
+          />
+          {passwordError ? (
+            <p id={`${passwordInputId}-error`} className="text-xs font-medium text-destructive">
+              {passwordError}
+            </p>
+          ) : null}
+          {mode === "sign-up" ? (
+            <p id={passwordHelpId} className="text-xs text-muted-foreground">
+              Use at least 8 characters.
+            </p>
+          ) : null}
+        </div>
+
+        <Button
+          type="submit"
+          size="default"
+          className="auth-submit min-h-[48px] w-full"
+          disabled={isSubmitting}
+        >
+          {mode === "sign-up" ? (
+            <UserPlus className="size-4" aria-hidden="true" />
+          ) : (
+            <LogIn className="size-4" aria-hidden="true" />
+          )}
+          <span>
+            {isSubmitting
+              ? "Working..."
+              : mode === "sign-up"
+                ? "Create account"
+                : "Sign in"}
+          </span>
+        </Button>
+      </form>
+
+      <div className="relative flex items-center py-1" aria-hidden="true">
+        <div className="w-full border-t border-border" />
+        <span className="shrink-0 bg-card px-3 text-xs uppercase tracking-wide text-muted-foreground">
+          or
+        </span>
+        <div className="w-full border-t border-border" />
+      </div>
+
+      <button
+        type="button"
+        className="auth-google"
+        disabled={isSubmitting || !isConfigured}
+        aria-busy={isGoogleSubmitting ? "true" : undefined}
+        onClick={handleGoogleSignIn}
+      >
+        <GoogleLogo size={18} />
+        {isGoogleSubmitting ? (
+          <>
+            <Loader2 className="size-4 shrink-0 animate-spin" aria-hidden="true" />
+            <span>Redirecting to Google...</span>
+          </>
+        ) : (
+          <span>{mode === "sign-up" ? "Sign up with Google" : "Sign in with Google"}</span>
+        )}
+      </button>
+
+      <div className="pt-1 text-center">
+        <Button
+          type="button"
+          variant="ghost"
+          size="default"
+          className="min-h-[44px] w-full text-sm text-muted-foreground hover:text-foreground"
+          disabled={isSubmitting}
+          onClick={toggleMode}
+        >
+          {mode === "sign-up"
+            ? "Already have an account? Sign in"
+            : "Don't have an account? Create one"}
+        </Button>
+      </div>
+    </div>
+  );
+
+  if (embedded) {
+    return <div className="w-full space-y-5">{formBody}</div>;
+  }
+
   return (
     <Card className="auth-card mx-auto w-full max-w-md">
       <CardHeader className="space-y-3 pb-5">
@@ -338,145 +551,7 @@ export function AuthBoundary({ onAuthSuccess }: AuthBoundaryProps = {}) {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {displayError ? (
-          <Alert id={errorAlertId} variant="destructive" role="alert">
-            <AlertTitle>Unable to sign in</AlertTitle>
-            <AlertDescription>{displayError}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        <form className="space-y-4" onSubmit={handleSubmitEmailAuth}>
-          {mode === "sign-up" ? (
-            <div className="field-group space-y-1.5">
-              <Label htmlFor={nameInputId}>Full name</Label>
-              <Input
-                id={nameInputId}
-                name="name"
-                required
-                className="auth-input min-h-[48px]"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                autoComplete="name"
-                enterKeyHint="next"
-                aria-invalid={Boolean(displayError)}
-                aria-describedby={emailDescribedBy}
-              />
-            </div>
-          ) : null}
-
-          <div className="field-group space-y-1.5">
-            <Label htmlFor={emailInputId}>Email</Label>
-            <Input
-              id={emailInputId}
-              name="email"
-              required
-              type="email"
-              className="auth-input min-h-[48px]"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              spellCheck={false}
-              autoCorrect="off"
-              autoCapitalize="none"
-              enterKeyHint="next"
-              aria-invalid={Boolean(displayError)}
-              aria-describedby={emailDescribedBy}
-            />
-          </div>
-
-          <div className="field-group space-y-1.5">
-            <div className="flex items-center justify-between gap-2">
-              <Label htmlFor={passwordInputId}>Password</Label>
-              <Button
-                type="button"
-                variant="ghost"
-                size="default"
-                className="min-h-[44px] min-w-[44px] px-2.5 text-xs"
-                aria-pressed={showPassword}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                {showPassword ? (
-                  <EyeOff className="size-4" aria-hidden="true" />
-                ) : (
-                  <Eye className="size-4" aria-hidden="true" />
-                )}
-                <span>{showPassword ? "Hide" : "Show"}</span>
-              </Button>
-            </div>
-            <Input
-              id={passwordInputId}
-              name="password"
-              required
-              minLength={8}
-              type={showPassword ? "text" : "password"}
-              className="auth-input min-h-[48px]"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
-              enterKeyHint="done"
-              aria-invalid={Boolean(displayError)}
-              aria-describedby={passwordDescribedBy}
-            />
-            {mode === "sign-up" ? (
-              <p id={passwordHelpId} className="text-xs text-muted-foreground">
-                Use at least 8 characters.
-              </p>
-            ) : null}
-          </div>
-
-          <Button type="submit" size="default" className="auth-submit min-h-[48px] w-full" disabled={isSubmitting}>
-            {mode === "sign-up" ? (
-              <UserPlus className="size-4" aria-hidden="true" />
-            ) : (
-              <LogIn className="size-4" aria-hidden="true" />
-            )}
-            <span>
-              {isSubmitting
-                ? "Working..."
-                : mode === "sign-up"
-                  ? "Create account"
-                  : "Sign in"}
-            </span>
-          </Button>
-        </form>
-
-        <div className="relative flex items-center py-1" aria-hidden="true">
-          <div className="w-full border-t border-border" />
-          <span className="shrink-0 bg-card px-3 text-xs uppercase tracking-wide text-muted-foreground">
-            or
-          </span>
-          <div className="w-full border-t border-border" />
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="default"
-          className="auth-google min-h-[48px] w-full"
-          disabled={isSubmitting}
-          onClick={handleGoogleSignIn}
-        >
-          <LogIn className="size-4" aria-hidden="true" />
-          <span>Continue with Google</span>
-        </Button>
-      </CardContent>
-
-      <CardFooter className="justify-center border-0 pt-0">
-        <Button
-          type="button"
-          variant="ghost"
-          size="default"
-          className="min-h-[44px] w-full text-sm text-muted-foreground hover:text-foreground"
-          disabled={isSubmitting}
-          onClick={toggleMode}
-        >
-          {mode === "sign-up"
-            ? "Already have an account? Sign in"
-            : "Don't have an account? Create one"}
-        </Button>
-      </CardFooter>
+      <CardContent>{formBody}</CardContent>
     </Card>
   );
 }

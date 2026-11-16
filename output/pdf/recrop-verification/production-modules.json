@@ -1,0 +1,690 @@
+[
+  {
+    "id": "\u0000vite/modulepreload-polyfill.js",
+    "renderedLength": 1280
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/index.html?html-proxy&inline-css&index=0.css",
+    "renderedLength": 0
+  },
+  {
+    "id": "\u0000vite/preload-helper.js",
+    "renderedLength": 2206
+  },
+  {
+    "id": "\u0000commonjsHelpers.js",
+    "renderedLength": 140
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/jsx-runtime.js?commonjs-module",
+    "renderedLength": 31
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/cjs/react-jsx-runtime.production.js?commonjs-exports",
+    "renderedLength": 36
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/cjs/react-jsx-runtime.production.js",
+    "renderedLength": 1294
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/jsx-runtime.js",
+    "renderedLength": 239
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/jsx-runtime.js?commonjs-es-import",
+    "renderedLength": 44
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/index.js?commonjs-module",
+    "renderedLength": 26
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/cjs/react.production.js?commonjs-exports",
+    "renderedLength": 26
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/cjs/react.production.js",
+    "renderedLength": 19185
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/index.js",
+    "renderedLength": 194
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react/index.js?commonjs-es-import",
+    "renderedLength": 101
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/client.js?commonjs-module",
+    "renderedLength": 27
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/cjs/react-dom-client.production.js?commonjs-exports",
+    "renderedLength": 35
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/scheduler/index.js?commonjs-module",
+    "renderedLength": 30
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/scheduler/cjs/scheduler.production.js?commonjs-exports",
+    "renderedLength": 30
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/scheduler/cjs/scheduler.production.js",
+    "renderedLength": 11134
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/scheduler/index.js",
+    "renderedLength": 226
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/index.js?commonjs-module",
+    "renderedLength": 29
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/cjs/react-dom.production.js?commonjs-exports",
+    "renderedLength": 29
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/cjs/react-dom.production.js",
+    "renderedLength": 7918
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/index.js",
+    "renderedLength": 520
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/cjs/react-dom-client.production.js",
+    "renderedLength": 644593
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/client.js",
+    "renderedLength": 512
+  },
+  {
+    "id": "\u0000C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-dom/client.js?commonjs-es-import",
+    "renderedLength": 36
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/react-router/dist/development/chunk-6KYCQHYJ.mjs",
+    "renderedLength": 86309
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/shared/src/utils.js",
+    "renderedLength": 464
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/defaultAttributes.js",
+    "renderedLength": 404
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/Icon.js",
+    "renderedLength": 899
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/createLucideIcon.js",
+    "renderedLength": 538
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/arrow-down.js",
+    "renderedLength": 360
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/arrow-left.js",
+    "renderedLength": 360
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/arrow-right.js",
+    "renderedLength": 361
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/arrow-up.js",
+    "renderedLength": 355
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/book-open-check.js",
+    "renderedLength": 570
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/chart-column.js",
+    "renderedLength": 466
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/check.js",
+    "renderedLength": 303
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/chevron-down.js",
+    "renderedLength": 312
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/chevron-left.js",
+    "renderedLength": 314
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/chevron-right.js",
+    "renderedLength": 315
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/circle-check.js",
+    "renderedLength": 379
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/circle-dashed.js",
+    "renderedLength": 826
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/circle-dot.js",
+    "renderedLength": 385
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/circle-minus.js",
+    "renderedLength": 373
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/circle-x.js",
+    "renderedLength": 413
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/clipboard-paste.js",
+    "renderedLength": 595
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/clock-3.js",
+    "renderedLength": 383
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/clock.js",
+    "renderedLength": 379
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/eye-off.js",
+    "renderedLength": 696
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/eye.js",
+    "renderedLength": 478
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/file-check-2.js",
+    "renderedLength": 461
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/file-clock.js",
+    "renderedLength": 526
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/file-plus-2.js",
+    "renderedLength": 498
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/flag.js",
+    "renderedLength": 416
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/history.js",
+    "renderedLength": 440
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/inbox.js",
+    "renderedLength": 506
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/info.js",
+    "renderedLength": 408
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/layout-grid.js",
+    "renderedLength": 592
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/list-checks.js",
+    "renderedLength": 502
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/loader-circle.js",
+    "renderedLength": 329
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/lock.js",
+    "renderedLength": 407
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/log-in.js",
+    "renderedLength": 466
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/log-out.js",
+    "renderedLength": 466
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/menu.js",
+    "renderedLength": 460
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/pause.js",
+    "renderedLength": 419
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/play.js",
+    "renderedLength": 312
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/plus.js",
+    "renderedLength": 344
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/refresh-cw.js",
+    "renderedLength": 534
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/replace.js",
+    "renderedLength": 680
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/rotate-ccw.js",
+    "renderedLength": 395
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/save.js",
+    "renderedLength": 555
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/send.js",
+    "renderedLength": 509
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/sparkles.js",
+    "renderedLength": 758
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/timer.js",
+    "renderedLength": 455
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/trash-2.js",
+    "renderedLength": 589
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/triangle-alert.js",
+    "renderedLength": 501
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/user-plus.js",
+    "renderedLength": 538
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/wrench.js",
+    "renderedLength": 474
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/lucide-react/dist/esm/icons/x.js",
+    "renderedLength": 338
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/dps-logo-128.webp",
+    "renderedLength": 43
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/dps-logo-256.webp",
+    "renderedLength": 43
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/dps-logo-512.webp",
+    "renderedLength": 43
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/dps-logo-tile-128.webp",
+    "renderedLength": 47
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/dps-logo-tile-256.webp",
+    "renderedLength": 47
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/dps-logo-tile-512.webp",
+    "renderedLength": 47
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/clsx/dist/clsx.mjs",
+    "renderedLength": 362
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+    "renderedLength": 102703
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/lib/utils.ts",
+    "renderedLength": 58
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/BrandLogo.tsx",
+    "renderedLength": 2815
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/class-variance-authority/dist/index.mjs",
+    "renderedLength": 2365
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/alert.tsx",
+    "renderedLength": 1141
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/@radix-ui/react-compose-refs/dist/index.mjs",
+    "renderedLength": 1099
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/@radix-ui/react-slot/dist/index.mjs",
+    "renderedLength": 6631
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/button.tsx",
+    "renderedLength": 1986
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ErrorBoundary.tsx",
+    "renderedLength": 2321
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/auth/useAuth.ts",
+    "renderedLength": 327
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/lib/auth.ts",
+    "renderedLength": 668
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/lib/env.ts",
+    "renderedLength": 441
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/lib/api.ts",
+    "renderedLength": 5284
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/auth/AuthContext.tsx",
+    "renderedLength": 1402
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/card.tsx",
+    "renderedLength": 1602
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/skeleton.tsx",
+    "renderedLength": 290
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/state-panel.tsx",
+    "renderedLength": 4247
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/auth/ProtectedRoute.tsx",
+    "renderedLength": 3050
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/layouts/AdminLayout.tsx",
+    "renderedLength": 5254
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/student/student-console.css",
+    "renderedLength": 0
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/layouts/FocusLayout.tsx",
+    "renderedLength": 1575
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/layouts/PublicLayout.tsx",
+    "renderedLength": 2143
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/dialog.tsx",
+    "renderedLength": 6276
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/layouts/StudentLayout.tsx",
+    "renderedLength": 6463
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/layouts/routeMetadata.ts",
+    "renderedLength": 1951
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/layouts/AppShell.tsx",
+    "renderedLength": 3120
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/PageHeader.tsx",
+    "renderedLength": 1151
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/segmented-control.tsx",
+    "renderedLength": 796
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/adminApi.ts",
+    "renderedLength": 2371
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/adminUtils.ts",
+    "renderedLength": 9323
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/components/ExamStatusBadge.tsx",
+    "renderedLength": 1399
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/AdminDashboardPage.tsx",
+    "renderedLength": 22374
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/AdminOverviewPage.tsx",
+    "renderedLength": 18350
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/badge.tsx",
+    "renderedLength": 1106
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/components/AttemptDetailDialog.tsx",
+    "renderedLength": 12644
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/AdminResultsPage.tsx",
+    "renderedLength": 32358
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/tabs.tsx",
+    "renderedLength": 1002
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/label.tsx",
+    "renderedLength": 262
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/exam/AuthenticatedPdfImage.tsx",
+    "renderedLength": 2103
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/components/PdfCropEditor.tsx",
+    "renderedLength": 7547
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/textarea.tsx",
+    "renderedLength": 518
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/pdfStructure.ts",
+    "renderedLength": 1421
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/extractImportText.ts",
+    "renderedLength": 1495
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/importDedup.ts",
+    "renderedLength": 549
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/components/BulkParserPanel.tsx",
+    "renderedLength": 47423
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/input.tsx",
+    "renderedLength": 514
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/components/ExamSettingsForm.tsx",
+    "renderedLength": 25299
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/admin/components/QuestionListEditor.tsx",
+    "renderedLength": 25153
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/AdminExamEditorPage.tsx",
+    "renderedLength": 21476
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/AdminExamNewPage.tsx",
+    "renderedLength": 1651
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/AdminExamResultsPage.tsx",
+    "renderedLength": 24074
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/NotFoundPage.tsx",
+    "renderedLength": 902
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/auth/AuthBoundary.tsx",
+    "renderedLength": 16776
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/slides/slide-3-art.webp",
+    "renderedLength": 45
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/slides/slide-1-building.webp",
+    "renderedLength": 50
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/slides/slide-4-lab.webp",
+    "renderedLength": 45
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/assets/brand/slides/slide-2-trophy.webp",
+    "renderedLength": 48
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/auth/LoginSlideshow.tsx",
+    "renderedLength": 14759
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/hooks/useHealthCheck.ts",
+    "renderedLength": 1553
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/OverviewPage.tsx",
+    "renderedLength": 6021
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/exam/ExamProgressHeader.tsx",
+    "renderedLength": 3633
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/exam/ExamTimerBadge.tsx",
+    "renderedLength": 5400
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/exam/McqQuestionCard.tsx",
+    "renderedLength": 7678
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/question-tile.tsx",
+    "renderedLength": 3991
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/student/QuestionNavigatorDialog.tsx",
+    "renderedLength": 2455
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/student/formatters.ts",
+    "renderedLength": 3850
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/student/studentApi.ts",
+    "renderedLength": 1268
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/student/useAttemptRunner.ts",
+    "renderedLength": 12109
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/StudentAttemptPage.tsx",
+    "renderedLength": 17681
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/exam-card.tsx",
+    "renderedLength": 2127
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/student/StudentExamCard.tsx",
+    "renderedLength": 2897
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/components/ui/responsive-table.tsx",
+    "renderedLength": 2462
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/student/StudentHistorySection.tsx",
+    "renderedLength": 6951
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/StudentDashboardPage.tsx",
+    "renderedLength": 9302
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/StudentExamInstructionsPage.tsx",
+    "renderedLength": 14844
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/features/student/ResultReviewCard.tsx",
+    "renderedLength": 4421
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/pages/StudentResultPage.tsx",
+    "renderedLength": 25170
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/App.tsx",
+    "renderedLength": 2636
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/index.css",
+    "renderedLength": 0
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/src/main.tsx",
+    "renderedLength": 506
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/index.html",
+    "renderedLength": 0
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/@oddbird/popover-polyfill/dist/popover.js",
+    "renderedLength": 21216
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/pdfjs-dist/build/pdf.mjs",
+    "renderedLength": 647270
+  },
+  {
+    "id": "C:/Users/EricAppiahOwusu/AppData/Local/Temp/DPCIS-recrop-verify-20261115/frontend/node_modules/pdfjs-dist/build/pdf.worker.min.mjs?url",
+    "renderedLength": 50
+  }
+]

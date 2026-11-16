@@ -47,3 +47,12 @@ imageDetail.json
 imagedefinitions.json
 backend/var/exam-pdfs/
 backend/tests/fixtures/.preview/
+
+# Offline image-enhancement binaries & model weights (never commit)
+tools/image-enhance/bin/
+tools/image-enhance/models/
+tools/image-enhance/tmp/
+tools/image-enhance/*.zip
+tools/image-enhance/*.exe
+tools/image-enhance/*.bin
+tools/image-enhance/*.param

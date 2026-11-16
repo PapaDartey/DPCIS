@@ -35,8 +35,11 @@ from app.exams.pdf_import import (
     OCRUnavailable,
     detect_pdf_questions,
     detect_questions_with_ocr,
+    detect_scan_questions,
+    open_question_upload,
     validate_pdf,
 )
+from app.exams.pdf_recrop import router as recrop_router
 from app.exams.pdf_storage import (
     load_image,
     load_regions,
@@ -136,13 +139,16 @@ async def import_pdf_route(
     if exam is None or exam.status != "DRAFT":
         raise HTTPException(status_code=404, detail="Draft examination not found")
     data = await file.read(MAX_PDF_BYTES + 1)
+    # Version crop reuse, hashing original bytes so raster re-uploads also deduplicate.
+    digest = hashlib.sha256(b"graphics-crops-v2\0" + data).hexdigest()
     try:
-        doc = validate_pdf(data)
+        doc = open_question_upload(data)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     try:
-        detected = detect_pdf_questions(doc)
-        ocr_used = len(detected) < 2
+        scan_mode = not any(page.get_text("words") for page in doc)
+        detected = detect_scan_questions(doc) if scan_mode else detect_pdf_questions(doc)
+        ocr_used = not scan_mode and not detected
         if ocr_used:
             try:
                 detected = detect_questions_with_ocr(doc)
@@ -150,6 +156,8 @@ async def import_pdf_route(
                 raise HTTPException(status_code=422, detail=str(exc)) from exc
         page_count = len(doc)
         page_dimensions = [(float(page.rect.width), float(page.rect.height)) for page in doc]
+        if not data.startswith(b"%PDF-"):
+            data = doc.tobytes()
     finally:
         doc.close()
     if not detected:
@@ -169,7 +177,6 @@ async def import_pdf_route(
             answer_doc.close()
         if not answer_key_text.strip():
             raise HTTPException(status_code=422, detail="Answer PDF contains no selectable text")
-    digest = hashlib.sha256(data).hexdigest()
     existing = db.scalars(
         select(exam_models.ExamSourceFile)
         .where(exam_models.ExamSourceFile.exam_id == exam_id)
@@ -257,12 +264,13 @@ async def import_pdf_route(
                 ],
                 answer_label=cast(OptionLabel, answer[0]) if answer else None,
                 points=answer[1] if answer else Decimal(1),
-                valid=answer is not None and not mismatch,
+                valid=answer is not None and not mismatch and question.crop_valid,
+                errors=[w for w in warnings if w.startswith("Crop failed:")],
                 warnings=warnings,
                 pdf_options_text=question.options_text,
                 pdf_confidence=(
                     Decimal("0.50")
-                    if ocr_used
+                    if ocr_used or scan_mode
                     else Decimal("1.00")
                     if len(question.options_text) == 4
                     else Decimal("0.75")
@@ -274,7 +282,10 @@ async def import_pdf_route(
         invalid_questions=[q for q in items if not q.valid],
         total_blocks=len(items),
         valid_count=sum(q.valid for q in items),
-        errors=(
+        errors=[
+            ParseQuestionsError(block_index=item.position, message=message)
+            for item in items for message in item.errors
+        ] + (
             [
                 ParseQuestionsError(
                     block_index=0,
@@ -287,10 +298,11 @@ async def import_pdf_route(
             if mismatch
             else []
         ),
-        error_count=1 if mismatch else 0,
+        error_count=sum(len(item.errors) for item in items) + int(mismatch),
         normalized_answer_key=", ".join(f"{n}. {v[0]}" for n, v in sorted(key.items())),
         page_dimensions=page_dimensions,
         ocr_used=ocr_used,
+        scan_mode=scan_mode,
     )
 
 
@@ -515,5 +527,6 @@ def get_exam_student_route(
 
 
 router = APIRouter()
+router.include_router(recrop_router)
 router.include_router(admin_router)
 router.include_router(student_router)

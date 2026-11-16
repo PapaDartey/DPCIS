@@ -3,32 +3,45 @@
 :root {
   color-scheme: light;
 
-  /* 0. Canonical Admin & Assessment Spec Tokens */
-  --canvas: #f6f5f8;
+  /* 0. Delhi Private School Brand & Canonical Spec Tokens */
+  --brand-50: #eef8f0;
+  --brand-100: #dcf2e2;
+  --brand-200: #b8e4c5;
+  --brand-300: #7fd196;
+  --brand-400: #3eb55f;
+  --brand-500: #029022;
+  --brand-600: #086a1c;
+  --brand-700: #064a18;
+  --brand-800: #0c3518;
+  --brand-900: #0c1f14;
+
+  --accent-flame-red: #ef1e24;
+  --accent-flame-yellow: #fec600;
+  --accent-fist-gold: #c98f21;
+
+  --canvas: #f4f7f5;
   --surface: #ffffff;
-  --subtle: #f0eef3;
-  --line: #e6e2ea;
-  --line-strong: #d4cfdb;
-  --ink: #16121c;
-  --ink-2: #4a4457;
-  --ink-3: #6e677b;
-  --brand: #a3123f;
-  --brand-600: #8a0f35;
-  --brand-50: #fdf0f4;
-  --brand-focus-outline: #f08aa6;
-  --side: #17121d;
-  --side-2: #241c2e;
-  --side-border: #2e2638;
-  --side-avatar: #3a2f47;
-  --side-text: #d9d4e2;
-  --side-muted: #a39bb0;
-  --side-indicator: #ee6a8d;
-  --side-logo-start: #d1456a;
-  --side-active-start: rgb(209 69 106 / 0.3);
-  --side-active-end: rgb(209 69 106 / 0.08);
-  --ok: #0f7a4a;
-  --ok-bg: #e8f7ef;
-  --ok-border: #b7e4cb;
+  --subtle: #ecf2ee;
+  --line: #dde6e0;
+  --line-strong: #c5d3ca;
+  --ink: #0f1a13;
+  --ink-2: #3b4b41;
+  --ink-3: #5b6d62;
+  --brand: #067a1f;
+  --brand-focus-outline: #7fd196;
+  --side: #0c1f14;
+  --side-2: #142e1f;
+  --side-border: #1e3d2b;
+  --side-avatar: #1e3d2b;
+  --side-text: #d6e4da;
+  --side-muted: #9bb5a3;
+  --side-indicator: #7fd196;
+  --side-logo-start: #067a1f;
+  --side-active-start: rgb(127 209 150 / 0.24);
+  --side-active-end: rgb(127 209 150 / 0.08);
+  --ok: #0f766e;
+  --ok-bg: #e7f6f4;
+  --ok-border: #99d8d1;
   --warn: #a15c07;
   --warn-bg: #fff4dc;
   --warn-border: #f3d79a;
@@ -40,23 +53,23 @@
   --info: #1d4ed8;
   --info-bg: #eaf0ff;
   --info-border: #bfdbfe;
-  --spot-grad-start: #6d0d2d;
-  --spot-grad-end: #cf3f68;
-  --spot-radial-light: rgb(255 255 255 / 0.24);
-  --spot-radial-dark: rgb(0 0 0 / 0.28);
-  --spot-shadow: rgb(163 18 63 / 0.7);
+  --spot-grad-start: #064a18;
+  --spot-grad-end: #029022;
+  --spot-radial-light: rgb(255 255 255 / 0.2);
+  --spot-radial-dark: rgb(0 0 0 / 0.24);
+  --spot-shadow: rgb(6 122 31 / 0.45);
   --spot-live-bg: rgb(255 255 255 / 0.16);
-  --spot-dot: #7cf2b0;
-  --spot-dot-ring: rgb(124 242 176 / 0.25);
+  --spot-dot: #fec600;
+  --spot-dot-ring: rgb(254 198 0 / 0.28);
   --spot-glass-bg: rgb(255 255 255 / 0.14);
   --spot-glass-hover: rgb(255 255 255 / 0.24);
   --spot-glass-border: rgb(255 255 255 / 0.4);
-  --row-hover: #fbfafc;
-  --card-shadow: 0 1px 2px rgb(22 18 28 / 0.04);
-  --btn-primary-shadow: 0 6px 16px -6px rgb(163 18 63 / 0.55);
+  --row-hover: #f8fbf9;
+  --card-shadow: 0 1px 2px rgb(15 26 19 / 0.04);
+  --btn-primary-shadow: 0 6px 16px -6px rgb(6 122 31 / 0.45);
   --seg-active-shadow: 0 1px 3px rgb(0 0 0 / 0.14);
-  --menu-shadow: 0 14px 32px -12px rgb(22 18 28 / 0.35);
-  --ei-active-ring: 0 0 0 3px rgb(163 18 63 / 0.12);
+  --menu-shadow: 0 14px 32px -12px rgb(15 26 19 / 0.35);
+  --ei-active-ring: 0 0 0 3px rgb(6 122 31 / 0.14);
 
   /* 1. Surfaces & Canvas */
   --bg-canvas: var(--canvas);
@@ -64,7 +77,7 @@
   --bg-elevated: var(--surface);
   --bg-subtle: var(--subtle);
   --bg-muted: var(--line);
-  --bg-overlay: rgb(22 18 28 / 0.52);
+  --bg-overlay: rgb(15 26 19 / 0.52);
 
   /* 2. Typography & Ink */
   --text-primary: var(--ink);
@@ -77,13 +90,13 @@
   --border-strong: var(--line-strong);
   --border-focus: var(--brand-focus-outline);
 
-  /* 4. Brand Accent (Wine #a3123f) */
+  /* 4. Brand Accent (Delhi Private School Green #067a1f) */
   --accent-primary: var(--brand);
   --accent-hover: var(--brand-600);
   --accent-subtle: var(--brand-50);
-  --accent-border: #f5c2d1;
-  --accent-focus-ring: rgb(163 18 63 / 0.14);
-  --accent-shadow: rgb(163 18 63 / 0.55);
+  --accent-border: #b8e4c5;
+  --accent-focus-ring: rgb(6 122 31 / 0.14);
+  --accent-shadow: rgb(6 122 31 / 0.45);
 
   /* 5. Selected Answer State (222deg Neutral Deep Slate-Ink — 17.85:1 AAA, never looks like an error) */
   --selected-bg: #f1f5f9;
@@ -103,24 +116,16 @@
   --warning-border: var(--warn-border);
   --info-subtle: var(--info-bg);
 
-  /* 8. Auth & Hero Surface Tokens (replaces hardcoded hex/rgb in component rules) */
-  --surface-auth-story: #2b1020;
-  --surface-auth-overlay-top: rgb(27 11 23 / 0.54);
-  --surface-auth-overlay-mid-low: rgb(27 11 23 / 0.04);
-  --surface-auth-overlay-mid: rgb(27 11 23 / 0.38);
-  --surface-auth-overlay-bottom: rgb(27 11 23 / 0.96);
+  /* 8. Slideshow & Hero Surface Tokens */
+  --slideshow-bg: #064a18;
+  --slideshow-cover-tint: rgb(6 74 24 / 0.12);
+  --slideshow-scrim: linear-gradient(155deg, rgb(6 74 24 / 0.58), rgb(2 144 34 / 0.34));
+  --slideshow-frame-bg: rgb(6 74 24 / 0.5);
+  --slideshow-frame-shadow: 0 20px 50px -16px rgb(6 26 14 / 0.65);
+  --slideshow-bottom-gradient: linear-gradient(180deg, rgb(6 74 24 / 0) 0%, rgb(6 74 24 / 0.72) 55%, rgb(6 40 16 / 0.94) 100%);
+  --slideshow-control-bg: rgb(6 74 24 / 0.85);
+  --slideshow-control-hover: #086a1c;
   --surface-input-glass: rgb(255 255 255 / 0.92);
-  --surface-portal-hero: #172330;
-  --surface-portal-student-start: #162636;
-  --surface-portal-student-mid: #24384a;
-  --surface-portal-student-end: #3a2933;
-  --surface-portal-admin-start: #192532;
-  --surface-portal-admin-mid: #263340;
-  --surface-portal-admin-end: #392631;
-  --surface-portal-eyebrow: #fecdd3;
-  --surface-portal-ring: rgb(255 255 255 / 0.14);
-  --surface-portal-ring-outer: rgb(255 255 255 / 0.025);
-  --surface-portal-glow: rgb(163 18 63 / 0.22);
 
   /* 9. Typography Tokens */
   --font:
@@ -162,9 +167,9 @@
 
   /* 12. Elevation & Shadows */
   --shadow-xs: var(--card-shadow);
-  --shadow-sm: 0 1px 3px 0 rgb(22 18 28 / 0.08), 0 1px 2px -1px rgb(22 18 28 / 0.06);
-  --shadow-md: 0 4px 12px -2px rgb(22 18 28 / 0.08), 0 2px 6px -2px rgb(22 18 28 / 0.05);
-  --shadow-lg: 0 20px 40px -12px rgb(22 18 28 / 0.18);
+  --shadow-sm: 0 1px 3px 0 rgb(15 26 19 / 0.08), 0 1px 2px -1px rgb(15 26 19 / 0.06);
+  --shadow-md: 0 4px 12px -2px rgb(15 26 19 / 0.08), 0 2px 6px -2px rgb(15 26 19 / 0.05);
+  --shadow-lg: 0 20px 40px -12px rgb(15 26 19 / 0.18);
 
   /* 13. Motion Tokens */
   --ease-standard: cubic-bezier(0.2, 0.75, 0.2, 1);
@@ -257,6 +262,11 @@
     outline-offset: 2px;
   }
 
+  [data-route-heading]:focus,
+  [data-route-heading]:focus-visible {
+    outline: none;
+  }
+
   :where(input, select, textarea) {
     font-size: max(1rem, 1em);
   }
@@ -278,30 +288,6 @@
 /* Account access: restrained motion around a focused form. */
 .auth-stage {
   animation: auth-arrive 650ms var(--ease-standard) both;
-}
-
-.auth-story {
-  background: var(--surface-auth-story);
-}
-
-.auth-story-image {
-  object-position: center 32%;
-  animation: auth-photo-drift 22s ease-in-out infinite alternate;
-}
-
-.auth-story::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    var(--surface-auth-overlay-top) 0%,
-    var(--surface-auth-overlay-mid-low) 28%,
-    var(--surface-auth-overlay-mid) 49%,
-    var(--surface-auth-overlay-bottom) 100%
-  );
 }
 
 .auth-reveal {
@@ -370,17 +356,46 @@
   box-shadow: 0 16px 28px -12px var(--accent-shadow);
 }
 
-.auth-card .auth-google {
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
+/* Google Identity light-theme button (https://developers.google.com/identity/branding-guidelines) */
+.auth-google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid #747775;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #1f1f1f;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+  cursor: pointer;
   transition:
-    transform var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
     box-shadow var(--duration-fast) ease;
 }
 
-.auth-card .auth-google:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+.auth-google:hover:not(:disabled) {
+  background-color: #f8f9fa;
+}
+
+.auth-google:active:not(:disabled) {
+  background-color: #f1f3f4;
+}
+
+.auth-google:focus-visible {
+  outline: 3px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.auth-google:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 @keyframes auth-arrive {
@@ -411,23 +426,6 @@
   }
   to {
     transform: scale(1.055);
-  }
-}
-
-@media (max-width: 1023px) {
-  .auth-story-image {
-    object-position: center 28%;
-  }
-}
-
-@media (max-width: 639px) {
-  .auth-story::after {
-    background: linear-gradient(
-      180deg,
-      var(--surface-auth-overlay-top),
-      transparent 36%,
-      var(--surface-auth-overlay-bottom) 100%
-    );
   }
 }
 
@@ -468,145 +466,6 @@
   color: var(--accent-primary);
   border-color: var(--accent-border);
   font-weight: 600;
-}
-
-/* Legacy portal compatibility rules (token-backed until Phase B/C page migration) */
-.portal-hero {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  border-radius: var(--radius-xl);
-  background: var(--surface-portal-hero);
-  color: var(--text-on-accent);
-  box-shadow: var(--shadow-lg);
-}
-
-.portal-hero::before,
-.portal-hero::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: 50%;
-}
-
-.portal-hero::before {
-  inline-size: min(52rem, 85vw);
-  aspect-ratio: 1;
-  inset-block-start: -29rem;
-  inset-inline-end: -9rem;
-  border: 1px solid var(--surface-portal-ring);
-  box-shadow: 0 0 0 6rem var(--surface-portal-ring-outer);
-}
-
-.portal-hero::after {
-  inline-size: 35rem;
-  aspect-ratio: 1;
-  inset-block-end: -27rem;
-  inset-inline-end: 8%;
-  background: var(--surface-portal-glow);
-  filter: blur(5rem);
-}
-
-.portal-hero-student {
-  background: linear-gradient(
-    115deg,
-    var(--surface-portal-student-start),
-    var(--surface-portal-student-mid) 68%,
-    var(--surface-portal-student-end)
-  );
-}
-
-.portal-hero-admin {
-  background: linear-gradient(
-    115deg,
-    var(--surface-portal-admin-start),
-    var(--surface-portal-admin-mid) 70%,
-    var(--surface-portal-admin-end)
-  );
-}
-
-.portal-eyebrow {
-  color: var(--surface-portal-eyebrow);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.portal-panel {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  box-shadow: var(--shadow-xs);
-}
-
-.portal-stat {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  box-shadow: var(--shadow-xs);
-}
-
-.portal-stat::before {
-  content: "";
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: var(--space-5);
-  block-size: 3px;
-  border-radius: 0 0 var(--radius-full) var(--radius-full);
-  background: var(--accent-primary);
-}
-
-.portal-list-row {
-  transition:
-    background-color var(--duration-fast) ease,
-    transform var(--duration-fast) ease;
-}
-
-.portal-list-row:hover {
-  background: var(--bg-subtle);
-}
-
-.portal-exam-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  transition:
-    transform var(--duration-normal) ease,
-    box-shadow var(--duration-normal) ease;
-}
-
-.portal-exam-card::before {
-  content: "";
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: 0;
-  block-size: 3px;
-  background: var(--accent-primary);
-}
-
-.portal-exam-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.portal-reveal {
-  animation: portal-rise 400ms var(--ease-standard) both;
-}
-
-@keyframes portal-rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Container-aware card grid */
@@ -802,17 +661,6 @@ dialog.exam-dialog::backdrop {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portal-reveal {
-    animation: none;
-  }
-  .portal-list-row,
-  .portal-exam-card {
-    transition: none;
-  }
-  .portal-list-row:hover,
-  .portal-exam-card:hover {
-    transform: none;
-  }
   .mcq-option-card,
   .exam-progress::-webkit-progress-value {
     transition: none;
@@ -820,19 +668,17 @@ dialog.exam-dialog::backdrop {
 
   .auth-stage,
   .auth-reveal,
-  .auth-card,
-  .auth-story-image {
+  .auth-card {
     animation: none;
   }
 
   .auth-card .auth-input,
   .auth-card .auth-submit,
-  .auth-card .auth-google {
+  .auth-google {
     transition: none;
   }
 
-  .auth-card .auth-submit:hover:not(:disabled),
-  .auth-card .auth-google:hover:not(:disabled) {
+  .auth-card .auth-submit:hover:not(:disabled) {
     transform: none;
   }
 }
@@ -2002,9 +1848,7 @@ dialog.exam-dialog::backdrop {
     margin: 0 !important;
   }
 
-  .foundation-card,
-  .portal-panel,
-  .portal-stat {
+  .foundation-card {
     box-shadow: none !important;
     break-inside: avoid;
   }
