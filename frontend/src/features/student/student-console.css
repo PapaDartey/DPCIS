@@ -57,9 +57,15 @@
 .student-console .student-score-ring span { display: grid; place-items: center; width: 128px; height: 128px; border-radius: 50%; background: #fff; font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .student-console .student-breakdown { display: flex; height: 14px; overflow: hidden; margin: 20px; border-radius: 99px; background: #ecf2ee; }
 .student-console .student-attempt-grid { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 24px; align-items: start; }
-.student-console .student-question-map { position: sticky; top: 88px; }
-.student-console .student-question-map-grid { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 8px; padding: 16px 20px; }
-.student-console .student-question-map-grid button { aspect-ratio: 1; min-width: 0; }
+.student-console .student-question-map { position: sticky; top: 88px; container-type: inline-size; }
+.student-console .student-question-map-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 16px; max-height: min(55vh, 460px); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+.student-console .student-question-map-grid button { min-width: 0; min-height: 60px; width: 100%; }
+@container (max-width: 260px) {
+  .student-console .student-question-map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (min-width: 440px) {
+  .student-console .student-question-map-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 .student-console .student-mobile-controls { display: none; }
 .student-console.student-focus .mcq-option-card[data-selected="true"] { background: #0f1a13; border-color: #0f1a13; color: #fff; }
 .student-console.student-focus .mcq-option-card[data-selected="true"] span { color: #fff; }

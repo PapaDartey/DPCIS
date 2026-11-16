@@ -53,7 +53,7 @@ export function QuestionNavigatorDialog({
           </Badge>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        <div className="grid max-h-[55vh] grid-cols-2 gap-2.5 overflow-y-auto overflow-x-hidden pr-1 sm:grid-cols-3">
           {questions.map((question, index) => {
             const isCurrent = index === currentIndex;
             const isAnswered = Boolean(answers[question.id]);

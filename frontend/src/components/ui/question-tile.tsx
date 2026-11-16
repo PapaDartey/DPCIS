@@ -1,4 +1,4 @@
-import { Check, CircleDashed, Flag } from "lucide-react";
+import { Check, CircleDashed, CircleDot, Flag } from "lucide-react";
 import type { ButtonHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
@@ -69,11 +69,11 @@ export function QuestionTile({
       aria-current={isCurrent ? "step" : undefined}
       aria-label={`Question ${questionNumber}, ${statusText}${isFlagged ? ", Flagged" : ""}${isCurrent ? ", Current question" : ""}`}
       className={cn(
-        "flex min-h-11 cursor-pointer flex-col items-start justify-center gap-0.5 rounded-lg border px-3 py-2 text-left transition-colors",
+        "flex min-h-[60px] w-full cursor-pointer flex-col items-start justify-between gap-1.5 rounded-lg border px-2.5 py-2.5 text-left transition-colors",
         isCurrent
           ? "border-primary bg-accent text-accent-foreground ring-2 ring-primary/25"
           : isAnswered
-            ? "border-selected-border/40 bg-selected-bg text-foreground hover:bg-muted"
+            ? "border-selected-border/45 bg-selected-bg text-foreground hover:bg-muted"
             : "border-border bg-card text-foreground hover:bg-muted",
         className,
       )}
@@ -83,13 +83,24 @@ export function QuestionTile({
         <span>Q{questionNumber}</span>
         {isFlagged ? (
           <Flag className="size-3.5 shrink-0 text-warning" aria-hidden="true" />
+        ) : isCurrent ? (
+          <CircleDot className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
         ) : isAnswered ? (
           <Check className="size-3.5 shrink-0 text-selected-border" aria-hidden="true" />
         ) : (
           <CircleDashed className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
         )}
       </span>
-      <span className="text-xs font-medium text-muted-foreground">
+      <span
+        className={cn(
+          "whitespace-nowrap text-xs font-medium leading-tight",
+          isCurrent
+            ? "font-semibold text-accent-foreground"
+            : isAnswered
+              ? "text-foreground/80"
+              : "text-muted-foreground",
+        )}
+      >
         {isCurrent ? "Current" : statusText}
       </span>
     </button>
