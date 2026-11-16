@@ -356,6 +356,133 @@ async function main() {
       if (!report.slideshow.reducedMotionStopsAutoAdvance) report.passed = false;
       await rmContext.close();
 
+      // Google button branding, contrast, focus/hover crops, and 1440/390/360 checks
+      const googleIconRequests = [];
+      const gContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+      const gPage = await gContext.newPage();
+      gPage.on("request", (req) => {
+        const url = req.url().toLowerCase();
+        if (url.includes("google") || url.includes("gstatic") || url.includes("fonts.googleapis")) {
+          googleIconRequests.push(req.url());
+        }
+      });
+      await gPage.goto(baseUrl, { waitUntil: "networkidle" });
+      const gBtn = gPage.locator("button.auth-google");
+      await gBtn.waitFor({ state: "visible" });
+      await gPage.screenshot({ path: path.join(outDir, "google-btn-signin-1440.png") });
+
+      const signInAudit = await gPage.evaluate(() => {
+        const btn = document.querySelector("button.auth-google");
+        const svg = btn?.querySelector("svg");
+        const fills = svg ? Array.from(svg.querySelectorAll("path")).map((p) => p.getAttribute("fill")) : [];
+        const st = btn ? getComputedStyle(btn) : null;
+        const parseRgb = (s) => {
+          const m = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+          return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : [0, 0, 0];
+        };
+        const lum = ([r, g, b]) => {
+          const a = [r, g, b].map((v) => {
+            const c = v / 255;
+            return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+          });
+          return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+        };
+        const fg = st ? parseRgb(st.color) : [0, 0, 0];
+        const bg = st ? parseRgb(st.backgroundColor) : [255, 255, 255];
+        const l1 = Math.max(lum(fg), lum(bg));
+        const l2 = Math.min(lum(fg), lum(bg));
+        const contrastRatio = (l1 + 0.05) / (l2 + 0.05);
+        const bodyText = document.body.innerText;
+        return {
+          text: btn?.textContent?.trim() ?? "",
+          ariaHidden: svg?.getAttribute("aria-hidden"),
+          fills,
+          contrastRatio: Number(contrastRatio.toFixed(2)),
+          height: btn?.getBoundingClientRect().height ?? 0,
+          hasUnableToSignIn: bodyText.includes("Unable to sign in") || bodyText.includes("Google sign-in could not be started"),
+        };
+      });
+
+      // Hover crop
+      await gBtn.hover();
+      await gPage.waitForTimeout(150);
+      await gBtn.screenshot({ path: path.join(outDir, "google-btn-hover-zoom.png") });
+
+      // Focus-visible crop (Tab onto button)
+      await gBtn.focus();
+      await gPage.keyboard.press("Shift+Tab");
+      await gPage.keyboard.press("Tab");
+      await gPage.waitForTimeout(150);
+      const focusRing = await gPage.evaluate(() => {
+        const btn = document.querySelector("button.auth-google");
+        const st = btn ? getComputedStyle(btn) : null;
+        return { outlineWidth: st?.outlineWidth ?? "", outlineStyle: st?.outlineStyle ?? "" };
+      });
+      await gBtn.screenshot({ path: path.join(outDir, "google-btn-focus-zoom.png") });
+
+      // Sign-up mode 1440
+      await gPage.getByRole("button", { name: /Don't have an account\? Create one/i }).click();
+      await gPage.waitForTimeout(150);
+      const signUpText1440 = (await gBtn.textContent())?.trim() ?? "";
+      await gPage.screenshot({ path: path.join(outDir, "google-btn-signup-1440.png") });
+
+      // Mobile 390 and 360 single-line checks
+      await gPage.setViewportSize({ width: 390, height: 844 });
+      await gPage.waitForTimeout(150);
+      await gPage.screenshot({ path: path.join(outDir, "google-btn-signup-390.png") });
+      await gPage.getByRole("button", { name: /Already have an account\? Sign in/i }).click();
+      await gPage.waitForTimeout(150);
+      await gPage.screenshot({ path: path.join(outDir, "google-btn-signin-390.png") });
+
+      const mobile390 = await gPage.evaluate(() => {
+        const btn = document.querySelector("button.auth-google");
+        const span = btn?.querySelector("span");
+        const r = document.createRange();
+        if (span) r.selectNodeContents(span);
+        return {
+          height: btn?.getBoundingClientRect().height ?? 0,
+          overflowX: btn ? btn.scrollWidth > btn.clientWidth : true,
+          lineCount: span ? r.getClientRects().length : 0,
+        };
+      });
+
+      await gPage.setViewportSize({ width: 360, height: 800 });
+      await gPage.waitForTimeout(150);
+      const mobile360 = await gPage.evaluate(() => {
+        const btn = document.querySelector("button.auth-google");
+        const span = btn?.querySelector("span");
+        const r = document.createRange();
+        if (span) r.selectNodeContents(span);
+        return {
+          height: btn?.getBoundingClientRect().height ?? 0,
+          overflowX: btn ? btn.scrollWidth > btn.clientWidth : true,
+          lineCount: span ? r.getClientRects().length : 0,
+        };
+      });
+
+      const expectedFills = ["#EA4335", "#4285F4", "#FBBC05", "#34A853"];
+      report.googleButtonCheck = {
+        signInAudit,
+        signUpText1440,
+        focusRing,
+        mobile390,
+        mobile360,
+        externalIconRequests: googleIconRequests,
+        passed:
+          signInAudit.text === "Sign in with Google" &&
+          signUpText1440 === "Sign up with Google" &&
+          signInAudit.ariaHidden === "true" &&
+          JSON.stringify(signInAudit.fills) === JSON.stringify(expectedFills) &&
+          signInAudit.contrastRatio >= 4.5 &&
+          signInAudit.height >= 44 &&
+          focusRing.outlineWidth === "3px" &&
+          mobile390.height >= 44 && !mobile390.overflowX && mobile390.lineCount === 1 &&
+          mobile360.height >= 44 && !mobile360.overflowX && mobile360.lineCount === 1 &&
+          googleIconRequests.length === 0,
+      };
+      if (!report.googleButtonCheck.passed) report.passed = false;
+      await gContext.close();
+
       await context.close();
     } finally {
       await browser.close();

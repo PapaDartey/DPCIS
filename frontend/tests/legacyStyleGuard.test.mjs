@@ -84,6 +84,10 @@ test("style baseline metrics scan across frontend/src outside token files", () =
     return !norm.endsWith("/src/index.css") && !norm.endsWith("/src/features/student/student-console.css");
   });
 
+  // Named exception: official Google "G" SVG brand colors (#EA4335, #4285F4, #FBBC05, #34A853)
+  // must remain unaltered in GoogleLogo.tsx per Google Identity branding guidelines.
+  const GOOGLE_LOGO_HEX_ALLOWLIST = new Set(["#EA4335", "#4285F4", "#FBBC05", "#34A853"]);
+
   let hardHex = 0;
   let hardRgb = 0;
   let rawTailwindPalette = 0;
@@ -94,8 +98,13 @@ test("style baseline metrics scan across frontend/src outside token files", () =
     /\b(?:bg|text|border|ring|fill|stroke)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b/g;
 
   for (const file of nonTokenFiles) {
+    const norm = file.replace(/\\/g, "/");
     const content = fs.readFileSync(file, "utf8");
-    hardHex += (content.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []).length;
+    const hexMatches = content.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
+    const filteredHex = norm.endsWith("/src/components/GoogleLogo.tsx")
+      ? hexMatches.filter((hex) => !GOOGLE_LOGO_HEX_ALLOWLIST.has(hex.toUpperCase()))
+      : hexMatches;
+    hardHex += filteredHex.length;
     hardRgb += (content.match(/\brgba?\(/g) ?? []).length;
     rawTailwindPalette += (content.match(twPaletteRe) ?? []).length;
     hardFontSizes += (content.match(/\btext-\[\d+(?:\.\d+)?(?:px|rem)\]|font-size\s*:/g) ?? []).length;

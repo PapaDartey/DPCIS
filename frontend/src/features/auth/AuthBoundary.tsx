@@ -1,7 +1,8 @@
-import { Eye, EyeOff, LogIn, LogOut, RotateCcw, UserPlus } from "lucide-react";
+import { Eye, EyeOff, Loader2, LogIn, LogOut, RotateCcw, UserPlus } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import type { FormEvent } from "react";
 
+import { GoogleLogo } from "@/components/GoogleLogo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -87,6 +88,7 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [touched, setTouched] = useState({ name: false, email: false, password: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
 
   const isConfigured = sharedAuth ? sharedAuth.isConfigured : isNeonAuthConfigured;
 
@@ -145,6 +147,7 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
     }
     setLocalError(null);
     setIsSubmitting(true);
+    setIsGoogleSubmitting(true);
     try {
       const result = await signInWithGoogle();
       if (result.error) {
@@ -163,6 +166,7 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
         ),
       );
     } finally {
+      setIsGoogleSubmitting(false);
       setIsSubmitting(false);
     }
   };
@@ -491,17 +495,23 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
         <div className="w-full border-t border-border" />
       </div>
 
-      <Button
+      <button
         type="button"
-        variant="outline"
-        size="default"
-        className="auth-google min-h-[48px] w-full"
-        disabled={isSubmitting}
+        className="auth-google"
+        disabled={isSubmitting || !isConfigured}
+        aria-busy={isGoogleSubmitting ? "true" : undefined}
         onClick={handleGoogleSignIn}
       >
-        <LogIn className="size-4" aria-hidden="true" />
-        <span>Continue with Google</span>
-      </Button>
+        <GoogleLogo size={18} />
+        {isGoogleSubmitting ? (
+          <>
+            <Loader2 className="size-4 shrink-0 animate-spin" aria-hidden="true" />
+            <span>Redirecting to Google...</span>
+          </>
+        ) : (
+          <span>{mode === "sign-up" ? "Sign up with Google" : "Sign in with Google"}</span>
+        )}
+      </button>
 
       <div className="pt-1 text-center">
         <Button

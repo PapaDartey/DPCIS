@@ -175,5 +175,37 @@
       "outlineWidth": "2px"
     },
     "passed": true
+  },
+  "googleButtonCheck": {
+    "signInAudit": {
+      "text": "Sign in with Google",
+      "ariaHidden": "true",
+      "fills": [
+        "#EA4335",
+        "#4285F4",
+        "#FBBC05",
+        "#34A853"
+      ],
+      "contrastRatio": 16.48,
+      "height": 48,
+      "hasUnableToSignIn": false
+    },
+    "signUpText1440": "Sign up with Google",
+    "focusRing": {
+      "outlineWidth": "3px",
+      "outlineStyle": "solid"
+    },
+    "mobile390": {
+      "height": 48,
+      "overflowX": false,
+      "lineCount": 1
+    },
+    "mobile360": {
+      "height": 48,
+      "overflowX": false,
+      "lineCount": 1
+    },
+    "externalIconRequests": [],
+    "passed": true
   }
 }
