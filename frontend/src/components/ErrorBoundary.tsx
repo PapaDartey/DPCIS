@@ -13,6 +13,20 @@ export interface ErrorBoundaryProps {
 
 interface ErrorBoundaryState {
   hasError: boolean;
+  isChunkError: boolean;
+}
+
+function isChunkLoadError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  const msg = error.message.toLowerCase();
+  return (
+    error.name === "ChunkLoadError" ||
+    msg.includes("loading chunk") ||
+    msg.includes("failed to fetch dynamically imported module") ||
+    msg.includes("importing a module script failed")
+  );
 }
 
 function keysChanged(
@@ -32,10 +46,10 @@ export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
-  state: ErrorBoundaryState = { hasError: false };
+  state: ErrorBoundaryState = { hasError: false, isChunkError: false };
 
-  static getDerivedStateFromError(): ErrorBoundaryState {
-    return { hasError: true };
+  static getDerivedStateFromError(error: unknown): ErrorBoundaryState {
+    return { hasError: true, isChunkError: isChunkLoadError(error) };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
@@ -44,12 +58,16 @@ export class ErrorBoundary extends Component<
 
   componentDidUpdate(prevProps: ErrorBoundaryProps): void {
     if (this.state.hasError && keysChanged(prevProps.resetKeys, this.props.resetKeys)) {
-      this.setState({ hasError: false });
+      this.setState({ hasError: false, isChunkError: false });
     }
   }
 
   private handleReset = () => {
-    this.setState({ hasError: false });
+    this.setState({ hasError: false, isChunkError: false });
+  };
+
+  private handleReload = () => {
+    window.location.reload();
   };
 
   render() {
@@ -65,16 +83,27 @@ export class ErrorBoundary extends Component<
               <div className="space-y-3">
                 <div>
                   <AlertTitle>
-                    {this.props.fallbackTitle ?? "Something unexpected interrupted this view"}
+                    {this.state.isChunkError
+                      ? "A new version or network interruption prevented this page from loading"
+                      : (this.props.fallbackTitle ?? "Something unexpected interrupted this view")}
                   </AlertTitle>
                   <AlertDescription>
-                    No local data was lost. You can reload this section or return to another route.
+                    {this.state.isChunkError
+                      ? "Reload the application to fetch the latest page bundle."
+                      : "No local data was lost. You can reload this section or return to another route."}
                   </AlertDescription>
                 </div>
-                <Button variant="outline" size="sm" onClick={this.handleReset}>
-                  <RotateCcw className="size-4" aria-hidden="true" />
-                  Retry view
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={this.handleReload}>
+                    <RotateCcw className="size-4" aria-hidden="true" />
+                    Reload
+                  </Button>
+                  {!this.state.isChunkError ? (
+                    <Button variant="ghost" size="sm" onClick={this.handleReset}>
+                      Retry view
+                    </Button>
+                  ) : null}
+                </div>
               </div>
             </div>
           </Alert>

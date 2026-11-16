@@ -1,0 +1,24 @@
+[
+  {
+    "width": 1440,
+    "checks": [
+      "Invalid vector crops rejected in preview and blocked from import",
+      "PDF upload and 24-question graphics-aware preview",
+      "Top drag accepted; deliberate bottom clipping rejected (422), old image kept",
+      "Bottom drag accepted",
+      "Imported and saved 24 questions through browser UI"
+    ],
+    "errors": [],
+    "screenshots": [
+      "1440-invalid-preview.png",
+      "1440-invalid-drag.png",
+      "1440-crop-editor.png",
+      "1440-recrop-before-after.png",
+      "1440-failure.png"
+    ],
+    "exam_id": "28ba23f0-ea12-4c59-bf6c-456b68a3a79e",
+    "status": "failed",
+    "stage": "recrop preview",
+    "failure": "Expected values to be strictly equal:\n\nfalse !== true\n"
+  }
+]

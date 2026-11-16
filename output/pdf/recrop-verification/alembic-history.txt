@@ -1,0 +1,6 @@
+0005_exam_pdf_sources -> 0006_submission_reason (head), Allow the full student submission reason in graded attempts.
+0004_exam_closed_at_and_indexes -> 0005_exam_pdf_sources, Add source PDF records and optional question crop references.
+0003_attempt_option_order -> 0004_exam_closed_at_and_indexes, Add exams.closed_at, student_answers defaults, and query/integrity indexes.
+0002_examination_schema -> 0003_attempt_option_order, Add option_order column to attempt_questions for option randomization.
+0001_application_users -> 0002_examination_schema, Add examination domain tables (exams, questions, options, attempts, answers).
+<base> -> 0001_application_users, Create application-level identities linked to Managed Auth users.

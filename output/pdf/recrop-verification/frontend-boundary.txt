@@ -1,0 +1,4 @@
+Default-off Vite guard: PASS
+failed to load config from C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\tests\vite.importer.config.ts
+failed to load config from C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\tests\vite.importer.config.ts
+Vite test-config production-build rejection: PASS

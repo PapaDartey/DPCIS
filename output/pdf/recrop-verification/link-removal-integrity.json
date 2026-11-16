@@ -1,0 +1,31 @@
+{
+  "stopped_node_pids": [
+    29016,
+    21768,
+    36040,
+    40176,
+    15636,
+    48308
+  ],
+  "target": "C:\\Users\\EricAppiahOwusu\\Music\\DPCIS",
+  "link_type": "Junction",
+  "required_paths": {
+    "backend/app": true,
+    "backend/tests": true,
+    "frontend/src": true,
+    "frontend/package.json": true,
+    "docs": true,
+    ".git": true
+  },
+  "link_exists": false,
+  "before_lines": 115,
+  "after_lines": 118,
+  "first_five_equal": true,
+  "status_added": [
+    "?? output/pdf/recrop-verification/link-removal-before-full.txt",
+    "?? output/pdf/recrop-verification/link-removal-before.txt",
+    "?? output/pdf/recrop-verification/package.json.bak"
+  ],
+  "status_removed": [],
+  "other_links": []
+}

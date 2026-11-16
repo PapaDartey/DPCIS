@@ -33,7 +33,7 @@ export function PageHeader({
         {eyebrow ? <small>{eyebrow}</small> : null}
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <h1>{title}</h1>
+          <h1 data-route-heading="">{title}</h1>
           {meta ? <div className="flex flex-wrap items-center gap-2">{meta}</div> : null}
         </div>
 

@@ -1,0 +1,4 @@
+
+> examination-hub-frontend@0.1.0 lint
+> eslint . && tsc -b --noEmit
+

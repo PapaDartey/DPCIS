@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -9,53 +9,104 @@ import {
   type TouchEvent,
 } from "react";
 
-import slide3Art from "@/assets/brand/slides/slide-3-art.webp";
-import slide1Building from "@/assets/brand/slides/slide-1-building.webp";
-import slide4Lab from "@/assets/brand/slides/slide-4-lab.webp";
-import slide2Trophy from "@/assets/brand/slides/slide-2-trophy.webp";
+import hrSlide0Building1280 from "@/assets/brand/slides/hr-slide-0-building@1280.webp";
+import hrSlide0Building1920 from "@/assets/brand/slides/hr-slide-0-building@1920.webp";
+import hrSlide1Lab1280 from "@/assets/brand/slides/hr-slide-1-lab@1280.webp";
+import hrSlide1Lab1920 from "@/assets/brand/slides/hr-slide-1-lab@1920.webp";
+import hrSlide2Classroom1280 from "@/assets/brand/slides/hr-slide-2-classroom@1280.webp";
+import hrSlide2Classroom1920 from "@/assets/brand/slides/hr-slide-2-classroom@1920.webp";
+import hrSlide3Sports1280 from "@/assets/brand/slides/hr-slide-3-sports@1280.webp";
+import hrSlide3Sports1920 from "@/assets/brand/slides/hr-slide-3-sports@1920.webp";
+import hrSlide4Debate1280 from "@/assets/brand/slides/hr-slide-4-debate@1280.webp";
+import hrSlide4Debate1920 from "@/assets/brand/slides/hr-slide-4-debate@1920.webp";
 import { cn } from "@/lib/utils";
+
+/**
+ * Off-by-default fallback flag for the legacy restored low-res slides
+ * (archived in `src/assets/brand/slides/slide-{1..4}-*@{1280,1920}.webp`).
+ * Keep `false` so only native high-resolution official photos render.
+ */
+export const USE_LEGACY_RESTORED_SLIDES = false;
+
+/**
+ * Official high-resolution photos retrieved from `https://dpsghana.edu.gh/`
+ * pending written school approval (`docs/brand/photo-sources.md`).
+ */
+export const PENDING_APPROVAL_SLIDES = [
+  { id: "building-highres", approvalStatus: "pending approval" },
+  { id: "lab-highres", approvalStatus: "pending approval" },
+  { id: "classroom-highres", approvalStatus: "pending approval" },
+  { id: "sports-highres", approvalStatus: "pending approval" },
+  { id: "debate-highres", approvalStatus: "pending approval" },
+] as const;
 
 export interface SlideDefinition {
   id: string;
   src: string;
+  src1280: string;
+  w1280: number;
   width: number;
   height: number;
   alt: string;
   objectPosition: string;
+  approvalStatus: "pending approval" | "approved";
 }
 
 export const SCHOOL_SLIDES: readonly SlideDefinition[] = [
   {
-    id: "building",
-    src: slide1Building,
-    width: 678,
-    height: 452,
-    alt: "School building with a yellow and green facade",
-    objectPosition: "50% 45%",
+    id: "building-highres",
+    src: hrSlide0Building1920,
+    src1280: hrSlide0Building1280,
+    w1280: 1280,
+    width: 1920,
+    height: 1280,
+    alt: "Main campus building of DPS International School in Tema Community 25",
+    objectPosition: "center 65%",
+    approvalStatus: "pending approval",
   },
   {
-    id: "trophy",
-    src: slide2Trophy,
-    width: 439,
-    height: 455,
-    alt: "Students celebrating with a trophy",
-    objectPosition: "50% 25%",
+    id: "lab-highres",
+    src: hrSlide1Lab1920,
+    src1280: hrSlide1Lab1280,
+    w1280: 1280,
+    width: 1920,
+    height: 1280,
+    alt: "Pupils and teacher conducting a science experiment in the DPS International School laboratory",
+    objectPosition: "center 35%",
+    approvalStatus: "pending approval",
   },
   {
-    id: "art",
-    src: slide3Art,
-    width: 515,
-    height: 388,
-    alt: "Students painting in an art class",
-    objectPosition: "50% 35%",
+    id: "classroom-highres",
+    src: hrSlide2Classroom1920,
+    src1280: hrSlide2Classroom1280,
+    w1280: 1280,
+    width: 1920,
+    height: 1282,
+    alt: "Students and teacher collaborating in a smartboard classroom at DPS International School",
+    objectPosition: "center 35%",
+    approvalStatus: "pending approval",
   },
   {
-    id: "lab",
-    src: slide4Lab,
-    width: 547,
-    height: 365,
-    alt: "Pupils watching a science experiment in a laboratory",
-    objectPosition: "50% 35%",
+    id: "sports-highres",
+    src: hrSlide3Sports1920,
+    src1280: hrSlide3Sports1280,
+    w1280: 1280,
+    width: 1920,
+    height: 1280,
+    alt: "Students playing basketball on the DPS International School campus court",
+    objectPosition: "center 45%",
+    approvalStatus: "pending approval",
+  },
+  {
+    id: "debate-highres",
+    src: hrSlide4Debate1920,
+    src1280: hrSlide4Debate1280,
+    w1280: 1280,
+    width: 1920,
+    height: 1282,
+    alt: "Students participating in a group classroom discussion at DPS International School",
+    objectPosition: "center 35%",
+    approvalStatus: "pending approval",
   },
 ] as const;
 
@@ -66,7 +117,26 @@ export interface LoginSlideshowProps {
 
 const AUTO_ADVANCE_MS = 6000;
 
-export function LoginSlideshow({ fit = "frame", className }: LoginSlideshowProps) {
+function SlideDots({ activeIndex, count }: { activeIndex: number; count: number }) {
+  return (
+    <div className="flex items-center gap-1.5" aria-hidden="true">
+      {Array.from({ length: count }, (_, index) => {
+        const isActive = index === activeIndex;
+        return (
+          <span
+            key={index}
+            className={cn(
+              "block h-2 rounded-full transition-all duration-300",
+              isActive ? "w-6 bg-[var(--accent-flame-yellow)]" : "w-2 bg-white/45",
+            )}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+export function LoginSlideshow({ fit = "cover", className }: LoginSlideshowProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isUserPaused, setIsUserPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -245,9 +315,12 @@ export function LoginSlideshow({ fit = "frame", className }: LoginSlideshowProps
                 fit === "cover" ? (
                   <img
                     src={slide.src}
+                    srcSet={`${slide.src1280} ${slide.w1280}w, ${slide.src} ${slide.width}w`}
+                    sizes="(min-width: 1024px) max(58vw, 150vh), 100vw"
                     alt={slide.alt}
                     width={slide.width}
                     height={slide.height}
+                    loading={index === 0 ? "eager" : "lazy"}
                     fetchPriority={index === 0 ? "high" : "auto"}
                     decoding={index === 0 ? "sync" : "async"}
                     className="h-full w-full object-cover"
@@ -302,35 +375,37 @@ export function LoginSlideshow({ fit = "frame", className }: LoginSlideshowProps
         })}
       </div>
 
-      {/* Bottom dark-green gradient (~60% height) for legibility */}
+      {/* Faint overall dark-green tint + bottom ~40% gradient for legibility */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[62%]"
+        className="pointer-events-none absolute inset-0 z-20"
+        style={{ background: "var(--slideshow-cover-tint)" }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[42%]"
         style={{
           background: "var(--slideshow-bottom-gradient)",
         }}
       />
 
-      {/* Previous / Next arrows on hover or focus */}
+      {/* Visually hidden until keyboard focus */}
       <button
         type="button"
-        aria-label="Previous slide"
-        onClick={handlePrev}
-        className="hidden sm:inline-flex absolute left-3 top-1/2 z-30 size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-[var(--slideshow-control-bg)] text-white opacity-0 transition-opacity hover:bg-[var(--slideshow-bg)] focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
+        aria-label={isUserPaused ? "Play slideshow" : "Pause slideshow"}
+        aria-pressed={isUserPaused}
+        onClick={() => setIsUserPaused((prev) => !prev)}
+        className="sr-only focus:not-sr-only focus:absolute focus:right-4 focus:top-4 focus:z-40 focus:inline-flex focus:min-h-11 focus:items-center focus:gap-2 focus:rounded-full focus:border focus:border-white/40 focus:bg-[var(--slideshow-bg)] focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:text-white focus:shadow-lg focus:outline-none focus:ring-3 focus:ring-[var(--brand-focus-outline)]"
       >
-        <ChevronLeft className="size-5" aria-hidden="true" />
+        {isUserPaused ? (
+          <Play className="size-4" aria-hidden="true" />
+        ) : (
+          <Pause className="size-4" aria-hidden="true" />
+        )}
+        <span>{isUserPaused ? "Play slideshow" : "Pause slideshow"}</span>
       </button>
 
-      <button
-        type="button"
-        aria-label="Next slide"
-        onClick={handleNext}
-        className="hidden sm:inline-flex absolute right-3 top-1/2 z-30 size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-[var(--slideshow-control-bg)] text-white opacity-0 transition-opacity hover:bg-[var(--slideshow-bg)] focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
-      >
-        <ChevronRight className="size-5" aria-hidden="true" />
-      </button>
-
-      {/* Fixed school identity overlay + slide controls */}
+      {/* Fixed school identity overlay + non-interactive slide dots */}
       <div className="relative z-30 flex flex-wrap items-end justify-between gap-4 px-5 pb-4 pt-6 sm:px-8 sm:pb-5 lg:px-10 lg:pb-8">
         <div className="min-w-0 space-y-1">
           <div className="flex items-center gap-2">
@@ -343,49 +418,11 @@ export function LoginSlideshow({ fit = "frame", className }: LoginSlideshowProps
             </span>
           </div>
           <p className="text-lg font-bold tracking-tight text-white sm:text-xl lg:text-2xl">
-            Delhi Private School
+            DPS International School
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            aria-label={isUserPaused ? "Play slideshow" : "Pause slideshow"}
-            aria-pressed={isUserPaused}
-            onClick={() => setIsUserPaused((prev) => !prev)}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/30 bg-[var(--slideshow-control-bg)] px-3 text-xs font-semibold text-white transition-colors hover:bg-[var(--slideshow-control-hover)]"
-          >
-            {isUserPaused ? (
-              <Play className="size-4" aria-hidden="true" />
-            ) : (
-              <Pause className="size-4" aria-hidden="true" />
-            )}
-            <span className="sr-only">{isUserPaused ? "Play" : "Pause"}</span>
-          </button>
-
-          <div className="flex items-center gap-1.5" role="group" aria-label="Slide indicators">
-            {SCHOOL_SLIDES.map((slide, index) => {
-              const isActive = index === activeIndex;
-              return (
-                <button
-                  key={slide.id}
-                  type="button"
-                  aria-label={`Show slide ${index + 1} of ${SCHOOL_SLIDES.length}`}
-                  aria-current={isActive ? "true" : undefined}
-                  onClick={() => goToSlide(index)}
-                  className="inline-flex min-h-11 min-w-6 items-center justify-center px-0.5"
-                >
-                  <span
-                    className={cn(
-                      "block h-2 rounded-full transition-all duration-300",
-                      isActive ? "w-6 bg-[var(--accent-flame-yellow)]" : "w-2 bg-white/45 hover:bg-white/75",
-                    )}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <SlideDots activeIndex={activeIndex} count={SCHOOL_SLIDES.length} />
       </div>
     </section>
   );

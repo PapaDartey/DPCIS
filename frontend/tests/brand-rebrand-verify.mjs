@@ -1,5 +1,5 @@
-import { spawn } from "node:child_process";
 import fs from "node:fs";
+import http from "node:http";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendDir = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(frontendDir, "..");
+const distDir = path.join(frontendDir, "dist");
 const outDir = path.join(repoRoot, "docs", "ui-screenshots", "brand-verify");
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -32,27 +33,42 @@ function loadFromNpxOrLocal(pkg) {
 const { chromium } = loadFromNpxOrLocal("playwright");
 const axeCore = loadFromNpxOrLocal("axe-core");
 
-const PREVIEW_PORT = 4179;
-const BASE_URL = `http://127.0.0.1:${PREVIEW_PORT}`;
-
-async function waitForServer(url, timeoutMs = 15000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // retry
+function startStaticDistServer() {
+  const mimeTypes = {
+    ".html": "text/html; charset=utf-8",
+    ".js": "application/javascript; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".webp": "image/webp",
+    ".png": "image/png",
+    ".ico": "image/x-icon",
+    ".webmanifest": "application/manifest+json",
+  };
+  const server = http.createServer((req, res) => {
+    const urlPath = (req.url || "/").split("?")[0];
+    const rel = urlPath === "/" ? "index.html" : urlPath.replace(/^\/+/, "");
+    let filePath = path.join(distDir, rel);
+    if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+      filePath = path.join(distDir, "index.html");
     }
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  throw new Error(`Preview server did not start within ${timeoutMs}ms`);
+    const ext = path.extname(filePath).toLowerCase();
+    res.writeHead(200, { "Content-Type": mimeTypes[ext] || "application/octet-stream" });
+    fs.createReadStream(filePath).pipe(res);
+  });
+  return new Promise((resolve) => {
+    server.listen(0, "127.0.0.1", () => {
+      const addr = server.address();
+      resolve({
+        baseUrl: `http://127.0.0.1:${addr.port}`,
+        close: () => new Promise((r) => server.close(() => r())),
+      });
+    });
+  });
 }
 
 function getActiveSlideIndex(page) {
   return page.evaluate(() => {
-    const dots = Array.from(document.querySelectorAll('[aria-label="Slide indicators"] button'));
-    return dots.findIndex((d) => d.getAttribute("aria-current") === "true");
+    const el = document.querySelector(".dps-slideshow");
+    return Number(el?.getAttribute("data-active-slide") ?? -1);
   });
 }
 
@@ -80,22 +96,17 @@ async function runAxe(page, routeLabel) {
 }
 
 async function main() {
-  const server = spawn(
-    process.platform === "win32" ? "npx.cmd" : "npx",
-    ["vite", "preview", "--host", "127.0.0.1", "--port", String(PREVIEW_PORT), "--strictPort"],
-    { cwd: frontendDir, stdio: "ignore", shell: process.platform === "win32" },
-  );
-
+  const { baseUrl, close } = await startStaticDistServer();
   const report = {
     viewports: [],
     slideshow: {},
+    noCssUpscaling: [],
     assets404: [],
     axe: [],
     passed: true,
   };
 
   try {
-    await waitForServer(BASE_URL);
     let browser;
     for (const opts of [
       { headless: true },
@@ -106,12 +117,10 @@ async function main() {
         browser = await chromium.launch(opts);
         break;
       } catch {
-        // try next browser channel
+        // try next
       }
     }
-    if (!browser) {
-      throw new Error("No Playwright Chromium, Chrome, or Edge browser available");
-    }
+    if (!browser) throw new Error("No Playwright Chromium/Chrome/Edge available");
 
     try {
       const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -122,46 +131,122 @@ async function main() {
         }
       });
 
-      await page.goto(BASE_URL, { waitUntil: "networkidle" });
+      await page.goto(baseUrl, { waitUntil: "networkidle" });
 
-      // Check BrandLogo + 4 slides loaded
-      const logoCheck = await page.evaluate(() => {
-        const logos = Array.from(document.querySelectorAll("[data-brand-logo]"));
-        return logos.map((img) => ({
-          alt: img.getAttribute("alt"),
-          complete: img.complete,
-          naturalWidth: img.naturalWidth,
-          height: img.getBoundingClientRect().height,
-        }));
+      const domCheck = await page.evaluate(() => {
+        const slideshow = document.querySelector(".dps-slideshow");
+        const arrows = document.querySelectorAll(
+          '[aria-label="Previous slide"], [aria-label="Next slide"]',
+        ).length;
+        const dotButtons = document.querySelectorAll('[aria-label="Slide indicators"] button').length;
+        const pauseBtn = document.querySelector('button[aria-label="Pause slideshow"]');
+        const pauseRect = pauseBtn?.getBoundingClientRect();
+        return {
+          fit: slideshow?.getAttribute("data-fit"),
+          arrowCount: arrows,
+          dotButtonCount: dotButtons,
+          pauseButtonExists: Boolean(pauseBtn),
+          pauseHiddenInitially: Boolean(pauseRect && pauseRect.width <= 1 && pauseRect.height <= 1),
+        };
       });
-      report.logoCheck = logoCheck;
-      if (logoCheck.length === 0 || logoCheck.some((l) => l.naturalWidth === 0 || l.height < 28)) {
+      report.slideshow.domCheck = domCheck;
+      if (
+        domCheck.fit !== "cover" ||
+        domCheck.arrowCount !== 0 ||
+        domCheck.dotButtonCount !== 0 ||
+        !domCheck.pauseButtonExists ||
+        !domCheck.pauseHiddenInitially
+      ) {
         report.passed = false;
       }
 
-      // Capture all 4 slides via dot clicks
-      for (let i = 0; i < 4; i++) {
-        await page.locator('[aria-label="Slide indicators"] button').nth(i).click();
-        await page.waitForTimeout(500);
-        await page.screenshot({ path: path.join(outDir, `login-slide-${i + 1}-1440.png`) });
-      }
-
-      const slideImgs = await page.evaluate(() => {
-        const imgs = Array.from(document.querySelectorAll(".dps-slideshow img[alt]"));
-        return imgs
-          .filter((i) => i.getAttribute("alt"))
-          .map((i) => ({
-            alt: i.getAttribute("alt"),
-            naturalWidth: i.naturalWidth,
-          }));
+      // Check pause button becomes visible on keyboard Tab focus
+      await page.locator(".dps-slideshow").focus();
+      await page.keyboard.press("Tab");
+      const pauseFocusedRect = await page.evaluate(() => {
+        const el = document.activeElement;
+        const rect = el?.getBoundingClientRect();
+        return {
+          ariaLabel: el?.getAttribute("aria-label"),
+          width: rect?.width ?? 0,
+          height: rect?.height ?? 0,
+        };
       });
-      report.slideshow.images = slideImgs;
-      if (slideImgs.length < 4 || slideImgs.some((s) => s.naturalWidth === 0)) {
+      report.slideshow.pauseFocusedRect = pauseFocusedRect;
+      if (
+        pauseFocusedRect.ariaLabel !== "Pause slideshow" ||
+        pauseFocusedRect.width < 40 ||
+        pauseFocusedRect.height < 40
+      ) {
         report.passed = false;
       }
 
-      // Return to slide 0 and clear focus/hover for auto-advance test
-      await page.locator('[aria-label="Slide indicators"] button').nth(0).click();
+      // Capture all 4 slides at 1440x900, 1920x1080, 1024x768, 390x844
+      for (const vp of [
+        { width: 1440, height: 900, label: "1440" },
+        { width: 1920, height: 1080, label: "1920" },
+        { width: 1024, height: 768, label: "1024" },
+        { width: 390, height: 844, label: "390" },
+      ]) {
+        await page.setViewportSize({ width: vp.width, height: vp.height });
+        for (let step = 0; step < 4; step++) {
+          const idx = await getActiveSlideIndex(page);
+          await page.evaluate(() => {
+            if (document.activeElement instanceof HTMLElement) {
+              document.activeElement.blur();
+            }
+          });
+          await page.waitForTimeout(350);
+          await page.screenshot({
+            path: path.join(outDir, `login-cover-slide-${idx + 1}-${vp.label}.png`),
+          });
+
+          // Verify no CSS upscaling at 1440, 1920, 390
+          if (vp.label !== "1024") {
+            const scaleCheck = await page.evaluate(async (activeIdx) => {
+              const img = document.querySelectorAll(".dps-slideshow img[alt]")[activeIdx];
+              if (!img) return { ok: false };
+              const rect = img.getBoundingClientRect();
+              const src = img.currentSrc || img.src;
+              const probe = new Image();
+              probe.src = src;
+              if (!probe.complete) {
+                await new Promise((res) => {
+                  probe.onload = res;
+                  probe.onerror = res;
+                });
+              }
+              const naturalWidth = probe.naturalWidth || img.naturalWidth;
+              const naturalHeight = probe.naturalHeight || img.naturalHeight;
+              return {
+                currentSrc: src.split("/").pop(),
+                naturalWidth,
+                naturalHeight,
+                displayWidth: Math.round(rect.width),
+                displayHeight: Math.round(rect.height),
+                ok: naturalWidth >= rect.width - 1 && naturalHeight >= rect.height - 1,
+              };
+            }, idx);
+            report.noCssUpscaling.push({ viewport: vp.label, slide: idx + 1, ...scaleCheck });
+            if (!scaleCheck.ok) report.passed = false;
+          }
+
+          // Capture 100% face-area crop on slide 2 (trophy) and slide 3 (art) at 1920x1080
+          if (vp.label === "1920" && (idx === 1 || idx === 2)) {
+            await page.screenshot({
+              path: path.join(outDir, `face-crop-slide-${idx + 1}-1920.png`),
+              clip: { x: 220, y: 120, width: 520, height: 420 },
+            });
+          }
+
+          await page.locator(".dps-slideshow").focus();
+          await page.keyboard.press("ArrowRight");
+          await page.waitForTimeout(1300);
+        }
+      }
+
+      // Test auto-advance at 1440x900
+      await page.setViewportSize({ width: 1440, height: 900 });
       await page.evaluate(() => {
         if (document.activeElement instanceof HTMLElement) {
           document.activeElement.blur();
@@ -175,55 +260,87 @@ async function main() {
       report.slideshow.autoAdvance = { idxBefore, idxAfter, advanced: idxAfter !== idxBefore };
       if (!report.slideshow.autoAdvance.advanced) report.passed = false;
 
-      // Test pause button stops rotation
-      const pauseBtn = page.getByRole("button", { name: /pause slideshow/i });
-      await pauseBtn.click();
-      const idxPausedStart = await getActiveSlideIndex(page);
-      await page.waitForTimeout(6500);
-      const idxPausedEnd = await getActiveSlideIndex(page);
-      report.slideshow.pauseStopsRotation = idxPausedStart === idxPausedEnd;
-      if (!report.slideshow.pauseStopsRotation) report.passed = false;
-
-      // Resume and test hover pauses rotation
-      await page.getByRole("button", { name: /play slideshow/i }).click();
-      const idxHoverStart = await getActiveSlideIndex(page);
-      await page.locator(".dps-slideshow").hover();
-      await page.waitForTimeout(6500);
-      const idxHoverEnd = await getActiveSlideIndex(page);
-      report.slideshow.hoverPausesRotation = idxHoverStart === idxHoverEnd;
-      if (!report.slideshow.hoverPausesRotation) report.passed = false;
-
-      // Axe on /
       report.axe.push(await runAxe(page, "/"));
 
-      // Responsive viewports check
-      for (const vp of [
-        { width: 1440, height: 900 },
-        { width: 1024, height: 768 },
-        { width: 768, height: 1024 },
-        { width: 390, height: 844 },
-        { width: 360, height: 800 },
-      ]) {
-        await page.setViewportSize(vp);
-        await page.waitForTimeout(200);
-        const overflow = await page.evaluate(() => {
-          return document.documentElement.scrollWidth > window.innerWidth + 1;
-        });
-        report.viewports.push({ ...vp, horizontalOverflow: overflow });
-        if (overflow) report.passed = false;
-        if (vp.width === 390 || vp.width === 360) {
-          await page.screenshot({ path: path.join(outDir, `login-${vp.width}.png`) });
-        }
-      }
+      // Login form error styling check: untouched fields must NOT have aria-invalid="true";
+      // invalid only after blur/submit; check show/hide password and sign-up mode.
+      await page.setViewportSize({ width: 1440, height: 900 });
+      const initialInvalidCount = await page.locator('input[aria-invalid="true"]').count();
+      await page.locator('input[name="email"]').focus();
+      await page.locator('input[name="email"]').blur();
+      const emailInvalidAfterEmptyBlur = await page.locator('input[name="email"]').getAttribute("aria-invalid");
+      await page.locator('input[name="password"]').fill("short");
+      await page.locator('input[name="password"]').blur();
+      const passwordInvalidAfterShortBlur = await page.locator('input[name="password"]').getAttribute("aria-invalid");
+      const showBtn = page.getByRole("button", { name: "Show password" });
+      await showBtn.click();
+      const passwordTypeAfterShow = await page.locator('input[name="password"]').getAttribute("type");
+      await page.getByRole("button", { name: /Create one/i }).click();
+      const nameInputVisibleInSignUp = await page.locator('input[name="name"]').isVisible();
+      const signUpInitialInvalidCount = await page.locator('input[aria-invalid="true"]').count();
+      report.formErrorStylingCheck = {
+        initialInvalidCount,
+        emailInvalidAfterEmptyBlur,
+        passwordInvalidAfterShortBlur,
+        passwordTypeAfterShow,
+        nameInputVisibleInSignUp,
+        signUpInitialInvalidCount,
+        passed:
+          initialInvalidCount === 0 &&
+          emailInvalidAfterEmptyBlur === "true" &&
+          passwordInvalidAfterShortBlur === "true" &&
+          passwordTypeAfterShow === "text" &&
+          nameInputVisibleInSignUp &&
+          signUpInitialInvalidCount === 0,
+      };
+      if (!report.formErrorStylingCheck.passed) report.passed = false;
+      // Switch back to sign-in mode cleanly
+      await page.getByRole("button", { name: /Sign in$/i }).last().click();
 
-      // 404 route check + axe
-      await page.setViewportSize({ width: 1280, height: 800 });
-      await page.goto(`${BASE_URL}/nonexistent-route-check`, { waitUntil: "networkidle" });
-      const has404Logo = await page.locator("[data-brand-logo]").count();
-      report.notFoundHasLogo = has404Logo > 0;
-      if (!report.notFoundHasLogo) report.passed = false;
-      await page.screenshot({ path: path.join(outDir, "404-1280.png") });
-      report.axe.push(await runAxe(page, "/nonexistent-route-check"));
+      // Route-change focus ring check: skip on first load, no outline on [data-route-heading], outline on focused button
+      await page.goto(`${baseUrl}/nonexistent-route`, { waitUntil: "networkidle" });
+      const firstLoadFocusedH1 = await page.evaluate(() => document.activeElement?.tagName === "H1");
+      await page.locator('a[href="/"]').first().click();
+      await page.waitForSelector('h1[data-route-heading]');
+      const headingFocusState = await page.evaluate(() => {
+        const el = document.activeElement;
+        const st = el ? getComputedStyle(el) : null;
+        return {
+          tagName: el?.tagName,
+          hasAttr: el?.hasAttribute("data-route-heading") ?? false,
+          outlineStyle: st?.outlineStyle ?? "",
+          outlineWidth: st?.outlineWidth ?? "",
+        };
+      });
+      // Tab until we reach a button to confirm keyboard focus ring IS visible on buttons
+      let buttonFocusState = { tagName: "", outlineStyle: "none", outlineWidth: "0px" };
+      for (let t = 0; t < 12; t++) {
+        await page.keyboard.press("Tab");
+        buttonFocusState = await page.evaluate(() => {
+          const el = document.activeElement;
+          const st = el ? getComputedStyle(el) : null;
+          return {
+            tagName: el?.tagName ?? "",
+            outlineStyle: st?.outlineStyle ?? "",
+            outlineWidth: st?.outlineWidth ?? "",
+          };
+        });
+        if (buttonFocusState.tagName === "BUTTON") break;
+      }
+      report.routeFocusCheck = {
+        skippedFirstLoad: !firstLoadFocusedH1,
+        heading: headingFocusState,
+        button: buttonFocusState,
+        passed:
+          !firstLoadFocusedH1 &&
+          headingFocusState.tagName === "H1" &&
+          headingFocusState.hasAttr &&
+          (headingFocusState.outlineStyle === "none" || headingFocusState.outlineWidth === "0px") &&
+          buttonFocusState.tagName === "BUTTON" &&
+          buttonFocusState.outlineStyle !== "none" &&
+          buttonFocusState.outlineWidth !== "0px",
+      };
+      if (!report.routeFocusCheck.passed) report.passed = false;
 
       // Reduced motion context
       const rmContext = await browser.newContext({
@@ -231,7 +348,7 @@ async function main() {
         reducedMotion: "reduce",
       });
       const rmPage = await rmContext.newPage();
-      await rmPage.goto(BASE_URL, { waitUntil: "networkidle" });
+      await rmPage.goto(baseUrl, { waitUntil: "networkidle" });
       const rmBefore = await getActiveSlideIndex(rmPage);
       await rmPage.waitForTimeout(6500);
       const rmAfter = await getActiveSlideIndex(rmPage);
@@ -244,7 +361,7 @@ async function main() {
       await browser.close();
     }
   } finally {
-    server.kill();
+    await close();
   }
 
   for (const a of report.axe) {

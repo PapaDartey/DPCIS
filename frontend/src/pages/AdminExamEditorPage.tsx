@@ -37,6 +37,7 @@ import { BulkParserPanel } from "@/features/admin/components/BulkParserPanel";
 import { ExamSettingsForm } from "@/features/admin/components/ExamSettingsForm";
 import { ExamStatusBadge } from "@/features/admin/components/ExamStatusBadge";
 import { QuestionListEditor } from "@/features/admin/components/QuestionListEditor";
+import { RecropPanel } from "@/features/admin/components/RecropPanel";
 import { uniqueIncomingPdfQuestions } from "@/features/admin/importDedup";
 import type { ExamCreate, ExamWithQuestionsAdmin } from "@/types/adminExam";
 
@@ -480,6 +481,11 @@ export function AdminExamEditorPage() {
       </div>
 
       <div hidden={activeSection !== "questions"} className="space-y-6">
+      {exam.questions.some((question) => question.source_file_id) ? (
+        <RecropPanel examId={exam.id}
+          disabled={isReadOnly || hasUnsavedChanges || isSavingQuestions}
+          onApplied={triggerReload} />
+      ) : null}
       {!isReadOnly ? (
         <BulkParserPanel
           examId={exam.id}

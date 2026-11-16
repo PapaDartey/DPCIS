@@ -57,21 +57,31 @@ test("brand assets and slideshow webp files exist under size budget", () => {
     assert.ok(fs.statSync(abs).size > 0, `Empty brand asset: ${rel}`);
   }
 
-  const slides = [
-    "src/assets/brand/slides/slide-1-building.webp",
-    "src/assets/brand/slides/slide-2-trophy.webp",
-    "src/assets/brand/slides/slide-3-art.webp",
-    "src/assets/brand/slides/slide-4-lab.webp",
+  const desktopSlides = [
+    "src/assets/brand/slides/slide-1-building@1920.webp",
+    "src/assets/brand/slides/slide-2-trophy@1920.webp",
+    "src/assets/brand/slides/slide-3-art@1920.webp",
+    "src/assets/brand/slides/slide-4-lab@1920.webp",
   ];
-  let totalSlideBytes = 0;
-  for (const rel of slides) {
+  const mobileSlides = [
+    "src/assets/brand/slides/slide-1-building@1280.webp",
+    "src/assets/brand/slides/slide-2-trophy@1280.webp",
+    "src/assets/brand/slides/slide-3-art@1280.webp",
+    "src/assets/brand/slides/slide-4-lab@1280.webp",
+  ];
+  let totalDesktopBytes = 0;
+  for (const rel of [...desktopSlides, ...mobileSlides]) {
     const abs = path.join(frontendDir, rel);
     assert.ok(fs.existsSync(abs), `Missing slideshow asset: ${rel}`);
-    totalSlideBytes += fs.statSync(abs).size;
+    const sz = fs.statSync(abs).size;
+    assert.ok(sz <= 250 * 1024, `${rel} (${sz} B) exceeds 250 KB per-file budget`);
+    if (desktopSlides.includes(rel)) {
+      totalDesktopBytes += sz;
+    }
   }
   assert.ok(
-    totalSlideBytes < 500 * 1024,
-    `Total slideshow WebP size (${totalSlideBytes} B) must stay under 500 KB`,
+    totalDesktopBytes <= 1024 * 1024,
+    `Total @1920 slideshow WebP size (${totalDesktopBytes} B) must stay under 1 MB`,
   );
 });
 

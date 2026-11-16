@@ -1,0 +1,10 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\EricAppiahOwusu\Music\DPCIS\backend
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collected 84 items / 80 deselected / 4 selected
+
+tests\test_exams.py ....                                                 [100%]
+
+====================== 4 passed, 80 deselected in 7.48s =======================

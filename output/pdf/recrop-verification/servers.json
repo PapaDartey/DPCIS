@@ -1,0 +1,7 @@
+{
+  "frontend": "http://127.0.0.1:5173",
+  "backend": "http://127.0.0.1:8000",
+  "frontendPid": 1892,
+  "mode": "isolated test session",
+  "backendPid": 10588
+}

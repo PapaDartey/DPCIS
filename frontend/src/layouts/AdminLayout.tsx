@@ -119,7 +119,7 @@ export function AdminLayout({ mainRef, children }: AdminLayoutProps) {
         </main>
         <footer className="admin-footer flex items-center gap-2">
           <BrandLogo size={24} variant="mark" />
-          <span>Delhi Private School — Examination Hub · Administration</span>
+          <span>DPS International School — Examination Hub · Administration</span>
         </footer>
       </div>
     </div>

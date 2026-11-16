@@ -1,0 +1,414 @@
+{
+  "method": "Unique resolved source paths per package; package after last node_modules/; deduplicated across maps.",
+  "map_count": 32,
+  "packages": {
+    "@better-auth/core": 5,
+    "@better-fetch/fetch": 1,
+    "@neondatabase/auth": 4,
+    "@oddbird/popover-polyfill": 1,
+    "@radix-ui/react-compose-refs": 1,
+    "@radix-ui/react-slot": 1,
+    "@supabase/auth-js": 6,
+    "better-auth": 32,
+    "class-variance-authority": 1,
+    "clsx": 1,
+    "defu": 1,
+    "lucide-react": 51,
+    "nanostores": 2,
+    "pdfjs-dist": 2,
+    "react": 4,
+    "react-dom": 4,
+    "react-router": 1,
+    "scheduler": 2,
+    "tailwind-merge": 1,
+    "zod": 18
+  },
+  "maps": [
+    {
+      "map": "assets\\AdminDashboardPage-CPkSo5LX.js.map",
+      "sources": [
+        "../../src/pages/AdminDashboardPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\AdminExamEditorPage-DgaV4ghf.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/arrow-down.js",
+        "../../node_modules/lucide-react/dist/esm/icons/arrow-up.js",
+        "../../node_modules/lucide-react/dist/esm/icons/chart-column.js",
+        "../../node_modules/lucide-react/dist/esm/icons/chevron-down.js",
+        "../../node_modules/lucide-react/dist/esm/icons/clipboard-paste.js",
+        "../../node_modules/lucide-react/dist/esm/icons/file-plus-2.js",
+        "../../node_modules/lucide-react/dist/esm/icons/list-checks.js",
+        "../../node_modules/lucide-react/dist/esm/icons/plus.js",
+        "../../node_modules/lucide-react/dist/esm/icons/replace.js",
+        "../../node_modules/lucide-react/dist/esm/icons/sparkles.js",
+        "../../node_modules/lucide-react/dist/esm/icons/trash-2.js",
+        "../../node_modules/lucide-react/dist/esm/icons/wrench.js",
+        "../../src/components/ui/tabs.tsx",
+        "../../src/features/admin/components/PdfCropEditor.tsx",
+        "../../src/features/admin/pdfStructure.ts",
+        "../../src/features/admin/extractImportText.ts",
+        "../../src/features/admin/importDedup.ts",
+        "../../src/features/admin/components/BulkParserPanel.tsx",
+        "../../src/features/admin/components/QuestionListEditor.tsx",
+        "../../src/features/admin/components/RecropPanel.tsx",
+        "../../src/pages/AdminExamEditorPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\AdminExamNewPage-D0Ot89we.js.map",
+      "sources": [
+        "../../src/pages/AdminExamNewPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\AdminExamResultsPage-Czivc6yN.js.map",
+      "sources": [
+        "../../src/pages/AdminExamResultsPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\AdminOverviewPage-BFowPrOD.js.map",
+      "sources": [
+        "../../src/pages/AdminOverviewPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\AdminResultsPage-xETikLZZ.js.map",
+      "sources": [
+        "../../src/pages/AdminResultsPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\adminUtils-B6Vu6L43.js.map",
+      "sources": [
+        "../../src/features/admin/adminApi.ts",
+        "../../src/features/admin/adminUtils.ts"
+      ]
+    },
+    {
+      "map": "assets\\arrow-right-j2EIRxz-.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/arrow-right.js"
+      ]
+    },
+    {
+      "map": "assets\\AttemptDetailDialog-DSH2CKKu.js.map",
+      "sources": [
+        "../../src/features/admin/components/AttemptDetailDialog.tsx"
+      ]
+    },
+    {
+      "map": "assets\\AuthenticatedPdfImage-BwzjXl8t.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/send.js",
+        "../../src/components/exam/AuthenticatedPdfImage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\badge-BCoHwvTr.js.map",
+      "sources": [
+        "../../src/components/ui/badge.tsx"
+      ]
+    },
+    {
+      "map": "assets\\circle-check-BEz3SwRs.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/circle-check.js"
+      ]
+    },
+    {
+      "map": "assets\\circle-minus-LsJAhF8e.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/circle-minus.js"
+      ]
+    },
+    {
+      "map": "assets\\circle-x-MMGnMuQ0.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/circle-x.js"
+      ]
+    },
+    {
+      "map": "assets\\clock-BJqMmMrZ.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/clock.js"
+      ]
+    },
+    {
+      "map": "assets\\ExamSettingsForm-CtoMkhhJ.js.map",
+      "sources": [
+        "../../src/components/ui/textarea.tsx",
+        "../../src/features/admin/components/ExamSettingsForm.tsx"
+      ]
+    },
+    {
+      "map": "assets\\ExamStatusBadge-CSujKzXx.js.map",
+      "sources": [
+        "../../src/features/admin/components/ExamStatusBadge.tsx"
+      ]
+    },
+    {
+      "map": "assets\\flag-173lGbzN.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/flag.js"
+      ]
+    },
+    {
+      "map": "assets\\index-ZNM8y0VQ.js.map",
+      "sources": [
+        "../../node_modules/react/cjs/react-jsx-runtime.production.js",
+        "../../node_modules/react/jsx-runtime.js",
+        "../../node_modules/react/cjs/react.production.js",
+        "../../node_modules/react/index.js",
+        "../../node_modules/scheduler/cjs/scheduler.production.js",
+        "../../node_modules/scheduler/index.js",
+        "../../node_modules/react-dom/cjs/react-dom.production.js",
+        "../../node_modules/react-dom/index.js",
+        "../../node_modules/react-dom/cjs/react-dom-client.production.js",
+        "../../node_modules/react-dom/client.js",
+        "../../node_modules/react-router/dist/development/chunk-6KYCQHYJ.mjs",
+        "../../node_modules/lucide-react/dist/esm/shared/src/utils.js",
+        "../../node_modules/lucide-react/dist/esm/defaultAttributes.js",
+        "../../node_modules/lucide-react/dist/esm/Icon.js",
+        "../../node_modules/lucide-react/dist/esm/createLucideIcon.js",
+        "../../node_modules/lucide-react/dist/esm/icons/arrow-left.js",
+        "../../node_modules/lucide-react/dist/esm/icons/eye-off.js",
+        "../../node_modules/lucide-react/dist/esm/icons/eye.js",
+        "../../node_modules/lucide-react/dist/esm/icons/inbox.js",
+        "../../node_modules/lucide-react/dist/esm/icons/loader-circle.js",
+        "../../node_modules/lucide-react/dist/esm/icons/log-in.js",
+        "../../node_modules/lucide-react/dist/esm/icons/log-out.js",
+        "../../node_modules/lucide-react/dist/esm/icons/menu.js",
+        "../../node_modules/lucide-react/dist/esm/icons/pause.js",
+        "../../node_modules/lucide-react/dist/esm/icons/play.js",
+        "../../node_modules/lucide-react/dist/esm/icons/rotate-ccw.js",
+        "../../node_modules/lucide-react/dist/esm/icons/triangle-alert.js",
+        "../../node_modules/lucide-react/dist/esm/icons/user-plus.js",
+        "../../node_modules/lucide-react/dist/esm/icons/x.js",
+        "../../src/assets/brand/dps-logo-128.webp",
+        "../../src/assets/brand/dps-logo-256.webp",
+        "../../src/assets/brand/dps-logo-512.webp",
+        "../../src/assets/brand/dps-logo-tile-128.webp",
+        "../../src/assets/brand/dps-logo-tile-256.webp",
+        "../../src/assets/brand/dps-logo-tile-512.webp",
+        "../../node_modules/clsx/dist/clsx.mjs",
+        "../../node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+        "../../src/lib/utils.ts",
+        "../../src/components/BrandLogo.tsx",
+        "../../node_modules/class-variance-authority/dist/index.mjs",
+        "../../src/components/ui/alert.tsx",
+        "../../node_modules/@radix-ui/react-compose-refs/dist/index.mjs",
+        "../../node_modules/@radix-ui/react-slot/dist/index.mjs",
+        "../../src/components/ui/button.tsx",
+        "../../src/components/ErrorBoundary.tsx",
+        "../../src/components/ui/card.tsx",
+        "../../src/components/ui/skeleton.tsx",
+        "../../src/components/ui/state-panel.tsx",
+        "../../src/features/auth/useAuth.ts",
+        "../../node_modules/@supabase/auth-js/dist/module/lib/errors.js",
+        "../../node_modules/@supabase/auth-js/dist/module/lib/base64url.js",
+        "../../node_modules/@supabase/auth-js/dist/module/lib/helpers.js",
+        "../../node_modules/@supabase/auth-js/dist/module/lib/locks.js",
+        "../../node_modules/@supabase/auth-js/dist/module/lib/polyfills.js",
+        "../../node_modules/@supabase/auth-js/dist/module/GoTrueClient.js",
+        "../../node_modules/@neondatabase/auth/dist/better-auth-helpers-DHCiMdRW.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/package.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/version.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/broadcast-channel.mjs",
+        "../../node_modules/nanostores/atom/index.js",
+        "../../node_modules/nanostores/lifecycle/index.js",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/equality.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/focus-manager.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/online-manager.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/parser.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/query-atom.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/query.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/session-refresh.mjs",
+        "../../node_modules/@better-auth/core/dist/env/env-impl.mjs",
+        "../../node_modules/@better-auth/core/dist/utils/error-codes.mjs",
+        "../../node_modules/@better-auth/core/dist/error/index.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/utils/url.mjs",
+        "../../node_modules/@better-auth/core/dist/utils/url.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/fetch-plugins.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/session-atom.mjs",
+        "../../node_modules/defu/dist/defu.mjs",
+        "../../node_modules/@better-fetch/fetch/dist/index.js",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/config.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/utils/is-atom.mjs",
+        "../../node_modules/@better-auth/core/dist/utils/string.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/proxy.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/client/vanilla.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/admin/error-codes.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/access/access.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/admin/access/statement.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/admin/has-permission.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/admin/client.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/email-otp/error-codes.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/email-otp/client.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/jwt/client.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/magic-link/client.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/organization/error-codes.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/organization/access/statement.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/organization/permission.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/organization/client.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/phone-number/error-codes.mjs",
+        "../../node_modules/@neondatabase/auth/node_modules/better-auth/dist/plugins/phone-number/client.mjs",
+        "../../node_modules/zod/v4/core/util.js",
+        "../../node_modules/zod/v4/core/core.js",
+        "../../node_modules/zod/v4/core/errors.js",
+        "../../node_modules/zod/v4/core/parse.js",
+        "../../node_modules/zod/v4/core/regexes.js",
+        "../../node_modules/zod/v4/core/checks.js",
+        "../../node_modules/zod/v4/core/doc.js",
+        "../../node_modules/zod/v4/core/versions.js",
+        "../../node_modules/zod/v4/core/schemas.js",
+        "../../node_modules/zod/v4/core/memoizer.js",
+        "../../node_modules/zod/v4/locales/en.js",
+        "../../node_modules/zod/v4/core/registries.js",
+        "../../node_modules/zod/v4/core/api.js",
+        "../../node_modules/zod/v4/core/to-json-schema.js",
+        "../../node_modules/zod/v4/core/json-schema-processors.js",
+        "../../node_modules/zod/v4/classic/errors.js",
+        "../../node_modules/zod/v4/classic/parse.js",
+        "../../node_modules/zod/v4/classic/schemas.js",
+        "../../node_modules/@neondatabase/auth/dist/adapter-core-BDFV2Hgb.mjs",
+        "../../node_modules/@neondatabase/auth/dist/supabase-adapter-hYitiCZ_.mjs",
+        "../../node_modules/@neondatabase/auth/dist/neon-auth-C2hmrLLP.mjs",
+        "../../src/lib/auth.ts",
+        "../../src/lib/env.ts",
+        "../../src/lib/api.ts",
+        "../../src/features/auth/AuthContext.tsx",
+        "../../src/features/auth/ProtectedRoute.tsx",
+        "../../src/layouts/AdminLayout.tsx",
+        "../../src/layouts/FocusLayout.tsx",
+        "../../src/layouts/PublicLayout.tsx",
+        "../../src/components/ui/dialog.tsx",
+        "../../src/layouts/StudentLayout.tsx",
+        "../../src/layouts/routeMetadata.ts",
+        "../../src/layouts/AppShell.tsx",
+        "../../src/components/PageHeader.tsx",
+        "../../src/pages/NotFoundPage.tsx",
+        "../../src/components/ui/input.tsx",
+        "../../src/components/ui/label.tsx",
+        "../../src/features/auth/AuthBoundary.tsx",
+        "../../src/assets/brand/slides/hr-slide-0-building@1280.webp",
+        "../../src/assets/brand/slides/hr-slide-0-building@1920.webp",
+        "../../src/assets/brand/slides/hr-slide-1-lab@1280.webp",
+        "../../src/assets/brand/slides/hr-slide-1-lab@1920.webp",
+        "../../src/assets/brand/slides/hr-slide-2-classroom@1280.webp",
+        "../../src/assets/brand/slides/hr-slide-2-classroom@1920.webp",
+        "../../src/assets/brand/slides/hr-slide-3-sports@1280.webp",
+        "../../src/assets/brand/slides/hr-slide-3-sports@1920.webp",
+        "../../src/assets/brand/slides/hr-slide-4-debate@1280.webp",
+        "../../src/assets/brand/slides/hr-slide-4-debate@1920.webp",
+        "../../src/features/auth/LoginSlideshow.tsx",
+        "../../src/hooks/useHealthCheck.ts",
+        "../../src/pages/OverviewPage.tsx",
+        "../../src/App.tsx",
+        "../../src/main.tsx"
+      ]
+    },
+    {
+      "map": "assets\\info-Cv8-q5h2.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/info.js"
+      ]
+    },
+    {
+      "map": "assets\\lock-CECQ30m2.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/lock.js"
+      ]
+    },
+    {
+      "map": "assets\\pdf-CfURPAMH.js.map",
+      "sources": [
+        "../../node_modules/pdfjs-dist/build/pdf.mjs"
+      ]
+    },
+    {
+      "map": "assets\\pdf.worker.min-J5hfpf8E.js.map",
+      "sources": [
+        "../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs?url"
+      ]
+    },
+    {
+      "map": "assets\\popover-Bb7gA8qz.js.map",
+      "sources": [
+        "../../node_modules/@oddbird/popover-polyfill/dist/popover.js"
+      ]
+    },
+    {
+      "map": "assets\\save-BpzZGtp3.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/save.js"
+      ]
+    },
+    {
+      "map": "assets\\segmented-control-gJ52_uAY.js.map",
+      "sources": [
+        "../../src/components/ui/segmented-control.tsx"
+      ]
+    },
+    {
+      "map": "assets\\studentApi-CV7SFjKq.js.map",
+      "sources": [
+        "../../src/features/student/formatters.ts",
+        "../../src/features/student/studentApi.ts"
+      ]
+    },
+    {
+      "map": "assets\\StudentAttemptPage-SwVgAQFi.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/check.js",
+        "../../node_modules/lucide-react/dist/esm/icons/circle-dashed.js",
+        "../../node_modules/lucide-react/dist/esm/icons/circle-dot.js",
+        "../../node_modules/lucide-react/dist/esm/icons/layout-grid.js",
+        "../../src/components/exam/ExamProgressHeader.tsx",
+        "../../src/components/exam/ExamTimerBadge.tsx",
+        "../../src/components/exam/McqQuestionCard.tsx",
+        "../../src/components/ui/question-tile.tsx",
+        "../../src/features/student/QuestionNavigatorDialog.tsx",
+        "../../src/features/student/useAttemptRunner.ts",
+        "../../src/pages/StudentAttemptPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\StudentDashboardPage-DwjqLoY_.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/book-open-check.js",
+        "../../node_modules/lucide-react/dist/esm/icons/clock-3.js",
+        "../../node_modules/lucide-react/dist/esm/icons/file-clock.js",
+        "../../node_modules/lucide-react/dist/esm/icons/history.js",
+        "../../node_modules/lucide-react/dist/esm/icons/refresh-cw.js",
+        "../../src/components/ui/exam-card.tsx",
+        "../../src/features/student/StudentExamCard.tsx",
+        "../../src/components/ui/responsive-table.tsx",
+        "../../src/features/student/StudentHistorySection.tsx",
+        "../../src/pages/StudentDashboardPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\StudentExamInstructionsPage-CVXRqNva.js.map",
+      "sources": [
+        "../../src/pages/StudentExamInstructionsPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\StudentResultPage-oO99NPG5.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/file-check-2.js",
+        "../../src/features/student/ResultReviewCard.tsx",
+        "../../src/pages/StudentResultPage.tsx"
+      ]
+    },
+    {
+      "map": "assets\\timer-B4zJEVtv.js.map",
+      "sources": [
+        "../../node_modules/lucide-react/dist/esm/icons/timer.js"
+      ]
+    }
+  ]
+}

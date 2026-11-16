@@ -84,6 +84,8 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [touched, setTouched] = useState({ name: false, email: false, password: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isConfigured = sharedAuth ? sharedAuth.isConfigured : isNeonAuthConfigured;
@@ -183,9 +185,31 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
     }
   };
 
+  const getNameError = (val: string) =>
+    mode === "sign-up" && val.trim().length === 0 ? "Enter your full name." : null;
+  const getEmailError = (val: string) => {
+    const trimmed = val.trim();
+    if (!trimmed) return "Enter your email address.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return "Enter a valid email address.";
+    return null;
+  };
+  const getPasswordError = (val: string) => {
+    if (!val) return "Enter your password.";
+    if (val.length < 8) return "Password must be at least 8 characters.";
+    return null;
+  };
+
+  const nameError = hasSubmitted || touched.name ? getNameError(name) : null;
+  const emailError = hasSubmitted || touched.email ? getEmailError(email) : null;
+  const passwordError = hasSubmitted || touched.password ? getPasswordError(password) : null;
+
   const handleSubmitEmailAuth = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setHasSubmitted(true);
     setLocalError(null);
+    if (getNameError(name) || getEmailError(email) || getPasswordError(password)) {
+      return;
+    }
     setIsSubmitting(true);
     const fallbackError =
       mode === "sign-up"
@@ -223,6 +247,8 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
 
   const toggleMode = () => {
     setLocalError(null);
+    setHasSubmitted(false);
+    setTouched({ name: false, email: false, password: false });
     setMode((prev) => (prev === "sign-in" ? "sign-up" : "sign-in"));
   };
 
@@ -330,7 +356,7 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
         </Alert>
       ) : null}
 
-      <form className="space-y-4" onSubmit={handleSubmitEmailAuth}>
+      <form className="space-y-4" noValidate onSubmit={handleSubmitEmailAuth}>
         {mode === "sign-up" ? (
           <div className="field-group space-y-1.5">
             <Label htmlFor={nameInputId}>Full name</Label>
@@ -341,11 +367,17 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
               className="auth-input min-h-[48px]"
               value={name}
               onChange={(event) => setName(event.target.value)}
+              onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
               autoComplete="name"
               enterKeyHint="next"
-              aria-invalid={Boolean(displayError)}
-              aria-describedby={emailDescribedBy}
+              aria-invalid={Boolean(nameError)}
+              aria-describedby={nameError ? `${nameInputId}-error` : undefined}
             />
+            {nameError ? (
+              <p id={`${nameInputId}-error`} className="text-xs font-medium text-destructive">
+                {nameError}
+              </p>
+            ) : null}
           </div>
         ) : null}
 
@@ -359,14 +391,24 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
             className="auth-input min-h-[48px]"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
             autoComplete="email"
             spellCheck={false}
             autoCorrect="off"
             autoCapitalize="none"
             enterKeyHint="next"
-            aria-invalid={Boolean(displayError)}
-            aria-describedby={emailDescribedBy}
+            aria-invalid={Boolean(emailError)}
+            aria-describedby={
+              [emailError ? `${emailInputId}-error` : null, emailDescribedBy]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
           />
+          {emailError ? (
+            <p id={`${emailInputId}-error`} className="text-xs font-medium text-destructive">
+              {emailError}
+            </p>
+          ) : null}
         </div>
 
         <div className="field-group space-y-1.5">
@@ -398,11 +440,21 @@ export function AuthBoundary({ onAuthSuccess, embedded = false }: AuthBoundaryPr
             className="auth-input min-h-[48px]"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
             autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
             enterKeyHint="done"
-            aria-invalid={Boolean(displayError)}
-            aria-describedby={passwordDescribedBy}
+            aria-invalid={Boolean(passwordError)}
+            aria-describedby={
+              [passwordError ? `${passwordInputId}-error` : null, passwordDescribedBy]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
           />
+          {passwordError ? (
+            <p id={`${passwordInputId}-error`} className="text-xs font-medium text-destructive">
+              {passwordError}
+            </p>
+          ) : null}
           {mode === "sign-up" ? (
             <p id={passwordHelpId} className="text-xs text-muted-foreground">
               Use at least 8 characters.

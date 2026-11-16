@@ -57,7 +57,7 @@ export function BrandLogo({
     >
       <img
         src={src}
-        alt="Delhi Private School logo"
+        alt="DPS International School logo"
         width={imgSize}
         height={imgSize}
         data-brand-logo={variant}
@@ -71,7 +71,7 @@ export function BrandLogo({
   ) : (
     <img
       src={src}
-      alt="Delhi Private School logo"
+      alt="DPS International School logo"
       width={imgSize}
       height={imgSize}
       data-brand-logo={variant}
@@ -115,7 +115,7 @@ export function BrandLogo({
             onDark ? "text-[var(--side-text)]" : "text-muted-foreground",
           )}
         >
-          Delhi Private School
+          DPS International School
         </span>
       </span>
     </span>

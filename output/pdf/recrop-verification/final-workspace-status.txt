@@ -1,0 +1,60 @@
+ M .gitignore
+ M backend/app/exams/pdf_import.py
+ M backend/app/exams/pdf_storage.py
+ M backend/app/exams/router.py
+ M backend/app/exams/schemas.py
+ D backend/tests/fixtures/atomic_structure_ms.pdf
+ D backend/tests/fixtures/atomic_structure_qp.pdf
+ M backend/tests/fixtures/pdfs/cie_igcse_chem_2_2_atomic_structure_qp.expected.json
+ M backend/tests/test_exams.py
+ M backend/tests/test_pdf_import.py
+ M docs/agent-coordination.md
+ M docs/brand/README.md
+ M docs/design-research/design-direction.md
+ M frontend/src/App.tsx
+ D frontend/src/assets/brand/slides/slide-1-building.webp
+ D frontend/src/assets/brand/slides/slide-2-trophy.webp
+ D frontend/src/assets/brand/slides/slide-3-art.webp
+ D frontend/src/assets/brand/slides/slide-4-lab.webp
+ M frontend/src/components/ErrorBoundary.tsx
+ M frontend/src/components/PageHeader.tsx
+ M frontend/src/features/admin/adminApi.ts
+ M frontend/src/features/admin/components/BulkParserPanel.tsx
+ M frontend/src/features/admin/components/PdfCropEditor.tsx
+ M frontend/src/features/auth/LoginSlideshow.tsx
+ M frontend/src/index.css
+ M frontend/src/layouts/AppShell.tsx
+ M frontend/src/pages/AdminExamEditorPage.tsx
+ M frontend/src/pages/OverviewPage.tsx
+ M frontend/src/types/adminExam.ts
+ M frontend/tests/brand-rebrand-verify.mjs
+ M frontend/tests/brandLogoCoverage.test.mjs
+?? backend/app/exams/pdf_recrop.py
+?? backend/tests/browser_server.py
+?? backend/tests/fixtures/graphics_boundaries.pdf
+?? backend/tests/fixtures/pdfs/answer-keys/
+?? backend/tests/fixtures/pdfs/cie_igcse_chem_2_2_atomic_structure_qp.pdf
+?? backend/tests/test_pdf_fixture_pairs.py
+?? backend/tests/test_pdf_graphics.py
+?? backend/tests/verify_browser_boundary.py
+?? backend/var/
+?? docs/brand/enhance-compare/
+?? docs/design-research/mockups/admin-pages-design-spec.html
+?? docs/ui-screenshots/brand-verify/
+?? docs/ui-screenshots/importer-verify/
+?? docs/ui-screenshots/live-verify/
+?? frontend/src/assets/brand/slides/slide-1-building@1280.webp
+?? frontend/src/assets/brand/slides/slide-1-building@1920.webp
+?? frontend/src/assets/brand/slides/slide-2-trophy@1280.webp
+?? frontend/src/assets/brand/slides/slide-2-trophy@1920.webp
+?? frontend/src/assets/brand/slides/slide-3-art@1280.webp
+?? frontend/src/assets/brand/slides/slide-3-art@1920.webp
+?? frontend/src/assets/brand/slides/slide-4-lab@1280.webp
+?? frontend/src/assets/brand/slides/slide-4-lab@1920.webp
+?? frontend/src/features/admin/components/RecropPanel.tsx
+?? frontend/tests/importer-browser-verify.mjs
+?? frontend/tests/importer-test-auth.ts
+?? frontend/tests/production-boundary-verify.mjs
+?? frontend/tests/vite.importer.config.ts
+?? output/
+?? tools/

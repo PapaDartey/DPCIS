@@ -1,0 +1,35 @@
+ M frontend/package.json
+ M frontend/src/App.tsx
+ D frontend/src/assets/brand/slides/slide-1-building.webp
+ D frontend/src/assets/brand/slides/slide-2-trophy.webp
+ D frontend/src/assets/brand/slides/slide-3-art.webp
+ D frontend/src/assets/brand/slides/slide-4-lab.webp
+ M frontend/src/components/ErrorBoundary.tsx
+ M frontend/src/components/PageHeader.tsx
+ M frontend/src/features/auth/AuthBoundary.tsx
+ M frontend/src/features/auth/LoginSlideshow.tsx
+ M frontend/src/index.css
+ M frontend/src/layouts/AppShell.tsx
+ M frontend/src/pages/AdminExamEditorPage.tsx
+ M frontend/src/pages/OverviewPage.tsx
+ M frontend/tests/brand-rebrand-verify.mjs
+ M frontend/tests/brandLogoCoverage.test.mjs
+?? frontend/dist-report-sourcemap-temp/
+?? frontend/src/assets/brand/slides/hr-slide-0-building@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-0-building@1920.webp
+?? frontend/src/assets/brand/slides/hr-slide-1-lab@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-1-lab@1920.webp
+?? frontend/src/assets/brand/slides/hr-slide-2-classroom@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-2-classroom@1920.webp
+?? frontend/src/assets/brand/slides/hr-slide-3-sports@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-3-sports@1920.webp
+?? frontend/src/assets/brand/slides/hr-slide-4-debate@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-4-debate@1920.webp
+?? frontend/src/assets/brand/slides/slide-1-building@1280.webp
+?? frontend/src/assets/brand/slides/slide-1-building@1920.webp
+?? frontend/src/assets/brand/slides/slide-2-trophy@1280.webp
+?? frontend/src/assets/brand/slides/slide-2-trophy@1920.webp
+?? frontend/src/assets/brand/slides/slide-3-art@1280.webp
+?? frontend/src/assets/brand/slides/slide-3-art@1920.webp
+?? frontend/src/assets/brand/slides/slide-4-lab@1280.webp
+?? frontend/src/assets/brand/slides/slide-4-lab@1920.webp

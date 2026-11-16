@@ -1,0 +1,76 @@
+[
+  {
+    "width": 1440,
+    "checks": [
+      "Invalid vector crops rejected in preview and blocked from import",
+      "PDF upload and 24-question graphics-aware preview",
+      "Top drag accepted; deliberate bottom clipping rejected (422), old image kept",
+      "Bottom drag accepted",
+      "Imported and saved 24 questions through browser UI",
+      "Before/after preview read-only; only approved Q1 changed; keys and marks identical"
+    ],
+    "errors": [],
+    "screenshots": [
+      "docs/ui-screenshots/importer-verify/1440-invalid-preview.png",
+      "docs/ui-screenshots/importer-verify/1440-invalid-drag.png",
+      "docs/ui-screenshots/importer-verify/1440-crop-editor.png",
+      "docs/ui-screenshots/importer-verify/1440-recrop-before-after.png"
+    ],
+    "exam_id": "0b7b87e1-3cbe-40a8-bcc0-c4e820a5eca1",
+    "viewport": {
+      "document": 1440,
+      "inner": 1440,
+      "nav": {
+        "x": 14,
+        "y": 122,
+        "width": 220,
+        "height": 131,
+        "top": 122,
+        "right": 234,
+        "bottom": 253,
+        "left": 14
+      },
+      "overflow": "visible"
+    },
+    "overflow": [],
+    "status": "passed",
+    "expected_http_errors": 1
+  },
+  {
+    "width": 390,
+    "checks": [
+      "Invalid vector crops rejected in preview and blocked from import",
+      "PDF upload and 24-question graphics-aware preview",
+      "Top drag accepted; deliberate bottom clipping rejected (422), old image kept",
+      "Bottom drag accepted",
+      "Imported and saved 24 questions through browser UI",
+      "Before/after preview read-only; only approved Q1 changed; keys and marks identical"
+    ],
+    "errors": [],
+    "screenshots": [
+      "docs/ui-screenshots/importer-verify/390-invalid-preview.png",
+      "docs/ui-screenshots/importer-verify/390-invalid-drag.png",
+      "docs/ui-screenshots/importer-verify/390-crop-editor.png",
+      "docs/ui-screenshots/importer-verify/390-recrop-before-after.png"
+    ],
+    "exam_id": "56d33313-9ea3-479a-a6a9-aff6bddb50c4",
+    "viewport": {
+      "document": 390,
+      "inner": 390,
+      "nav": {
+        "x": 16,
+        "y": -191,
+        "width": 358,
+        "height": 41,
+        "top": -191,
+        "right": 374,
+        "bottom": -150,
+        "left": 16
+      },
+      "overflow": "auto"
+    },
+    "overflow": [],
+    "status": "passed",
+    "expected_http_errors": 1
+  }
+]

@@ -1,5 +1,13 @@
 # Re-crop continuation verification - 2026-11-15
 
+## Requested corrections — 2026-11-16
+
+| Item | Result | Evidence |
+| --- | --- | --- |
+| 1. Exact manifest diff | DONE: added line `+    "dpcis": "file:..",` — a local-file **dependency**, not a script/config line. | `package-json-diff-2026-11-16.txt` |
+| 2. Shared-worktree sourcemaps | DONE: direct Vite production build exited 0; 1952 modules transformed, built in 1m 56s; 32 sourcemaps inspected. Package counts below; temporary output deleted after extraction. | `sourcemap-vite-2026-11-16.txt`, `sourcemap-packages-2026-11-16.json`, `audit-sourcemaps.py` |
+| 3. Combined-result fresh clone | NOT RUN: rebrand/redesign remains uncommitted at HEAD `94409d2` (including App, AuthBoundary, LoginSlideshow, styles, assets and tests). Historical clone gates below cover only the importer checkpoint, not the combined result. | `uncommitted-frontend-2026-11-16.txt` |
+
 Local FastAPI/SQLite and React/Vite verification only. No production resources, authentication implementation, grading, migrations, dependency versions, package.json, or lockfiles were changed by this workstream. Peer rebrand/redesign work remains separate.
 
 ## Failure diagnosis and implementation
@@ -47,18 +55,48 @@ Advisory references: [BA-M: OAuth state/Magic Link (critical)](https://github.co
 
 | Package / installed version(s) | Severity / advisory | Fresh `dist/` evidence | Smallest remediation candidate (not applied) |
 | --- | --- | --- | --- |
-| `better-auth` 1.7.6 (nested under Neon packages) | Critical BA-M; high BA-P; inherited Z | **No**: absent from fresh Vite module graph and `dist/` string scan | Vendor-supported Neon/Better Auth release, or separately reviewed compatible override; validate all auth flows. |
-| `zod` 4.5.4 (nested under Neon packages) | High Z | **No**: absent from fresh Vite module graph and `dist/` string scan | Vendor-supported patched Zod subtree or reviewed override to 4.6.6 with auth-schema tests. |
-| `@neondatabase/auth` 0.6.0-beta | High, inherited BA/Z; direct dependency | **No**: absent from fresh Vite module graph and `dist/` string scan | Vendor release replacing affected nested pins; npm reports no safe automatic fix. |
-| `@neondatabase/auth-ui` 0.4.0-beta | High, inherited BA/Z; transitive | **No**: absent from fresh Vite module graph and `dist/` string scan | Update through a supported Neon release; this package is not emitted by the current client graph. |
-| `@better-auth/api-key` 1.7.21 | Inherited findings; transitive | **No**: absent from fresh Vite module graph and `dist/` string scan | Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
-| `@better-auth/core` 1.7.21 | Inherited findings; transitive | **No**: absent from fresh Vite module graph and `dist/` string scan | Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
-| `@better-auth/passkey` 1.7.6 | Inherited findings; transitive | **No**: absent from fresh Vite module graph and `dist/` string scan | Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
-| `@daveyplate/better-auth-ui` 3.4.0 | Inherited findings; transitive | **No**: absent from fresh Vite module graph and `dist/` string scan | Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
-| `@hookform/resolvers` 5.9.2 | Inherited findings; transitive | **No**: absent from fresh Vite module graph and `dist/` string scan | Resolve the affected Zod subtree through a supported vendor update. |
-| `better-call` 2.0.2 | Inherited findings; transitive | **No**: absent from fresh Vite module graph and `dist/` string scan | Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
+| `better-auth` 1.7.6 (nested under Neon packages) | Critical BA-M; high BA-P; inherited Z | **Yes: 32 source modules**| Vendor-supported Neon/Better Auth release, or separately reviewed compatible override; validate all auth flows. |
+| `zod` 4.5.4 (nested under Neon packages) | High Z | **Yes: 18 source modules**| Vendor-supported patched Zod subtree or reviewed override to 4.6.6 with auth-schema tests. |
+| `@neondatabase/auth` 0.6.0-beta | High, inherited BA/Z; direct dependency | **Yes: 4 source modules**| Vendor release replacing affected nested pins; npm reports no safe automatic fix. |
+| `@neondatabase/auth-ui` 0.4.0-beta | High, inherited BA/Z; transitive | **0 source modules in emitted sourcemaps**| Update through a supported Neon release; no source modules from this package appear in this build’s sourcemaps. |
+| `@better-auth/api-key` 1.7.21 | Inherited findings; transitive | **0 source modules in emitted sourcemaps**| Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
+| `@better-auth/core` 1.7.21 | Inherited findings; transitive | **Yes: 5 source modules**| Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
+| `@better-auth/passkey` 1.7.6 | Inherited findings; transitive | **0 source modules in emitted sourcemaps**| Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
+| `@daveyplate/better-auth-ui` 3.4.0 | Inherited findings; transitive | **0 source modules in emitted sourcemaps**| Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
+| `@hookform/resolvers` 5.9.2 | Inherited findings; transitive | **0 source modules in emitted sourcemaps**| Resolve the affected Zod subtree through a supported vendor update. |
+| `better-call` 2.0.2 | Inherited findings; transitive | **0 source modules in emitted sourcemaps**| Resolve the Better Auth/Zod dependency tree through a supported vendor update. |
 
-Evidence: the isolated clone's `npm audit --omit=dev` reported 10 findings and full `npm audit` reported 17; both exit 1 because advisories remain. The fresh Vite module graph and `dist/` scan recorded no audited package names; `production-modules.json` and `fresh-clone-dist-package-scan.json` were regenerated from that build. No dependency remediation was applied.
+Evidence correction: the earlier clone graph/string-scan absence claims do not establish the current shared-worktree bundle contents and are superseded by this sourcemap audit. Counts use unique resolved paths in `.map` `sources` arrays, deduplicated across chunks, assigned to the package after the **last** `node_modules/` segment. No minified-output package-name searches were used. A zero means no mapped source modules, not a general assertion that a dependency is uninstalled or invulnerable.
+
+The earlier Better Auth **32** and Zod **18** counts are reproduced. The earlier Neon **54** is not reproduced: Neon owns **4** mapped modules; its directory contains **36** including 32 nested Better Auth modules. Although 36 + 18 = 54, these Zod paths are top-level `node_modules/zod`, so attributing that total to Neon would mix dependency ownership. The earlier 54 lacks a reproducible counting definition and is superseded, not treated as evidence of 54 Neon-owned modules.
+
+Every package represented by `node_modules` source paths:
+
+| Package | Module count |
+| --- | ---: |
+| `@better-auth/core` | 5 |
+| `@better-fetch/fetch` | 1 |
+| `@neondatabase/auth` | 4 |
+| `@oddbird/popover-polyfill` | 1 |
+| `@radix-ui/react-compose-refs` | 1 |
+| `@radix-ui/react-slot` | 1 |
+| `@supabase/auth-js` | 6 |
+| `better-auth` | 32 |
+| `class-variance-authority` | 1 |
+| `clsx` | 1 |
+| `defu` | 1 |
+| `lucide-react` | 51 |
+| `nanostores` | 2 |
+| `pdfjs-dist` | 2 |
+| `react` | 4 |
+| `react-dom` | 4 |
+| `react-router` | 1 |
+| `scheduler` | 2 |
+| `tailwind-merge` | 1 |
+| `zod` | 18 |
+
+Build command (from `frontend/`): `node node_modules/vite/bin/vite.js build --sourcemap --outDir dist-report-sourcemap-temp`. No config/manifest changes. The initial `npm run build` attempt stalled at TypeScript and was stopped; its log is not a successful type-check or build gate. The direct Vite build above is the bundle evidence. Original `dist/` was not overwritten; temporary output was removed after preserving source-path evidence.
+
 
 The local app uses managed Neon authentication, not a self-hosted Better Auth server. Its deployed service version/plugin configuration was not inspected, so server vulnerability applicability remains unverified. The minimum versions above are advisory remediation candidates, not a claim that overrides are compatibility-safe. Authorization is needed before dependency remediation, as requested.
 
@@ -76,14 +114,7 @@ Executed boundary output is in `backend-boundary.txt` and `frontend-boundary.txt
 
 ## Manifest and isolated frontend verification
 
-The requested lockfile proof was run from the shared worktree:
-
-```text
- frontend/package.json | 1 +
- 1 file changed, 1 insertion(+)
-```
-
-`frontend/package-lock.json` produced no diff. The one `package.json` line is an unrelated existing peer-worktree change and was not modified here. In a fresh clone at the importer checkpoint, `npm ci` completed with `added 410 packages` and 17 existing vulnerabilities; `npm run lint` exited 0, `npm test` reported `12 passed, 0 failed`, and `npm run build` exited 0 after transforming 1945 modules and building in 41.23s. The shared worktree's earlier `npm ci` hit a Windows EPERM on a locked `.node` binary; `node_modules` was restored with `npm install --no-package-lock`.
+The exact current manifest addition and combined-clone status are recorded once in the correction table above. `frontend/package-lock.json` has no diff. Historical fresh-clone results below are from the importer checkpoint only. The shared worktree's earlier `npm ci` hit Windows EPERM; its `node_modules` was restored with `npm install --no-package-lock`. No dependency remediation was performed here.
 
 ## Verification gates
 
@@ -96,10 +127,10 @@ The requested lockfile proof was run from the shared worktree:
 | `python -m ruff check app tests alembic` | **All checks passed** | `ruff-final.txt` |
 | `python -m alembic heads` | **`0006_submission_reason (head)`** | `alembic-heads-rerun.txt` |
 | `python -m alembic history` | **One linear chain, 0001 through 0006** | `alembic-history-rerun.txt` |
-| `npm ci` (fresh clone) | **PASS** (`added 410 packages`; audit reported 17 existing findings) | `fresh-clone-npm-ci.txt` |
-| `npm run lint` (fresh clone) | **PASS** (exit 0; ESLint and TypeScript clean) | `fresh-clone-lint.txt` |
-| `npm test` (fresh clone) | **12 passed, 0 failed** | `fresh-clone-tests.txt` |
-| `npm run build` (fresh clone) | **PASS** (1945 modules; built in 41.23s) | `fresh-clone-build.txt` |
+| `npm ci` (historical importer clone) | **PASS** (`added 410 packages`; audit reported 17 existing findings) | `fresh-clone-npm-ci.txt` |
+| `npm run lint` (historical importer clone) | **PASS** (exit 0; ESLint and TypeScript clean) | `fresh-clone-lint.txt` |
+| `npm test` (historical importer clone) | **12 passed, 0 failed** | `fresh-clone-tests.txt` |
+| `npm run build` (historical importer clone) | **PASS** (1945 modules; built in 41.23s) | `fresh-clone-build.txt` |
 | Backend default-off boundary (`verify_browser_boundary.py`) | **PASS**; `/__test_session` returned 404 | `backend-boundary.txt` |
 | Frontend production boundary (`production-boundary-verify.mjs`) | **PASS** | `fresh-clone-production-boundary.txt` |
 | Changed-file + bundle secret-pattern scan | **0 findings** across 35 changed files + 32 bundle JS files | `security-scan.json` |

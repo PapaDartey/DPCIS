@@ -118,6 +118,7 @@
 
   /* 8. Slideshow & Hero Surface Tokens */
   --slideshow-bg: #064a18;
+  --slideshow-cover-tint: rgb(6 74 24 / 0.12);
   --slideshow-scrim: linear-gradient(155deg, rgb(6 74 24 / 0.58), rgb(2 144 34 / 0.34));
   --slideshow-frame-bg: rgb(6 74 24 / 0.5);
   --slideshow-frame-shadow: 0 20px 50px -16px rgb(6 26 14 / 0.65);
@@ -259,6 +260,11 @@
   :where(a:any-link, button, input, select, textarea, summary, [tabindex]):focus-visible {
     outline: 2px solid var(--border-focus);
     outline-offset: 2px;
+  }
+
+  [data-route-heading]:focus,
+  [data-route-heading]:focus-visible {
+    outline: none;
   }
 
   :where(input, select, textarea) {

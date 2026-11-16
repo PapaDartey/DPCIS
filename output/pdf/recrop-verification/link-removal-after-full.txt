@@ -1,0 +1,118 @@
+ M .gitignore
+ D backend/tests/fixtures/atomic_structure_ms.pdf
+ D backend/tests/fixtures/atomic_structure_qp.pdf
+ M docs/agent-coordination.md
+ M docs/brand/README.md
+ M docs/design-research/design-direction.md
+ M frontend/index.html
+ M frontend/package.json
+ M frontend/src/App.tsx
+ D frontend/src/assets/brand/slides/slide-1-building.webp
+ D frontend/src/assets/brand/slides/slide-2-trophy.webp
+ D frontend/src/assets/brand/slides/slide-3-art.webp
+ D frontend/src/assets/brand/slides/slide-4-lab.webp
+ M frontend/src/components/BrandLogo.tsx
+ M frontend/src/components/ErrorBoundary.tsx
+ M frontend/src/components/PageHeader.tsx
+ M frontend/src/features/auth/AuthBoundary.tsx
+ M frontend/src/features/auth/LoginSlideshow.tsx
+ M frontend/src/index.css
+ M frontend/src/layouts/AdminLayout.tsx
+ M frontend/src/layouts/AppShell.tsx
+ M frontend/src/layouts/PublicLayout.tsx
+ M frontend/src/layouts/StudentLayout.tsx
+ M frontend/src/pages/AdminExamEditorPage.tsx
+ M frontend/src/pages/OverviewPage.tsx
+ M frontend/tests/brand-rebrand-verify.mjs
+ M frontend/tests/brandLogoCoverage.test.mjs
+ M output/pdf/recrop-verification/report.md
+?? backend/var/
+?? docs/brand/enhance-compare/
+?? docs/brand/originals/high-res/
+?? docs/brand/photo-permission-request.md
+?? docs/brand/photo-sources.md
+?? docs/design-research/mockups/admin-pages-design-spec.html
+?? docs/ui-screenshots/brand-verify/
+?? docs/ui-screenshots/importer-verify/
+?? docs/ui-screenshots/live-verify/
+?? frontend/src/assets/brand/slides/hr-slide-0-building@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-0-building@1920.webp
+?? frontend/src/assets/brand/slides/hr-slide-1-lab@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-1-lab@1920.webp
+?? frontend/src/assets/brand/slides/hr-slide-2-classroom@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-2-classroom@1920.webp
+?? frontend/src/assets/brand/slides/hr-slide-3-sports@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-3-sports@1920.webp
+?? frontend/src/assets/brand/slides/hr-slide-4-debate@1280.webp
+?? frontend/src/assets/brand/slides/hr-slide-4-debate@1920.webp
+?? frontend/src/assets/brand/slides/slide-1-building@1280.webp
+?? frontend/src/assets/brand/slides/slide-1-building@1920.webp
+?? frontend/src/assets/brand/slides/slide-2-trophy@1280.webp
+?? frontend/src/assets/brand/slides/slide-2-trophy@1920.webp
+?? frontend/src/assets/brand/slides/slide-3-art@1280.webp
+?? frontend/src/assets/brand/slides/slide-3-art@1920.webp
+?? frontend/src/assets/brand/slides/slide-4-lab@1280.webp
+?? frontend/src/assets/brand/slides/slide-4-lab@1920.webp
+?? output/pdf/graphics-crops/
+?? output/pdf/recrop-verification/1440-crop-editor.png
+?? output/pdf/recrop-verification/1440-failure.png
+?? output/pdf/recrop-verification/1440-harness-key-mismatch.png
+?? output/pdf/recrop-verification/1440-invalid-drag.png
+?? output/pdf/recrop-verification/1440-invalid-preview.png
+?? output/pdf/recrop-verification/1440-recrop-before-after.png
+?? output/pdf/recrop-verification/alembic-heads.txt
+?? output/pdf/recrop-verification/alembic-history.txt
+?? output/pdf/recrop-verification/audit-sourcemaps.py
+?? output/pdf/recrop-verification/backend-boundary.txt
+?? output/pdf/recrop-verification/backend-full.txt
+?? output/pdf/recrop-verification/backend-live-error.log
+?? output/pdf/recrop-verification/backend-live.log
+?? output/pdf/recrop-verification/backend-server-error.log
+?? output/pdf/recrop-verification/backend-server-errors.txt
+?? output/pdf/recrop-verification/backend-server.log
+?? output/pdf/recrop-verification/backend-server.txt
+?? output/pdf/recrop-verification/baseline-backend.txt
+?? output/pdf/recrop-verification/baseline-lint.txt
+?? output/pdf/recrop-verification/browser-320.txt
+?? output/pdf/recrop-verification/browser-baseline-results.json
+?? output/pdf/recrop-verification/browser-baseline.txt
+?? output/pdf/recrop-verification/browser-extra-widths.txt
+?? output/pdf/recrop-verification/browser-final-1440-390.txt
+?? output/pdf/recrop-verification/browser-first-attempt.json
+?? output/pdf/recrop-verification/browser-results.json
+?? output/pdf/recrop-verification/browser-run.txt
+?? output/pdf/recrop-verification/build.txt
+?? output/pdf/recrop-verification/extra-width-results.json
+?? output/pdf/recrop-verification/final-workspace-status.txt
+?? output/pdf/recrop-verification/fixture-tests.txt
+?? output/pdf/recrop-verification/frontend-boundary.txt
+?? output/pdf/recrop-verification/frontend-live-error.log
+?? output/pdf/recrop-verification/frontend-live.log
+?? output/pdf/recrop-verification/frontend-server-error.log
+?? output/pdf/recrop-verification/frontend-server-errors.txt
+?? output/pdf/recrop-verification/frontend-server.log
+?? output/pdf/recrop-verification/frontend-server.txt
+?? output/pdf/recrop-verification/frontend-tests.txt
+?? output/pdf/recrop-verification/git-status-and-diff.txt
+?? output/pdf/recrop-verification/link-removal-before-full.txt
+?? output/pdf/recrop-verification/link-removal-before.txt
+?? output/pdf/recrop-verification/lint.txt
+?? output/pdf/recrop-verification/migrate_fixtures.py
+?? output/pdf/recrop-verification/npm-ci-rerun.txt
+?? output/pdf/recrop-verification/npm-ci.txt
+?? output/pdf/recrop-verification/package-json-diff-2026-11-16.txt
+?? output/pdf/recrop-verification/package.json.bak
+?? output/pdf/recrop-verification/production-boundary.txt
+?? output/pdf/recrop-verification/recrop-tests.txt
+?? output/pdf/recrop-verification/requested-width-results.json
+?? output/pdf/recrop-verification/ruff.txt
+?? output/pdf/recrop-verification/scan_boundaries.py
+?? output/pdf/recrop-verification/security-scan.json
+?? output/pdf/recrop-verification/servers.json
+?? output/pdf/recrop-verification/sourcemap-build-2026-11-16.txt
+?? output/pdf/recrop-verification/sourcemap-packages-2026-11-16.json
+?? output/pdf/recrop-verification/sourcemap-vite-2026-11-16.txt
+?? output/pdf/recrop-verification/uncommitted-frontend-2026-11-16.txt
+?? output/pdf/recrop-verification/workspace-diff-stat.txt
+?? output/pdf/recrop-verification/workspace-status.txt
+?? tools/

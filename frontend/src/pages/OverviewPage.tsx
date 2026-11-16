@@ -43,7 +43,7 @@ export function OverviewPage() {
             Examination Hub
           </h1>
           <p className="text-sm text-muted-foreground sm:text-base">
-            Delhi Private School · Checking your session...
+            DPS International School · Checking your session...
           </p>
         </header>
         <LoadingStatePanel label="Checking your session..." cards={1} />
@@ -67,7 +67,7 @@ export function OverviewPage() {
             Examination Hub
           </h1>
           <p className="text-sm text-muted-foreground sm:text-base">
-            Delhi Private School · Service Beyond Self
+            DPS International School · Service Beyond Self
           </p>
         </header>
 
@@ -88,7 +88,7 @@ export function OverviewPage() {
 
   return (
     <div className="auth-stage grid min-h-dvh w-full bg-card lg:grid-cols-[minmax(0,58fr)_minmax(0,42fr)]">
-      <LoginSlideshow fit="frame" />
+      <LoginSlideshow />
 
       <section
         aria-label="Account access"
@@ -105,7 +105,7 @@ export function OverviewPage() {
                 Welcome to Examination Hub
               </h1>
               <p className="text-sm font-medium text-muted-foreground">
-                Delhi Private School
+                DPS International School
               </p>
             </div>
           </div>
@@ -134,7 +134,7 @@ export function OverviewPage() {
 
         <footer className="mx-auto mt-8 flex w-full max-w-md items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
           <span>Service Beyond Self</span>
-          <span>Delhi Private School</span>
+          <span>DPS International School</span>
         </footer>
       </section>
     </div>

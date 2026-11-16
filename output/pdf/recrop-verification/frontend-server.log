@@ -1,0 +1,55 @@
+
+  VITE v6.4.6  ready in 1689 ms
+
+  ➜  Local:   http://127.0.0.1:5173/
+  ➜  press h + enter to show help
+2:13:01 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\admin\components\BulkParserPanel.tsx, /src/index.css
+2:13:03 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\components\BrandLogo.tsx, /src/index.css
+2:13:06 pm [vite] (client) page reload tests/legacyStyleGuard.test.mjs
+2:13:42 pm [vite] (client) page reload tests/importer-browser-verify.mjs
+2:24:28 pm [vite] (client) hmr update /src/pages/StudentResultPage.tsx, /src/index.css
+2:24:28 pm [vite] (client) hmr update /src/pages/StudentResultPage.tsx, /src/index.css
+2:24:29 pm [vite] (client) page reload tests/ui-visual-walk.mjs
+2:24:30 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\components\BrandLogo.tsx, /src/index.css
+2:24:32 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\admin\components\BulkParserPanel.tsx, /src/index.css
+2:26:31 pm [vite] (client) hmr update /src/index.css
+2:26:35 pm [vite] (client) hmr update /src/index.css
+2:26:41 pm [vite] (client) hmr update /src/index.css
+2:26:44 pm [vite] (client) hmr update /src/index.css
+2:26:47 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx, /src/index.css
+2:26:48 pm [vite] (client) hmr invalidate /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx Could not Fast Refresh ("SCHOOL_SLIDES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+2:26:48 pm [vite] (client) hmr update /src/index.css, /src/pages/OverviewPage.tsx
+2:26:50 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx, /src/index.css
+2:26:50 pm [vite] (client) hmr invalidate /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx Could not Fast Refresh ("SCHOOL_SLIDES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+2:26:50 pm [vite] (client) hmr update /src/index.css, /src/pages/OverviewPage.tsx
+2:26:52 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx, /src/index.css
+2:26:53 pm [vite] (client) hmr invalidate /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx Could not Fast Refresh ("SCHOOL_SLIDES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+2:26:53 pm [vite] (client) hmr update /src/index.css, /src/pages/OverviewPage.tsx
+2:26:56 pm [vite] (client) page reload tests/legacyStyleGuard.test.mjs
+2:27:00 pm [vite] (client) page reload tests/legacyStyleGuard.test.mjs
+2:27:14 pm [vite] (client) hmr update /src/index.css
+2:29:04 pm [vite] (client) hmr update /src/index.css
+2:29:27 pm [vite] (client) hmr update /src/index.css
+2:32:24 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx, /src/index.css
+2:32:26 pm [vite] (client) hmr update /src/index.css
+2:32:26 pm [vite] (client) hmr invalidate /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx Could not Fast Refresh ("SCHOOL_SLIDES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+2:32:26 pm [vite] (client) hmr update /src/index.css, /src/pages/OverviewPage.tsx
+2:32:27 pm [vite] (client) page reload tests/legacyStyleGuard.test.mjs
+2:33:00 pm [vite] (client) hmr update /src/index.css
+2:33:04 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx, /src/index.css
+2:33:05 pm [vite] (client) hmr invalidate /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx Could not Fast Refresh ("SCHOOL_SLIDES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+2:33:05 pm [vite] (client) hmr update /src/index.css, /src/pages/OverviewPage.tsx
+2:33:07 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx, /src/index.css
+2:33:07 pm [vite] (client) hmr invalidate /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx Could not Fast Refresh ("SCHOOL_SLIDES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+2:33:07 pm [vite] (client) hmr update /src/index.css, /src/pages/OverviewPage.tsx
+2:33:10 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx, /src/index.css
+2:33:11 pm [vite] (client) hmr invalidate /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx Could not Fast Refresh ("SCHOOL_SLIDES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+2:33:11 pm [vite] (client) hmr update /src/index.css, /src/pages/OverviewPage.tsx
+2:33:36 pm [vite] (client) page reload tests/brand-rebrand-verify.mjs
+2:34:45 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\admin\components\RecropPanel.tsx, /src/index.css
+2:35:03 pm [vite] (client) hmr update /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx, /src/index.css
+2:35:03 pm [vite] (client) hmr invalidate /@fs/C:\Users\EricAppiahOwusu\Music\DPCIS\frontend\src\features\auth\LoginSlideshow.tsx Could not Fast Refresh ("SCHOOL_SLIDES" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+2:35:03 pm [vite] (client) hmr update /src/index.css, /src/pages/OverviewPage.tsx
+2:35:03 pm [vite] (client) page reload tests/brand-rebrand-verify.mjs
+2:35:20 pm [vite] tests/vite.importer.config.ts changed, restarting server...
+2:36:34 pm [vite] (client) page reload tests/importer-browser-verify.mjs

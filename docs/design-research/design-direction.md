@@ -2,6 +2,7 @@
 
 > **Status:** `APPROVED`
 > **Brand Anchor:** Delhi Private School Forest Green (`#067a1f` / `--accent-primary`, derived from `DPS_LOGO.jpg` `#029022`) on a calm, green-tinted off-white assessment canvas (`#f4f7f5`), with a visibly distinct Orange-Red Danger hue (`#b8340a` / `--danger`) and a Deep Slate-Ink Selected-Answer state (`#0f172a` / `--selected-border`). Decorative logo accents (`--accent-flame-red: #ef1e24`, `--accent-flame-yellow: #fec600`, `--accent-fist-gold: #c98f21`) are reserved strictly for non-text decorative indicators.
+> **Visual Reference Mockup:** [`docs/design-research/mockups/admin-pages-design-spec.html`](./mockups/admin-pages-design-spec.html) (recolored to the DPS green palette and shield crest) is the canonical visual reference for the Admin Console (`Overview`, `Examinations`, and `Results`). Note: `student-pages-design-spec.html` was not present in `.user_uploaded/`, so only the admin spec was archived and recolored here.
 
 ---
 
