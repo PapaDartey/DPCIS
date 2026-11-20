@@ -1,0 +1,23 @@
+$ ./.venv/bin/python -m ruff check app tests alembic
+All checks passed!
+
+$ ./.venv/bin/python -m pytest
+........................................................................ [ 20%]
+........................................................................ [ 41%]
+........................................................................ [ 62%]
+........................................................................ [ 83%]
+.................s........................................               [100%]
+345 passed, 1 skipped in 17.28s
+
+$ ./.venv/bin/python -m alembic heads
+0008_google_email_proof (head)
+
+$ ./.venv/bin/python -m alembic history
+0007_pdf_import_workflow -> 0008_google_email_proof (head), Record a second email proof for accounts that use Google sign-in.
+0006_submission_reason -> 0007_pdf_import_workflow, Add PDF page dimensions, question region status, extracted text, and safe FK ondelete.
+0005_exam_pdf_sources -> 0006_submission_reason, Allow the full student submission reason in graded attempts.
+0004_exam_closed_at_and_indexes -> 0005_exam_pdf_sources, Add source PDF records and optional question crop references.
+0003_attempt_option_order -> 0004_exam_closed_at_and_indexes, Add exams.closed_at, student_answers defaults, and query/integrity indexes.
+0002_examination_schema -> 0003_attempt_option_order, Add option_order column to attempt_questions for option randomization.
+0001_application_users -> 0002_examination_schema, Add examination domain tables (exams, questions, options, attempts, answers).
+<base> -> 0001_application_users, Create application-level identities linked to Managed Auth users.

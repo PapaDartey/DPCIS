@@ -165,6 +165,8 @@ def _count_exam_questions(db: Session, exam_id: UUID) -> int:
 
 
 def _to_question_admin_out(question: exam_models.Question) -> QuestionAdminOut:
+    from app.exams.pdf_option_layout import public_layout
+
     sorted_options = sorted(question.options, key=lambda o: (o.position, o.label))
     return QuestionAdminOut(
         id=question.id,
@@ -179,6 +181,7 @@ def _to_question_admin_out(question: exam_models.Question) -> QuestionAdminOut:
             if question.source_file_id else []
         ),
         image_regions=json.loads(question.image_regions or "[]"),
+        option_layout=public_layout(question),
         pdf_options_text=json.loads(question.pdf_options_text or "{}"),
         pdf_warnings=json.loads(question.pdf_warnings or "[]"),
         pdf_confidence=question.pdf_confidence,
@@ -461,6 +464,13 @@ def save_questions(
     exam = _get_exam_or_404(db, exam_id, load_questions=True, for_update=True)
     _require_draft(exam, "Questions can only be saved on a draft examination")
 
+    from app.exams.pdf_option_layout import confirmed_layout, signature
+
+    prior_layouts = {
+        signature(question): question.option_layout
+        for question in exam.questions if confirmed_layout(question) is not None
+    }
+
     # A repeated import may refer to the same PDF through different source IDs.
     # Keep its last editor entry for each source question; different PDFs remain additive.
     unique: list[tuple[QuestionCreate, str | None]] = []
@@ -499,6 +509,7 @@ def save_questions(
         )
         question.image_regions = image_regions
         question.image_paths = _image_paths_json(q_data.source_number, image_regions)
+        question.option_layout = prior_layouts.get(signature(question))
         exam.questions.append(question)
 
     exam.updated_at = _utc_now()
@@ -602,6 +613,9 @@ def update_question(
             )
         question.position = data.position
 
+    from app.exams.pdf_option_layout import signature
+
+    previous_signature = signature(question)
     now = _utc_now()
     question.question_text = data.question_text
     question.source_file_id = data.source_file_id
@@ -628,6 +642,9 @@ def update_question(
                 position=pos,
             )
         )
+
+    if signature(question) != previous_signature:
+        question.option_layout = None
 
     exam.updated_at = now
     db.add(question)

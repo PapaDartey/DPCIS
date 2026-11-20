@@ -1,0 +1,8 @@
+failed to load config from /Users/papayawdartey/Downloads/DPCIS/frontend/tests/vite.option-layout.config.ts
+error during build:
+Error: Test-session config cannot build production assets
+    at file:///Users/papayawdartey/Downloads/DPCIS/frontend/node_modules/.vite-temp/vite.option-layout.config.ts.timestamp-1795096570610-6de727d57166c.mjs:9:34
+    at loadConfigFromFile (file:///Users/papayawdartey/Downloads/DPCIS/frontend/node_modules/vite/dist/node/chunks/dep-Cohbwjf9.js:49592:64)
+    at async resolveConfig (file:///Users/papayawdartey/Downloads/DPCIS/frontend/node_modules/vite/dist/node/chunks/dep-Cohbwjf9.js:49085:24)
+    at async createBuilder (file:///Users/papayawdartey/Downloads/DPCIS/frontend/node_modules/vite/dist/node/chunks/dep-Cohbwjf9.js:47060:18)
+    at async CAC.<anonymous> (file:///Users/papayawdartey/Downloads/DPCIS/frontend/node_modules/vite/dist/node/cli.js:862:23)

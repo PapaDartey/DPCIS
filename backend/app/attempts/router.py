@@ -28,6 +28,7 @@ from app.attempts.schemas import (
 from app.auth.dependencies import AuthIdentity, require_admin, require_student
 from app.database.session import get_db
 from app.exams import models as exam_models
+from app.exams.pdf_option_layout import asset_bytes, confirmed_layout
 from app.exams.pdf_storage import load_image
 
 exam_attempt_student_router = APIRouter(
@@ -60,14 +61,12 @@ admin_results_router = APIRouter(
 # ---------------------------------------------------------------------------
 
 
-@attempts_student_router.get("/{attempt_id}/questions/{question_id}/images/{index}")
-def get_question_image_route(
+def _active_image_question(
     attempt_id: UUID,
     question_id: UUID,
-    index: int,
-    identity: AuthIdentity = Depends(require_student),
-    db: Session = Depends(get_db),
-) -> BinaryResponse:
+    identity: AuthIdentity,
+    db: Session,
+) -> exam_models.Question:
     student_id = service.require_student_user_id(identity)
     attempt = db.get(attempt_models.ExamAttempt, attempt_id)
     if (
@@ -86,14 +85,51 @@ def get_question_image_route(
     question = db.get(exam_models.Question, question_id) if link else None
     if question is None or question.source_file_id is None or question.source_number is None:
         raise HTTPException(status_code=404, detail="Image not found")
+    return question
+
+
+@attempts_student_router.get("/{attempt_id}/questions/{question_id}/images/{index}")
+def get_question_image_route(
+    attempt_id: UUID, question_id: UUID, index: int,
+    identity: AuthIdentity = Depends(require_student), db: Session = Depends(get_db),
+) -> BinaryResponse:
+    question = _active_image_question(attempt_id, question_id, identity, db)
     try:
-        image = load_image(question.source_file_id, question.source_number, index)
+        layout = confirmed_layout(question)
+        image = (
+            asset_bytes(question.source_file_id, UUID(layout["preview_id"]), "stem", index)
+            if layout else load_image(question.source_file_id, question.source_number, index)
+        )
     except (FileNotFoundError, ValueError) as exc:
         raise HTTPException(status_code=404, detail="Image not found") from exc
     return BinaryResponse(
         content=image,
         media_type="image/png",
         headers={"Cache-Control": "no-store, private"},
+    )
+
+
+@attempts_student_router.get(
+    "/{attempt_id}/questions/{question_id}/options/{option_id}/images/{index}"
+)
+def get_option_image_route(
+    attempt_id: UUID, question_id: UUID, option_id: UUID, index: int,
+    identity: AuthIdentity = Depends(require_student), db: Session = Depends(get_db),
+) -> BinaryResponse:
+    question = _active_image_question(attempt_id, question_id, identity, db)
+    option = db.get(exam_models.QuestionOption, option_id)
+    layout = confirmed_layout(question)
+    if option is None or option.question_id != question.id or not layout:
+        raise HTTPException(404, "Image not found")
+    item = next(o for o in layout["layout"]["options"] if o["label"] == option.label)
+    if item["mode"] != "image":
+        raise HTTPException(404, "Image not found")
+    try:
+        data = asset_bytes(question.source_file_id, UUID(layout["preview_id"]), option.label, index)
+    except (OSError, ValueError) as exc:
+        raise HTTPException(404, "Image not found") from exc
+    return BinaryResponse(
+        data, media_type="image/png", headers={"Cache-Control": "no-store, private"}
     )
 
 

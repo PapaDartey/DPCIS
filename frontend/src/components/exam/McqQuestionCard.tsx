@@ -11,6 +11,7 @@ export interface McqOptionItem {
   optionId: string;
   label: "A" | "B" | "C" | "D";
   optionText: string;
+  imageUrls?: string[];
 }
 
 export interface McqQuestionCardProps {
@@ -18,6 +19,7 @@ export interface McqQuestionCardProps {
   totalQuestions: number;
   questionText: string;
   imageUrls?: string[];
+  optionsInImage?: boolean;
   points?: string | number;
   options: readonly McqOptionItem[];
   selectedOptionId: string | null;
@@ -39,6 +41,7 @@ export function McqQuestionCard({
   totalQuestions,
   questionText,
   imageUrls = [],
+  optionsInImage,
   points,
   options,
   selectedOptionId,
@@ -80,7 +83,7 @@ export function McqQuestionCard({
       </CardHeader>
 
       <CardContent className="pt-5 sm:pt-6">
-        <fieldset className="m-0 min-w-0 border-0 p-0">
+        <fieldset data-options-in-image={optionsInImage ?? hasImage} className="m-0 min-w-0 border-0 p-0">
           <legend className="mb-5 block w-full select-none break-words p-0 text-lg font-semibold leading-relaxed text-foreground sm:text-xl">
             {hasImage ? `Question ${questionNumber}: choose one answer` : questionText}
           </legend>
@@ -142,7 +145,16 @@ export function McqQuestionCard({
                   </span>
 
                   <span className="min-w-0 flex-1 break-words pt-1 text-base leading-relaxed text-foreground">
-                    {hasImage ? `Select ${option.label}` : option.optionText}
+                    {(optionsInImage ?? hasImage) ? `Select ${option.label}` : (
+                      option.imageUrls?.length ? option.imageUrls.map((path, imageIndex) => (
+                        <AuthenticatedPdfImage
+                          key={path}
+                          path={path}
+                          alt={`${option.optionText}${option.imageUrls!.length > 1 ? ` (part ${imageIndex + 1})` : ""}`}
+                          className="h-auto max-w-full rounded bg-white"
+                        />
+                      )) : option.optionText
+                    )}
                   </span>
 
                   {isSelected ? (

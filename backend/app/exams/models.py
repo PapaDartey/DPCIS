@@ -170,6 +170,7 @@ class Question(Base):
     )
     extracted_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     pdf_options_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    option_layout: Mapped[str | None] = mapped_column(Text, nullable=True)
     pdf_warnings: Mapped[str | None] = mapped_column(Text, nullable=True)
     pdf_confidence: Mapped[Decimal | None] = mapped_column(Numeric(3, 2), nullable=True)
     position: Mapped[int] = mapped_column(Integer, nullable=False)

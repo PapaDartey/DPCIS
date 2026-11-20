@@ -1,0 +1,14 @@
+{
+  "errors": [
+    "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "httpFailures": [
+    {
+      "status": 409,
+      "path": "/api/admin/exams/c50540f0-768e-4b5d-9df1-093f869d839b/questions/1d87ade4-df5d-4633-b409-5371e1d6f9a6/option-layout/preview/ced448e5-5fc6-48ee-8c42-126892181c74",
+      "body": {
+        "detail": "Separate answers only on a draft examination"
+      }
+    }
+  ]
+}

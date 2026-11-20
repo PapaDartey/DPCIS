@@ -1,0 +1,61 @@
+
+> examination-hub-frontend@0.1.0 build
+> tsc -b && vite build
+
+vite v6.4.6 building for production...
+transforming...
+✓ 1956 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                          2.54 kB │ gzip:   0.98 kB
+dist/assets/dps-logo-tile-128-DnmSzPi1.webp              4.97 kB
+dist/assets/dps-logo-128-Dnt07j06.webp                   7.30 kB
+dist/assets/dps-logo-tile-256-BKPxDI4n.webp             13.72 kB
+dist/assets/dps-logo-256-Dvk-aGoM.webp                  18.45 kB
+dist/assets/dps-logo-tile-512-B9jF8KBq.webp             36.31 kB
+dist/assets/dps-logo-512-C2gQk_X-.webp                  45.74 kB
+dist/assets/hr-slide-1-lab@1280-CUttvIUy.webp           85.71 kB
+dist/assets/hr-slide-4-debate@1280-B2BJOS9c.webp       121.59 kB
+dist/assets/hr-slide-1-lab@1920-BR8f-WUW.webp          137.24 kB
+dist/assets/hr-slide-0-building@1280-DRejW1Lj.webp     158.34 kB
+dist/assets/hr-slide-2-classroom@1280-CFVIJ2MC.webp    165.29 kB
+dist/assets/hr-slide-4-debate@1920-BIFcRjBU.webp       209.46 kB
+dist/assets/hr-slide-3-sports@1280-BoP-9FG0.webp       248.65 kB
+dist/assets/hr-slide-0-building@1920-C8akvBm2.webp     272.44 kB
+dist/assets/hr-slide-2-classroom@1920-8vjNqlrs.webp    295.89 kB
+dist/assets/hr-slide-3-sports@1920-BEHsxw-s.webp       304.32 kB
+dist/assets/pdf.worker.min-yatZIOMy.mjs              1,375.84 kB
+dist/assets/index-BpRt0LQh.css                          84.62 kB │ gzip:  16.59 kB
+dist/assets/pdf.worker.min-ocdtAcA3.js                   0.07 kB │ gzip:   0.09 kB
+dist/assets/arrow-right-B_-jI7CF.js                      0.34 kB │ gzip:   0.27 kB
+dist/assets/circle-minus-CSTsPZBh.js                     0.34 kB │ gzip:   0.27 kB
+dist/assets/circle-check-CuAxYNzS.js                     0.35 kB │ gzip:   0.27 kB
+dist/assets/clock-CW7lnrn2.js                            0.35 kB │ gzip:   0.27 kB
+dist/assets/info-Jc6CdIc-.js                             0.37 kB │ gzip:   0.28 kB
+dist/assets/lock-vfcVaQL7.js                             0.37 kB │ gzip:   0.29 kB
+dist/assets/circle-x-DgRKyMyh.js                         0.37 kB │ gzip:   0.28 kB
+dist/assets/flag-DdOdndAi.js                             0.39 kB │ gzip:   0.31 kB
+dist/assets/timer-C0Ye5yet.js                            0.41 kB │ gzip:   0.29 kB
+dist/assets/segmented-control-DX_jdcno.js                0.46 kB │ gzip:   0.29 kB
+dist/assets/save-BN6TELTf.js                             0.50 kB │ gzip:   0.33 kB
+dist/assets/ExamStatusBadge-D_7AB2Dx.js                  0.80 kB │ gzip:   0.35 kB
+dist/assets/badge-B_z9t3NX.js                            0.94 kB │ gzip:   0.45 kB
+dist/assets/AdminExamNewPage-8htGhJcF.js                 1.09 kB │ gzip:   0.67 kB
+dist/assets/studentApi-Mnrzk2KJ.js                       3.16 kB │ gzip:   1.37 kB
+dist/assets/AuthenticatedPdfImage-CwIbl14A.js            4.36 kB │ gzip:   1.75 kB
+dist/assets/AttemptDetailDialog-C7cM-CIT.js              6.56 kB │ gzip:   2.01 kB
+dist/assets/adminUtils-u-qyKXar.js                       6.98 kB │ gzip:   2.56 kB
+dist/assets/StudentExamInstructionsPage-DAe_imy7.js      7.51 kB │ gzip:   2.40 kB
+dist/assets/AdminDashboardPage-eWxaOcEP.js               9.31 kB │ gzip:   3.07 kB
+dist/assets/AdminOverviewPage-BEXdm3os.js                9.34 kB │ gzip:   2.48 kB
+dist/assets/popover-JQqW_zUn.js                          9.94 kB │ gzip:   3.37 kB
+dist/assets/AdminExamResultsPage-DXihdfLn.js            11.07 kB │ gzip:   3.34 kB
+dist/assets/ExamSettingsForm-CXHJ0_qv.js                13.45 kB │ gzip:   3.78 kB
+dist/assets/AdminResultsPage-nKWn8OOa.js                13.84 kB │ gzip:   4.03 kB
+dist/assets/StudentDashboardPage-BypSKn1y.js            15.35 kB │ gzip:   4.54 kB
+dist/assets/StudentResultPage-YUArb4bg.js               15.97 kB │ gzip:   3.78 kB
+dist/assets/StudentAttemptPage-CXZo9Dk3.js              27.25 kB │ gzip:   8.17 kB
+dist/assets/AdminExamEditorPage-BC_GOcPt.js             81.99 kB │ gzip:  22.17 kB
+dist/assets/pdf-CcZYcL52.js                            365.12 kB │ gzip: 107.61 kB
+dist/assets/index-27tJh7Mt.js                          366.18 kB │ gzip: 113.28 kB
+✓ built in 2.65s

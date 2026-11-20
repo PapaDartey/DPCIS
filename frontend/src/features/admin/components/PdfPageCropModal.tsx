@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Crop, Move, ZoomIn, ZoomOut } from "lucide-react";
 
 import { AuthenticatedPdfImage } from "@/components/exam/AuthenticatedPdfImage";
@@ -20,6 +20,7 @@ interface Props {
   initialRegion: PageCropRegion;
   title?: string;
   busy?: boolean;
+  minCropHeight?: number;
   onApply: (region: PageCropRegion) => Promise<void> | void;
 }
 
@@ -29,11 +30,12 @@ function clampBox(
   box: [number, number, number, number],
   width: number,
   height: number,
+  minHeight = MIN_CROP_PT,
 ): [number, number, number, number] {
   const x0 = Math.max(0, Math.min(width - 10, box[0]));
-  const y0 = Math.max(0, Math.min(height - MIN_CROP_PT, box[1]));
+  const y0 = Math.max(0, Math.min(height - minHeight, box[1]));
   const x1 = Math.max(x0 + 10, Math.min(width, box[2]));
-  const y1 = Math.max(y0 + MIN_CROP_PT, Math.min(height, box[3]));
+  const y1 = Math.max(y0 + minHeight, Math.min(height, box[3]));
   return [
     Math.round(x0 * 10) / 10,
     Math.round(y0 * 10) / 10,
@@ -51,8 +53,10 @@ export function PdfPageCropModal({
   initialRegion,
   title = "Crop question from PDF page",
   busy = false,
+  minCropHeight = MIN_CROP_PT,
   onApply,
 }: Props) {
+  const cropId = useId();
   const totalPages = Math.max(1, pageDimensions.length);
   const [page, setPage] = useState(initialRegion.page);
   const [bbox, setBbox] = useState<[number, number, number, number]>(initialRegion.bbox);
@@ -102,7 +106,7 @@ export function PdfPageCropModal({
         Math.max(startPt[0], currentPt[0]),
         Math.max(startPt[1], currentPt[1]),
       ];
-      setBbox(clampBox(raw, pageWidth, pageHeight));
+      setBbox(clampBox(raw, pageWidth, pageHeight, minCropHeight));
     };
     const cleanup = () => {
       window.removeEventListener("pointermove", onMove);
@@ -145,7 +149,7 @@ export function PdfPageCropModal({
         if (kind.includes("n")) next[1] = startBox[1] + dy;
         if (kind.includes("s")) next[3] = startBox[3] + dy;
       }
-      setBbox(clampBox(next, pageWidth, pageHeight));
+      setBbox(clampBox(next, pageWidth, pageHeight, minCropHeight));
     };
     const cleanup = () => {
       window.removeEventListener("pointermove", onMove);
@@ -174,14 +178,14 @@ export function PdfPageCropModal({
     const h = bbox[3] - bbox[1];
     const nx0 = Math.max(0, Math.min(pageWidth - w, bbox[0] + dx));
     const ny0 = Math.max(0, Math.min(pageHeight - h, bbox[1] + dy));
-    setBbox(clampBox([nx0, ny0, nx0 + w, ny0 + h], pageWidth, pageHeight));
+    setBbox(clampBox([nx0, ny0, nx0 + w, ny0 + h], pageWidth, pageHeight, minCropHeight));
   };
 
   const switchPage = (nextPage: number) => {
     const clamped = Math.max(1, Math.min(totalPages, nextPage));
     const [nextW, nextH] = pageDimensions[clamped - 1] ?? [595, 842];
     setPage(clamped);
-    setBbox((prev) => clampBox(prev, nextW, nextH));
+    setBbox((prev) => clampBox(prev, nextW, nextH, minCropHeight));
   };
 
   return (
@@ -292,7 +296,21 @@ export function PdfPageCropModal({
           </Button>
         </div>
 
-        <div className="max-h-[calc(100dvh-16rem)] overflow-auto rounded-lg border border-border bg-muted/40 p-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {["Left", "Top", "Right", "Bottom"].map((name, coordinate) => (
+            <label key={name} htmlFor={`${cropId}-${name}`} className="min-w-0 text-xs font-medium">
+              {name} (pt)
+              <input id={`${cropId}-${name}`} aria-label={`Crop ${name.toLowerCase()}`}
+                type="number" step="0.5" disabled={busy}
+                className="mt-1 min-h-11 w-full min-w-0 rounded-md border border-input bg-background p-2 text-sm"
+                value={Number(bbox[coordinate].toFixed(2))}
+                onChange={(event) => setBbox((previous) => previous.map((value, index) =>
+                  index === coordinate ? Number(event.target.value) : value,
+                ) as [number, number, number, number])} />
+            </label>
+          ))}
+        </div>
+        <div className="max-h-[calc(100dvh-20rem)] overflow-auto rounded-lg border border-border bg-muted/40 p-3">
           <div
             ref={canvasRef}
             onPointerDown={startDraw}

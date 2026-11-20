@@ -69,10 +69,10 @@
 .student-console .student-mobile-controls { display: none; }
 .student-console.student-focus .mcq-option-card[data-selected="true"] { background: #0f1a13; border-color: #0f1a13; color: #fff; }
 .student-console.student-focus .mcq-option-card[data-selected="true"] span { color: #fff; }
-.student-console.student-focus fieldset:has(img) > div { grid-template-columns: repeat(4,minmax(0,1fr)); }
-.student-console.student-focus fieldset:has(img) .mcq-option-card { min-height: 60px; justify-content: center; align-items: center; padding: 8px; }
-.student-console.student-focus fieldset:has(img) .mcq-option-card > span:nth-of-type(2) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.student-console.student-focus fieldset:has(img) .mcq-option-card > span:first-of-type { margin: 0; border: 0; background: transparent; font-size: 18px; }
+.student-console.student-focus fieldset[data-options-in-image="true"] > div { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.student-console.student-focus fieldset[data-options-in-image="true"] .mcq-option-card { min-height: 60px; justify-content: center; align-items: center; padding: 8px; }
+.student-console.student-focus fieldset[data-options-in-image="true"] .mcq-option-card > span:nth-of-type(2) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.student-console.student-focus fieldset[data-options-in-image="true"] .mcq-option-card > span:first-of-type { margin: 0; border: 0; background: transparent; font-size: 18px; }
 @media (max-width: 1024px) {
   .student-console .student-dashboard-grid, .student-console .student-instructions-grid, .student-console .student-result-grid, .student-console .student-attempt-grid { grid-template-columns: 1fr; }
   .student-console .student-kpis { grid-template-columns: 1fr; }
@@ -87,6 +87,6 @@
   .student-console .student-spotlight { padding: 24px 20px; }
   .student-console .student-spotlight-score { width: 100%; }
   .student-console.student-focus .mcq-option-card { min-height: 60px; }
-  .student-console.student-focus fieldset:has(img) > div { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .student-console.student-focus fieldset[data-options-in-image="true"] > div { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (prefers-reduced-motion: reduce) { .student-console *, .student-console *::before, .student-console *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }

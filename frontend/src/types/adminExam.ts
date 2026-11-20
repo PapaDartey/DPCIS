@@ -64,6 +64,20 @@ export interface ImageRegion {
   bbox_normalized?: number[];
 }
 
+export interface PdfLayoutOption {
+  label: OptionLabel;
+  mode: "image" | "text";
+  option_text: string;
+  regions: ImageRegion[];
+  image_urls?: string[];
+}
+
+export interface PdfOptionLayout {
+  stem: ImageRegion[];
+  options: PdfLayoutOption[];
+  stem_urls?: string[];
+}
+
 export interface QuestionAdminOut {
   id: string;
   question_text: string;
@@ -73,6 +87,7 @@ export interface QuestionAdminOut {
   extracted_text?: string | null;
   image_urls?: string[];
   image_regions?: ImageRegion[];
+  option_layout?: PdfOptionLayout | null;
   pdf_options_text?: Record<string, string>;
   pdf_warnings?: string[];
   pdf_confidence?: DecimalValue | null;

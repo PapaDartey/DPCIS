@@ -220,11 +220,13 @@ export function StudentAttemptPage() {
             totalQuestions={totalQuestions}
             questionText={currentQuestion.question_text}
             imageUrls={currentQuestion.image_urls}
+            optionsInImage={currentQuestion.options_in_image}
             points={currentQuestion.points}
             options={currentQuestion.options.map((opt) => ({
               optionId: opt.id,
               label: opt.label,
               optionText: opt.option_text,
+              imageUrls: opt.image_urls,
             }))}
             selectedOptionId={currentSelection}
             onSelectOption={(optionId) => selectOption(currentQuestion.id, optionId)}

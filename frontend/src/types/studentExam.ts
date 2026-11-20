@@ -41,6 +41,7 @@ export interface AttemptOptionDelivery {
   id: string;
   label: OptionLabel;
   option_text: string;
+  image_urls?: string[];
 }
 
 export interface AttemptQuestionDelivery {
@@ -48,6 +49,7 @@ export interface AttemptQuestionDelivery {
   display_order: number;
   question_text: string;
   image_urls?: string[];
+  options_in_image?: boolean;
   points: string | number;
   options: AttemptOptionDelivery[];
 }

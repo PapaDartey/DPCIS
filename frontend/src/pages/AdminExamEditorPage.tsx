@@ -38,6 +38,7 @@ import { ExamSettingsForm } from "@/features/admin/components/ExamSettingsForm";
 import { ExamStatusBadge } from "@/features/admin/components/ExamStatusBadge";
 import { QuestionListEditor } from "@/features/admin/components/QuestionListEditor";
 import { RecropPanel } from "@/features/admin/components/RecropPanel";
+import { PdfOptionSeparationPanel } from "@/features/admin/components/PdfOptionSeparationPanel";
 import { uniqueIncomingPdfQuestions } from "@/features/admin/importDedup";
 import type { ExamCreate, ExamWithQuestionsAdmin } from "@/types/adminExam";
 
@@ -481,6 +482,9 @@ export function AdminExamEditorPage() {
       </div>
 
       <div hidden={activeSection !== "questions"} className="space-y-6">
+      <PdfOptionSeparationPanel key={exam.updated_at} examId={exam.id} questions={exam.questions}
+        disabled={isReadOnly || hasUnsavedChanges || isSavingQuestions}
+        onApplied={triggerReload} />
       {exam.questions.some((question) => question.source_file_id) ? (
         <RecropPanel examId={exam.id}
           disabled={isReadOnly || hasUnsavedChanges || isSavingQuestions}

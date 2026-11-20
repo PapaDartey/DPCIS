@@ -1,0 +1,25 @@
+{
+  "checks": [
+    "Real admin checkbox persists randomize_options=true",
+    "Preview does not allow confirmation before review",
+    "Keyboard crop coordinates, text mode, regeneration, explicit confirmation",
+    "Separate image answers confirmed without changing marks/answer key",
+    "Admin preview: nine responsive widths without horizontal overflow",
+    "Student text/image options follow API UUID order; UI autosave and refresh preserve selection/deadline",
+    "Both student presentation modes: nine responsive widths without horizontal overflow",
+    "Browser-selected answers graded 100% after mixed PDF option shuffling"
+  ],
+  "widths": [
+    320,
+    360,
+    375,
+    390,
+    412,
+    768,
+    1024,
+    1280,
+    1440
+  ],
+  "consoleErrors": [],
+  "status": "passed"
+}

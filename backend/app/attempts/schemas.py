@@ -56,6 +56,7 @@ class AttemptOptionDelivery(BaseModel):
     id: UUID
     label: OptionLabel
     option_text: str
+    image_urls: list[str] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -67,6 +68,7 @@ class AttemptQuestionDelivery(BaseModel):
     display_order: int
     question_text: str
     image_urls: list[str] = Field(default_factory=list)
+    options_in_image: bool = False
     points: Decimal
     options: list[AttemptOptionDelivery] = Field(default_factory=list)
 

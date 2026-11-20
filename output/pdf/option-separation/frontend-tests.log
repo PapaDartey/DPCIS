@@ -1,0 +1,116 @@
+
+> examination-hub-frontend@0.1.0 test
+> node --experimental-strip-types --test tests/*.test.mjs
+
+(node:20068) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+TAP version 13
+# (node:20071) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: brand assets and slideshow webp files exist under size budget
+ok 1 - brand assets and slideshow webp files exist under size budget
+  ---
+  duration_ms: 2.242542
+  ...
+# Subtest: every route in docs/ui-manifest.md uses a layout/page with BrandLogo
+ok 2 - every route in docs/ui-manifest.md uses a layout/page with BrandLogo
+  ---
+  duration_ms: 4.413417
+  ...
+# Subtest: no legacy wine/crimson hexes remain in index.css or student-console.css
+ok 3 - no legacy wine/crimson hexes remain in index.css or student-console.css
+  ---
+  duration_ms: 0.971458
+  ...
+# (node:20072) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: dependency guard: no local file/link dependencies or dpcis self-reference
+ok 4 - dependency guard: no local file/link dependencies or dpcis self-reference
+  ---
+  duration_ms: 1.922542
+  ...
+# Subtest: dependency guard: rejects local paths and nested self-reference overrides
+ok 5 - dependency guard: rejects local paths and nested self-reference overrides
+  ---
+  duration_ms: 0.200041
+  ...
+# (node:20073) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: adding the same PDF again does not double its questions
+ok 6 - adding the same PDF again does not double its questions
+  ---
+  duration_ms: 0.752708
+  ...
+# Subtest: a different PDF still adds questions, including matching numbers
+ok 7 - a different PDF still adds questions, including matching numbers
+  ---
+  duration_ms: 0.624667
+  ...
+# (node:20074) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# {"legacyStyleBaselineCheck":{"scannedNonTokenFiles":88,"hardcodedHexOutsideTokenFiles":0,"hardcodedRgbOutsideTokenFiles":0,"rawTailwindPaletteClasses":0,"totalColorViolationsOutsideTokenFiles":0,"arbitraryFontSizesOutsideTokenFiles":6,"arbitrarySpacingOutsideTokenFiles":0}}
+# Subtest: legacy-style guard: zero old wine/crimson tokens or retired portal/auth-story classes in frontend/src
+ok 8 - legacy-style guard: zero old wine/crimson tokens or retired portal/auth-story classes in frontend/src
+  ---
+  duration_ms: 35.708292
+  ...
+# Subtest: legacy-style guard: fails on simulated old wine token and allows DPS green tokens
+ok 9 - legacy-style guard: fails on simulated old wine token and allows DPS green tokens
+  ---
+  duration_ms: 0.125167
+  ...
+# Subtest: style baseline metrics scan across frontend/src outside token files
+ok 10 - style baseline metrics scan across frontend/src outside token files
+  ---
+  duration_ms: 7.543375
+  ...
+# (node:20075) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: merge joins same-page bounds and retains ordered later pages
+ok 11 - merge joins same-page bounds and retains ordered later pages
+  ---
+  duration_ms: 1.137875
+  ...
+# Subtest: split keeps page order and enforces minimum height
+ok 12 - split keeps page order and enforces minimum height
+  ---
+  duration_ms: 0.326041
+  ...
+# Subtest: renumber shifts following answer-key positions
+ok 13 - renumber shifts following answer-key positions
+  ---
+  duration_ms: 0.10525
+  ...
+# (node:20076) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: groupParserErrors groups 28 repetitive errors into concise categories
+ok 14 - groupParserErrors groups 28 repetitive errors into concise categories
+  ---
+  duration_ms: 1.007375
+  ...
+# Subtest: groupParserErrors separates crop, answer-key, and formatting groups
+ok 15 - groupParserErrors separates crop, answer-key, and formatting groups
+  ---
+  duration_ms: 0.464583
+  ...
+# Subtest: parseFlexibleAnswerKey normalizes all supported formats
+ok 16 - parseFlexibleAnswerKey normalizes all supported formats
+  ---
+  duration_ms: 0.5195
+  ...
+# (node:20077) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: resolveRouteMetadata returns a unique, accurate document.title for all 12 manifest routes
+ok 17 - resolveRouteMetadata returns a unique, accurate document.title for all 12 manifest routes
+  ---
+  duration_ms: 0.648292
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 143.804125

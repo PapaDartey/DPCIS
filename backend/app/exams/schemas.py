@@ -369,6 +369,7 @@ class QuestionAdminOut(BaseModel):
     extracted_text: str | None = None
     image_urls: list[str] = Field(default_factory=list)
     image_regions: list[dict] = Field(default_factory=list)
+    option_layout: dict | None = None
     pdf_options_text: dict[str, str] = Field(default_factory=dict)
     pdf_warnings: list[str] = Field(default_factory=list)
     pdf_confidence: Decimal | None = None

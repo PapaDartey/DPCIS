@@ -613,7 +613,7 @@ def test_partial_unique_indexes_and_attempt_question_order_uniqueness(
             db.rollback()
 
 
-def test_alembic_infrastructure_has_single_linear_head_0006() -> None:
+def test_alembic_infrastructure_has_single_linear_head_0009() -> None:
     backend_dir = Path(__file__).resolve().parent.parent
     alembic_ini = backend_dir / "alembic.ini"
     alembic_cfg = Config(str(alembic_ini))
@@ -621,10 +621,11 @@ def test_alembic_infrastructure_has_single_linear_head_0006() -> None:
     assert not alembic_cfg.get_main_option("sqlalchemy.url")
 
     script_dir = ScriptDirectory.from_config(alembic_cfg)
-    assert script_dir.get_heads() == ["0008_google_email_proof"]
+    assert script_dir.get_heads() == ["0009_pdf_option_layout"]
 
     history_revs = [rev.revision for rev in script_dir.walk_revisions()]
     assert history_revs == [
+        "0009_pdf_option_layout",
         "0008_google_email_proof",
         "0007_pdf_import_workflow",
         "0006_submission_reason",
@@ -646,6 +647,7 @@ def test_alembic_infrastructure_has_single_linear_head_0006() -> None:
         "0006_submission_reason.py",
         "0007_pdf_import_workflow.py",
         "0008_google_email_proof.py",
+        "0009_pdf_option_layout.py",
     ]
 
 

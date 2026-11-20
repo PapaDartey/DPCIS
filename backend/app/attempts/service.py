@@ -97,6 +97,7 @@ from app.attempts.schemas import (
 )
 from app.auth.dependencies import ROLE_ADMIN, ROLE_STUDENT, AuthIdentity
 from app.exams import models as exam_models
+from app.exams.pdf_option_layout import confirmed_layout, option_assets
 from app.users.models import ApplicationUser
 
 VALID_OPTION_LABELS: tuple[OptionLabel, ...] = ("A", "B", "C", "D")
@@ -538,7 +539,9 @@ def start_attempt(
 
     for display_order, question in enumerate(selected_questions):
         ordered_opts = sorted(question.options, key=lambda o: (o.position, o.id))
-        if exam.randomize_options and not question.source_file_id:
+        if exam.randomize_options and (
+            not question.source_file_id or confirmed_layout(question) is not None
+        ):
             _SYSTEM_RANDOM.shuffle(ordered_opts)
         aq = attempt_models.AttemptQuestion(
             attempt_id=attempt.id,
@@ -653,9 +656,10 @@ def get_attempt_for_delivery(
     question_deliveries: list[AttemptQuestionDelivery] = []
     for aq in aq_rows:
         question = aq.question
+        layout = confirmed_layout(question)
         ordered_opts = (
             sorted(question.options, key=lambda opt: opt.position)
-            if question.source_file_id else
+            if question.source_file_id and layout is None else
             _order_options_by_snapshot(question.options, aq.option_order)
         )
         option_deliveries = [
@@ -663,6 +667,10 @@ def get_attempt_for_delivery(
                 id=opt.id,
                 label=VALID_OPTION_LABELS[idx],
                 option_text=opt.option_text,
+                image_urls=[
+                    f"/api/attempts/{attempt.id}/questions/{question.id}/options/{opt.id}/images/{i}"
+                    for i in option_assets(question, opt)
+                ],
             )
             for idx, opt in enumerate(ordered_opts)
         ]
@@ -670,12 +678,16 @@ def get_attempt_for_delivery(
             AttemptQuestionDelivery(
                 id=question.id,
                 display_order=aq.display_order,
-                question_text=question.question_text,
+                question_text=layout["stem_text"] if layout else question.question_text,
                 image_urls=(
                     [f"/api/attempts/{attempt.id}/questions/{question.id}/images/{i}"
-                     for i, _ in enumerate(json.loads(question.image_regions or "[]"))]
+                     for i, _ in enumerate(
+                         layout["layout"]["stem"] if layout else
+                         json.loads(question.image_regions or "[]")
+                     )]
                     if question.source_file_id else []
                 ),
+                options_in_image=bool(question.source_file_id and layout is None),
                 points=_quantize(question.points),
                 options=option_deliveries,
             )

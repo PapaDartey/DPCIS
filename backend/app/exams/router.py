@@ -33,6 +33,7 @@ from app.config import get_settings
 from app.database.session import get_db
 from app.exams import models as exam_models
 from app.exams import service
+from app.exams.option_layout_routes import router as option_layout_router
 from app.exams.parser import ANSWER_KEY_ENTRY, ANSWER_KEY_ROW
 from app.exams.pdf_import import (
     OCRUnavailable,
@@ -80,6 +81,7 @@ admin_router = APIRouter(
     tags=["admin-exams"],
     dependencies=[Depends(require_admin)],
 )
+admin_router.include_router(option_layout_router)
 
 student_router = APIRouter(
     prefix="/api/exams",
@@ -472,7 +474,9 @@ def update_question_crops_route(
     db: Session = Depends(get_db),
 ) -> CropUpdateResponse:
     service.require_admin_user_id(identity)
-    exam = db.get(exam_models.Exam, exam_id)
+    exam = db.scalar(
+        select(exam_models.Exam).where(exam_models.Exam.id == exam_id).with_for_update()
+    )
     source = db.get(exam_models.ExamSourceFile, source_id)
     if exam is None or exam.status != "DRAFT" or source is None or source.exam_id != exam_id:
         raise HTTPException(status_code=404, detail="Draft PDF source not found")
