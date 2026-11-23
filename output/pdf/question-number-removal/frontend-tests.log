@@ -1,0 +1,30 @@
+
+> examination-hub-frontend@0.1.0 test
+> node --experimental-strip-types --test tests/*.test.mjs
+
+[32m✔ brand assets and slideshow webp files exist under size budget [90m(0.8505ms)[39m[39m
+[32m✔ every route in docs/ui-manifest.md uses a layout/page with BrandLogo [90m(2.525459ms)[39m[39m
+[32m✔ no legacy wine/crimson hexes remain in index.css or student-console.css [90m(1.926625ms)[39m[39m
+[32m✔ dependency guard: no local file/link dependencies or dpcis self-reference [90m(2.301ms)[39m[39m
+[32m✔ dependency guard: rejects local paths and nested self-reference overrides [90m(0.189375ms)[39m[39m
+[32m✔ adding the same PDF again does not double its questions [90m(0.747875ms)[39m[39m
+[32m✔ a different PDF still adds questions, including matching numbers [90m(0.080583ms)[39m[39m
+{"legacyStyleBaselineCheck":{"scannedNonTokenFiles":88,"hardcodedHexOutsideTokenFiles":0,"hardcodedRgbOutsideTokenFiles":0,"rawTailwindPaletteClasses":0,"totalColorViolationsOutsideTokenFiles":0,"arbitraryFontSizesOutsideTokenFiles":6,"arbitrarySpacingOutsideTokenFiles":0}}
+[32m✔ legacy-style guard: zero old wine/crimson tokens or retired portal/auth-story classes in frontend/src [90m(17.395292ms)[39m[39m
+[32m✔ legacy-style guard: fails on simulated old wine token and allows DPS green tokens [90m(0.139167ms)[39m[39m
+[32m✔ style baseline metrics scan across frontend/src outside token files [90m(8.003666ms)[39m[39m
+[32m✔ merge joins same-page bounds and retains ordered later pages [90m(0.773958ms)[39m[39m
+[32m✔ split keeps page order and enforces minimum height [90m(0.278709ms)[39m[39m
+[32m✔ renumber shifts following answer-key positions [90m(0.113125ms)[39m[39m
+[32m✔ groupParserErrors groups 28 repetitive errors into concise categories [90m(0.493ms)[39m[39m
+[32m✔ groupParserErrors separates crop, answer-key, and formatting groups [90m(0.457292ms)[39m[39m
+[32m✔ parseFlexibleAnswerKey normalizes all supported formats [90m(0.509ms)[39m[39m
+[32m✔ resolveRouteMetadata returns a unique, accurate document.title for all 12 manifest routes [90m(0.584084ms)[39m[39m
+[34mℹ tests 17[39m
+[34mℹ suites 0[39m
+[34mℹ pass 17[39m
+[34mℹ fail 0[39m
+[34mℹ cancelled 0[39m
+[34mℹ skipped 0[39m
+[34mℹ todo 0[39m
+[34mℹ duration_ms 115.621791[39m

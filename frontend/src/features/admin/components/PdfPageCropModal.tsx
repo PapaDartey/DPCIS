@@ -9,6 +9,7 @@ import { sourcePageImageUrl } from "@/features/admin/adminApi";
 export interface PageCropRegion {
   page: number;
   bbox: [number, number, number, number];
+  number_bbox?: number[] | null;
 }
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
   title?: string;
   busy?: boolean;
   minCropHeight?: number;
+  allowNumberMask?: boolean;
   onApply: (region: PageCropRegion) => Promise<void> | void;
 }
 
@@ -54,6 +56,7 @@ export function PdfPageCropModal({
   title = "Crop question from PDF page",
   busy = false,
   minCropHeight = MIN_CROP_PT,
+  allowNumberMask = false,
   onApply,
 }: Props) {
   const cropId = useId();
@@ -61,7 +64,8 @@ export function PdfPageCropModal({
   const [page, setPage] = useState(initialRegion.page);
   const [bbox, setBbox] = useState<[number, number, number, number]>(initialRegion.bbox);
   const [zoomPct, setZoomPct] = useState<number>(100);
-  const [mode, setMode] = useState<"edit" | "draw">("edit");
+  const [mode, setMode] = useState<"edit" | "draw" | "number">("edit");
+  const [numberBox, setNumberBox] = useState<number[] | null>(initialRegion.number_bbox ?? null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const dragCleanupRef = useRef<(() => void) | null>(null);
 
@@ -71,6 +75,7 @@ export function PdfPageCropModal({
       setBbox(initialRegion.bbox);
       setZoomPct(100);
       setMode("edit");
+      setNumberBox(initialRegion.number_bbox ?? null);
     }
     return () => {
       dragCleanupRef.current?.();
@@ -93,7 +98,7 @@ export function PdfPageCropModal({
   };
 
   const startDraw = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (mode !== "draw" || busy) return;
+    if (mode === "edit" || busy) return;
     const startPt = clientToPdfPoint(event.clientX, event.clientY);
     if (!startPt) return;
     event.preventDefault();
@@ -106,7 +111,8 @@ export function PdfPageCropModal({
         Math.max(startPt[0], currentPt[0]),
         Math.max(startPt[1], currentPt[1]),
       ];
-      setBbox(clampBox(raw, pageWidth, pageHeight, minCropHeight));
+      if (mode === "number") setNumberBox(raw.map((value) => Math.round(value * 10) / 10));
+      else setBbox(clampBox(raw, pageWidth, pageHeight, minCropHeight));
     };
     const cleanup = () => {
       window.removeEventListener("pointermove", onMove);
@@ -185,6 +191,7 @@ export function PdfPageCropModal({
     const clamped = Math.max(1, Math.min(totalPages, nextPage));
     const [nextW, nextH] = pageDimensions[clamped - 1] ?? [595, 842];
     setPage(clamped);
+    setNumberBox(null);
     setBbox((prev) => clampBox(prev, nextW, nextH, minCropHeight));
   };
 
@@ -214,15 +221,40 @@ export function PdfPageCropModal({
               type="button"
               className="min-h-11"
               disabled={busy}
-              onClick={() => void onApply({ page, bbox })}
+              onClick={() => void onApply({ page, bbox, ...(allowNumberMask && numberBox ? { number_bbox: numberBox } : {}) })}
             >
               {busy ? "Updating crop…" : "Apply crop"}
             </Button>
           </div>
         </div>
+
       }
     >
       <div className="space-y-3">
+        {allowNumberMask ? <div className="space-y-2 rounded-lg border p-3">
+          <p className="text-sm font-medium">Printed question number</p>
+          <p className="text-xs text-muted-foreground">Recognized numbers are removed automatically. For a scan, mark only the printed question number. Check that no question text or diagram is covered.</p>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant={mode === "number" ? "default" : "outline"}
+              className="min-h-11" disabled={busy} onClick={() => {
+                setMode("number");
+                if (!numberBox) setNumberBox([bbox[0] + 2, bbox[1] + 2, Math.min(bbox[2], bbox[0] + 20), Math.min(bbox[3], bbox[1] + 25)]);
+              }}>Mark question number</Button>
+            {numberBox ? <Button type="button" variant="ghost" className="min-h-11" disabled={busy}
+              onClick={() => { setNumberBox(null); setMode("edit"); }}>Clear number area</Button> : null}
+          </div>
+          {mode === "number" ? <p role="status" className="text-xs">Draw a small box around the number, or edit its coordinates below.</p> : null}
+          {numberBox ? <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {["Left", "Top", "Right", "Bottom"].map((name, coordinate) => <label key={name} className="min-w-0 text-xs">
+              Number {name.toLowerCase()} (pt)
+              <input aria-label={`Number area ${name.toLowerCase()}`} type="number" step="0.5" disabled={busy}
+                className="mt-1 min-h-11 w-full min-w-0 rounded-md border border-input bg-background p-2 text-sm"
+                value={Number(numberBox[coordinate].toFixed(2))}
+                onChange={(event) => setNumberBox((previous) => previous?.map((value, index) =>
+                  index === coordinate ? Number(event.target.value) : value) ?? null)} />
+            </label>)}
+          </div> : null}
+        </div> : null}
         <div className="flex flex-wrap items-center gap-1.5">
           <Button
             type="button"
@@ -316,7 +348,7 @@ export function PdfPageCropModal({
             onPointerDown={startDraw}
             style={{ width: zoomPct === 100 ? "100%" : `${zoomPct}%` }}
             className={`relative mx-auto select-none bg-white shadow-sm ${
-              mode === "draw" ? "cursor-crosshair touch-none" : ""
+              mode !== "edit" ? "cursor-crosshair touch-none" : ""
             }`}
           >
             <AuthenticatedPdfImage
@@ -362,6 +394,11 @@ export function PdfPageCropModal({
                 );
               })}
             </div>
+            {allowNumberMask && numberBox ? <div aria-label="Question number removal area"
+              className="pointer-events-none absolute border border-dashed border-primary bg-white"
+              style={{ left: `${numberBox[0] / pageWidth * 100}%`, top: `${numberBox[1] / pageHeight * 100}%`,
+                width: `${Math.max(0, numberBox[2] - numberBox[0]) / pageWidth * 100}%`,
+                height: `${Math.max(0, numberBox[3] - numberBox[1]) / pageHeight * 100}%` }} /> : null}
           </div>
         </div>
       </div>

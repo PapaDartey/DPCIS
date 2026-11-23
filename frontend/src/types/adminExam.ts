@@ -61,6 +61,7 @@ export type RegionStatus = "detected" | "needs-review" | "approved";
 export interface ImageRegion {
   page: number;
   bbox: number[];
+  number_bbox?: number[] | null;
   bbox_normalized?: number[];
 }
 

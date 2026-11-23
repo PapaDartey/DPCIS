@@ -98,6 +98,7 @@ from app.attempts.schemas import (
 from app.auth.dependencies import ROLE_ADMIN, ROLE_STUDENT, AuthIdentity
 from app.exams import models as exam_models
 from app.exams.pdf_option_layout import confirmed_layout, option_assets
+from app.exams.pdf_question_numbers import numberless_text
 from app.users.models import ApplicationUser
 
 VALID_OPTION_LABELS: tuple[OptionLabel, ...] = ("A", "B", "C", "D")
@@ -217,9 +218,7 @@ def _load_attempt_for_student(
     student_user_id: UUID,
     for_update: bool = False,
 ) -> attempt_models.ExamAttempt:
-    stmt = select(attempt_models.ExamAttempt).where(
-        attempt_models.ExamAttempt.id == attempt_id
-    )
+    stmt = select(attempt_models.ExamAttempt).where(attempt_models.ExamAttempt.id == attempt_id)
     if for_update:
         stmt = stmt.with_for_update()
     attempt = db.execute(stmt).scalar_one_or_none()
@@ -287,7 +286,9 @@ def _build_question_review_items(
                 )
             )
             .order_by(attempt_models.AttemptQuestion.display_order)
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     )
     aq_by_qid = {aq.question_id: aq for aq in aq_rows}
 
@@ -332,9 +333,7 @@ def _build_result_payload(
 ) -> AttemptResultOut | AttemptSubmittedHiddenOut:
     started_at = ensure_utc(attempt.started_at)
     expires_at = ensure_utc(attempt.expires_at)
-    submitted_at = (
-        ensure_utc(attempt.submitted_at) if attempt.submitted_at is not None else None
-    )
+    submitted_at = ensure_utc(attempt.submitted_at) if attempt.submitted_at is not None else None
 
     if not is_admin and not can_view_student_result(attempt, exam):
         return AttemptSubmittedHiddenOut(
@@ -438,9 +437,7 @@ def start_attempt(
 ) -> AttemptStartResponse:
     """Start a new attempt or idempotently resume the active ``IN_PROGRESS`` sitting."""
     locked_user = db.execute(
-        select(ApplicationUser.id)
-        .where(ApplicationUser.id == student_user_id)
-        .with_for_update()
+        select(ApplicationUser.id).where(ApplicationUser.id == student_user_id).with_for_update()
     ).scalar_one_or_none()
     if locked_user is None:
         raise HTTPException(
@@ -475,7 +472,9 @@ def start_attempt(
                 attempt_models.ExamAttempt.user_id == student_user_id,
             )
             .order_by(attempt_models.ExamAttempt.started_at.desc())
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     )
 
     for existing in existing_attempts:
@@ -508,7 +507,9 @@ def start_attempt(
             .where(exam_models.Question.exam_id == exam.id)
             .options(selectinload(exam_models.Question.options))
             .order_by(exam_models.Question.position, exam_models.Question.id)
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     )
     if not all_questions:
         raise HTTPException(
@@ -639,7 +640,9 @@ def get_attempt_for_delivery(
                 )
             )
             .order_by(attempt_models.AttemptQuestion.display_order)
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     )
 
     answer_rows = list(
@@ -647,7 +650,9 @@ def get_attempt_for_delivery(
             select(attempt_models.StudentAnswer).where(
                 attempt_models.StudentAnswer.attempt_id == attempt.id
             )
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     )
     saved_answers: dict[UUID, UUID | None] = {
         ans.question_id: ans.selected_option_id for ans in answer_rows
@@ -659,8 +664,8 @@ def get_attempt_for_delivery(
         layout = confirmed_layout(question)
         ordered_opts = (
             sorted(question.options, key=lambda opt: opt.position)
-            if question.source_file_id and layout is None else
-            _order_options_by_snapshot(question.options, aq.option_order)
+            if question.source_file_id and layout is None
+            else _order_options_by_snapshot(question.options, aq.option_order)
         )
         option_deliveries = [
             AttemptOptionDelivery(
@@ -678,14 +683,25 @@ def get_attempt_for_delivery(
             AttemptQuestionDelivery(
                 id=question.id,
                 display_order=aq.display_order,
-                question_text=layout["stem_text"] if layout else question.question_text,
+                question_text=(
+                    numberless_text(
+                        layout["stem_text"] if layout else question.question_text,
+                        question.source_number,
+                    )
+                    if question.source_file_id
+                    else question.question_text
+                ),
                 image_urls=(
-                    [f"/api/attempts/{attempt.id}/questions/{question.id}/images/{i}"
-                     for i, _ in enumerate(
-                         layout["layout"]["stem"] if layout else
-                         json.loads(question.image_regions or "[]")
-                     )]
-                    if question.source_file_id else []
+                    [
+                        f"/api/attempts/{attempt.id}/questions/{question.id}/images/{i}"
+                        for i, _ in enumerate(
+                            layout["layout"]["stem"]
+                            if layout
+                            else json.loads(question.image_regions or "[]")
+                        )
+                    ]
+                    if question.source_file_id
+                    else []
                 ),
                 options_in_image=bool(question.source_file_id and layout is None),
                 points=_quantize(question.points),
@@ -987,9 +1003,7 @@ def list_student_attempts(
                 started_at=ensure_utc(attempt.started_at),
                 expires_at=ensure_utc(attempt.expires_at),
                 submitted_at=(
-                    ensure_utc(attempt.submitted_at)
-                    if attempt.submitted_at is not None
-                    else None
+                    ensure_utc(attempt.submitted_at) if attempt.submitted_at is not None else None
                 ),
                 total_questions=attempt.total_questions,
                 result_visible=visible,
@@ -1054,9 +1068,7 @@ def get_admin_exam_results(
             started_at=ensure_utc(attempt.started_at),
             expires_at=ensure_utc(attempt.expires_at),
             submitted_at=(
-                ensure_utc(attempt.submitted_at)
-                if attempt.submitted_at is not None
-                else None
+                ensure_utc(attempt.submitted_at) if attempt.submitted_at is not None else None
             ),
             total_questions=attempt.total_questions,
             correct_answers=attempt.correct_answers,

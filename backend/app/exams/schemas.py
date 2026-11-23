@@ -335,9 +335,7 @@ class QuestionCreate(BaseModel):
 
         expected_labels = list(VALID_OPTION_LABELS[: len(self.options)])
         if labels != expected_labels:
-            raise ValueError(
-                "options must have sequential labels starting at 'A' without gaps"
-            )
+            raise ValueError("options must have sequential labels starting at 'A' without gaps")
 
         seen_texts: set[str] = set()
         for option in self.options:
@@ -437,6 +435,7 @@ class CropRegionInput(BaseModel):
     page: int = Field(ge=1)
     bbox: tuple[float, float, float, float] | None = None
     bbox_normalized: tuple[float, float, float, float] | None = None
+    number_bbox: tuple[float, float, float, float] | None = None
 
     @model_validator(mode="after")
     def _require_bbox_or_normalized(self) -> CropRegionInput:

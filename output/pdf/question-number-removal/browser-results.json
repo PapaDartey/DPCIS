@@ -1,0 +1,37 @@
+{
+  "checks": [
+    "New full-question crops and reviewed split stems prepared from real PDF data",
+    "Shuffled student images: only the application question number; saved answers/order/deadline survive refresh",
+    "Correct selections grade 100% with question and option randomization enabled",
+    "Scanned paper: real UI manual number box, keyboard coordinates, crop regeneration and private image delivery",
+    "Student images and manual crop editor: nine responsive widths without horizontal overflow"
+  ],
+  "widths": [
+    320,
+    360,
+    375,
+    390,
+    412,
+    768,
+    1024,
+    1280,
+    1440
+  ],
+  "orders": [
+    {
+      "display": 1,
+      "source": 1
+    },
+    {
+      "display": 2,
+      "source": 3
+    },
+    {
+      "display": 3,
+      "source": 2
+    }
+  ],
+  "consoleErrors": [],
+  "httpFailures": [],
+  "status": "passed"
+}

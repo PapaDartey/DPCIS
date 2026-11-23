@@ -10,7 +10,7 @@ import {
 } from "@/features/admin/components/PdfPageCropModal";
 import type { ParsedQuestion } from "@/types/adminExam";
 
-type Region = { page: number; bbox: number[] };
+type Region = { page: number; bbox: number[]; number_bbox?: number[] | null };
 
 interface Props {
   examId: string;
@@ -198,12 +198,14 @@ export function PdfCropEditor({ examId, question, pageDimensions, onUpdated }: P
           initialRegion={{
             page: regions[fullPageIndex].page,
             bbox: regions[fullPageIndex].bbox as [number, number, number, number],
+            number_bbox: regions[fullPageIndex].number_bbox,
           }}
+          allowNumberMask={fullPageIndex === 0}
           title={`Question ${question.position}: edit crop on page`}
           busy={saving}
           onApply={async (updated: PageCropRegion) => {
             const next = regions.map((r, idx) =>
-              idx === fullPageIndex ? { page: updated.page, bbox: [...updated.bbox] } : r,
+              idx === fullPageIndex ? { page: updated.page, bbox: [...updated.bbox], number_bbox: updated.number_bbox } : r,
             );
             await commit(next, false);
             setFullPageIndex(null);

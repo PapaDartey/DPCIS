@@ -100,11 +100,11 @@ export function updateQuestionCrops(
   examId: string,
   sourceId: string,
   questionNumber: number,
-  regions: Array<{ page: number; bbox?: number[]; bbox_normalized?: number[] }>,
+  regions: Array<{ page: number; bbox?: number[]; bbox_normalized?: number[]; number_bbox?: number[] | null }>,
   dpi = 220,
   padding = 0,
   strict = true,
-): Promise<{ regions: Array<{ page: number; bbox: number[]; bbox_normalized?: number[] }>; image_urls: string[] }> {
+): Promise<{ regions: Array<{ page: number; bbox: number[]; bbox_normalized?: number[]; number_bbox?: number[] | null }>; image_urls: string[] }> {
   return apiPut(
     `/api/admin/exams/${encodeURIComponent(examId)}/sources/${encodeURIComponent(sourceId)}/questions/${questionNumber}/crops`,
     { body: { regions, dpi, padding, strict }, timeoutMs: 120000 },

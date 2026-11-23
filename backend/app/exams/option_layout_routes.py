@@ -30,6 +30,7 @@ from app.exams.pdf_option_layout import (
     suggest_layout,
     validate_text,
 )
+from app.exams.pdf_question_numbers import numberless_text
 from app.exams.pdf_storage import source_dir
 
 router = APIRouter(tags=["admin-exams"])
@@ -123,7 +124,8 @@ def preview_layout(
         "fingerprint": fingerprint(question),
         "layout": layout.model_dump(mode="json"),
         "preview_id": str(preview_id),
-        "stem_text": stem_text or "Question with a figure. Choose one answer.",
+        "stem_text": numberless_text(stem_text, question.source_number)
+        or "Question with a figure. Choose one answer.",
     }
     if preview_id:
         directory = layout_directory(question.source_file_id, preview_id)

@@ -1023,6 +1023,7 @@ export function BulkParserPanel({
             ],
           }}
           title="Draw new question crop from PDF page"
+          allowNumberMask
           busy={drawNewBusy}
           onApply={async (region: PageCropRegion) => {
             if (!parseResult.source_file_id) return;
@@ -1036,7 +1037,7 @@ export function BulkParserPanel({
                 examId,
                 parseResult.source_file_id,
                 nextNum,
-                [{ page: region.page, bbox: [...region.bbox] }],
+                [{ page: region.page, bbox: [...region.bbox], number_bbox: region.number_bbox }],
                 200,
                 0,
                 false,

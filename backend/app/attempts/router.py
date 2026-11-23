@@ -29,7 +29,7 @@ from app.auth.dependencies import AuthIdentity, require_admin, require_student
 from app.database.session import get_db
 from app.exams import models as exam_models
 from app.exams.pdf_option_layout import asset_bytes, confirmed_layout
-from app.exams.pdf_storage import load_image
+from app.exams.pdf_storage import load_image, student_image_without_number
 
 exam_attempt_student_router = APIRouter(
     prefix="/api/exams",
@@ -90,15 +90,25 @@ def _active_image_question(
 
 @attempts_student_router.get("/{attempt_id}/questions/{question_id}/images/{index}")
 def get_question_image_route(
-    attempt_id: UUID, question_id: UUID, index: int,
-    identity: AuthIdentity = Depends(require_student), db: Session = Depends(get_db),
+    attempt_id: UUID,
+    question_id: UUID,
+    index: int,
+    identity: AuthIdentity = Depends(require_student),
+    db: Session = Depends(get_db),
 ) -> BinaryResponse:
     question = _active_image_question(attempt_id, question_id, identity, db)
     try:
         layout = confirmed_layout(question)
         image = (
             asset_bytes(question.source_file_id, UUID(layout["preview_id"]), "stem", index)
-            if layout else load_image(question.source_file_id, question.source_number, index)
+            if layout
+            else load_image(question.source_file_id, question.source_number, index)
+        )
+        image = student_image_without_number(
+            question,
+            index,
+            image,
+            stem_regions=layout["layout"]["stem"] if layout else None,
         )
     except (FileNotFoundError, ValueError) as exc:
         raise HTTPException(status_code=404, detail="Image not found") from exc
@@ -113,8 +123,12 @@ def get_question_image_route(
     "/{attempt_id}/questions/{question_id}/options/{option_id}/images/{index}"
 )
 def get_option_image_route(
-    attempt_id: UUID, question_id: UUID, option_id: UUID, index: int,
-    identity: AuthIdentity = Depends(require_student), db: Session = Depends(get_db),
+    attempt_id: UUID,
+    question_id: UUID,
+    option_id: UUID,
+    index: int,
+    identity: AuthIdentity = Depends(require_student),
+    db: Session = Depends(get_db),
 ) -> BinaryResponse:
     question = _active_image_question(attempt_id, question_id, identity, db)
     option = db.get(exam_models.QuestionOption, option_id)

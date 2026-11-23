@@ -19,6 +19,7 @@ from pydantic import BaseModel, ConfigDict, Field, FiniteFloat
 
 from app.config import get_settings
 from app.exams.pdf_import import white_crop_border
+from app.exams.pdf_question_numbers import find_question_number, mask_png
 from app.exams.pdf_storage import source_dir
 
 
@@ -269,5 +270,13 @@ def render_layout(doc: fitz.Document, question, layout: LayoutInput) -> dict[str
                 pix = doc[page - 1].get_pixmap(clip=tight, dpi=dpi, alpha=False)
         index = counts.get(part, 0)
         counts[part] = index + 1
-        result[f"{part}-{index}.png"] = pix.tobytes("png")
+        data = pix.tobytes("png")
+        if part == "stem" and original and page == original[0]["page"]:
+            box = original[0].get("number_bbox") or find_question_number(
+                doc[page - 1],
+                fitz.Rect(original[0]["bbox"]),
+                question.source_number,
+            )
+            data = mask_png(data, rect, box)
+        result[f"{part}-{index}.png"] = data
     return result

@@ -663,9 +663,13 @@ def audit_question_crops(doc, questions, bands=None):
                 q.crop_valid = False
 
 
-def render_region(doc: fitz.Document, region: PdfRegion) -> bytes:
+def render_region(doc: fitz.Document, region: PdfRegion, *, number_bbox=None) -> bytes:
+    from app.exams.pdf_question_numbers import mask_png
+
     page = doc[region.page - 1]
-    return page.get_pixmap(clip=fitz.Rect(region.bbox), dpi=RENDER_DPI, alpha=False).tobytes("png")
+    clip = fitz.Rect(region.bbox)
+    data = page.get_pixmap(clip=clip, dpi=RENDER_DPI, alpha=False).tobytes("png")
+    return mask_png(data, clip, number_bbox)
 
 
 def detect_questions_with_ocr(doc: fitz.Document) -> list[PdfQuestion]:

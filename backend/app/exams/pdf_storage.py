@@ -20,6 +20,7 @@ from app.exams.pdf_import import (
     validate_pdf,
     white_crop_border,
 )
+from app.exams.pdf_question_numbers import find_question_number, mask_png, validate_number_bbox
 
 MIN_CROP_HEIGHT = 30.0
 MAX_RENDER_DPI = 300
@@ -93,20 +94,29 @@ def store_pdf(source_id: UUID, data: bytes, questions: list[PdfQuestion]) -> Non
         try:
             for question in questions:
                 regions = []
-                for region in question.regions:
+                for index, region in enumerate(question.regions):
                     page = doc[region.page - 1]
                     bbox = list(region.bbox)
-                    regions.append({
+                    saved = {
                         "page": region.page,
                         "bbox": bbox,
                         "bbox_normalized": _normalize_bbox(bbox, page.rect.width, page.rect.height),
-                    })
+                        "render_bbox": bbox,
+                    }
+                    number_box = (
+                        find_question_number(page, fitz.Rect(bbox), question.number)
+                        if index == 0
+                        else None
+                    )
+                    if number_box:
+                        saved["number_bbox"] = list(number_box)
+                    regions.append(saved)
                 (directory / f"{question.number}.json").write_text(
                     json.dumps(regions), encoding="utf-8"
                 )
                 for index, region in enumerate(question.regions):
                     (directory / f"{question.number}-{index}.png").write_bytes(
-                        render_region(doc, region)
+                        render_region(doc, region, number_bbox=regions[index].get("number_bbox"))
                     )
         finally:
             doc.close()
@@ -127,6 +137,36 @@ def load_image(source_id: UUID, question_number: int, index: int) -> bytes:
     if question_number < 1 or index < 0 or index >= len(load_regions(source_id, question_number)):
         raise FileNotFoundError
     return (source_dir(source_id) / f"{question_number}-{index}.png").read_bytes()
+
+
+def student_image_without_number(question, index: int, data: bytes, *, stem_regions=None) -> bytes:
+    """Presentation-only support for already saved full crops and reviewed stems."""
+    original = json.loads(question.image_regions or "[]")
+    regions = stem_regions if stem_regions is not None else original
+    if not original or not 0 <= index < len(regions):
+        return data
+    first, region = original[0], regions[index]
+    if region["page"] != first["page"]:
+        return data
+    clip = fitz.Rect(region.get("render_bbox", region["bbox"]))
+    box = first.get("number_bbox")
+    if box is None:
+        try:
+            with validate_pdf(
+                (source_dir(question.source_file_id) / "source.pdf").read_bytes()
+            ) as doc:
+                box = find_question_number(
+                    doc[first["page"] - 1], fitz.Rect(first["bbox"]), question.source_number
+                )
+        except (OSError, ValueError, IndexError):
+            return data
+    # Old crops with undocumented padding cannot safely use a guessed pixel map.
+    if "render_bbox" not in region and stem_regions is None:
+        pix = fitz.Pixmap(data)
+        expected = (clip * fitz.Matrix(pix.xres / 72, pix.yres / 72)).irect
+        if (pix.width, pix.height) != (expected.width, expected.height):
+            return data
+    return mask_png(data, clip, box)
 
 
 def render_source_page(source_id: UUID, page_number: int, *, dpi: int = 150) -> bytes:
@@ -200,7 +240,7 @@ def regenerate_crops(
         previous_page = 0
         images: list[bytes] = []
         normalized: list[dict] = []
-        for region in selected:
+        for region_index, region in enumerate(selected):
             page_number = region.get("page")
             if not isinstance(page_number, int) or not 1 <= page_number <= len(doc):
                 raise ValueError("Crop page is outside the PDF")
@@ -238,14 +278,28 @@ def regenerate_crops(
                     "Crop failed: non-white pixels touch the left/right "
                     "or top or bottom 2px border."
                 )
-            images.append(pix.tobytes("png"))
-            normalized.append({
+            manual_box = region.get("number_bbox")
+            if manual_box is not None and region_index != 0:
+                raise ValueError("Select a question-number area only on the first region.")
+            box = (
+                validate_number_bbox(manual_box, fitz.Rect(x0, y0, x1, y1))
+                if manual_box is not None
+                else find_question_number(page, fitz.Rect(x0, y0, x1, y1), question_number)
+                if region_index == 0
+                else None
+            )
+            images.append(mask_png(pix.tobytes("png"), clip, box, required=manual_box is not None))
+            saved = {
                 "page": page_number,
                 "bbox": [x0, y0, x1, y1],
+                "render_bbox": list(clip),
                 "bbox_normalized": _normalize_bbox(
                     [x0, y0, x1, y1], page.rect.width, page.rect.height
                 ),
-            })
+            }
+            if box:
+                saved["number_bbox"] = list(box)
+            normalized.append(saved)
             previous_page = page_number
     finally:
         doc.close()
