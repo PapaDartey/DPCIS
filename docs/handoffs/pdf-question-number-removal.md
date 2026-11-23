@@ -115,4 +115,20 @@ description must include the author's requested note: "I'm also working on a new
 method for handling image-based questions." No further technical details of that
 method have been supplied, and this PR makes no implementation claim about it.
 
-Commit, remote hash verification and PR URL are pending at this checkpoint.
+Feature commit `99a9ce4` was pushed to
+`PapaDartey/DPCIS:codex/pdf-question-number-removal`. The 49 staged feature/test/
+evidence files passed credential scanning and `git diff --cached --check`.
+The source/bundle scan again checked 171+60 files with zero findings.
+
+Opened [PR #19](https://github.com/appiah233/DPCIS/pull/19) against upstream
+`main`, with the problem, example, implementation, executed Friday validation,
+migration prerequisite and limitations explained. Direct GitHub inspection
+confirmed the feature commit as the PR head, an open/mergeable PR, and the
+requested new-method sentence in its body. Application tests were not repeated
+for this publication because all 296 application/test files match the tested
+Friday snapshot. This handoff update changes documentation only.
+
+The unrelated personal-repository publication files and their local ledger row
+remain uncommitted in this checkout; the user explicitly excluded that repository
+from this task. No production migration, deployment, merge or update to PR #18
+was performed.

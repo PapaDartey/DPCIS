@@ -54,3 +54,9 @@ findings total 12 vulnerabilities; no dependency upgrades were made. Temporary
 servers were stopped; no commit/push/PR or production changes for this issue.
 
 Implementation/usage: [handoff](../../../docs/handoffs/pdf-question-number-removal.md).
+
+Publication follow-up (2026-11-23): feature commit `99a9ce4` is pushed to the
+original DPCIS fork and included in [upstream PR #19](https://github.com/appiah233/DPCIS/pull/19).
+All 296 application/test files match the validated Friday snapshot above;
+publication credential/diff checks passed. The PR includes the author's note
+that a new method for handling image-based questions is in progress.
